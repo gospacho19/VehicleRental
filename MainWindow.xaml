@@ -1,0 +1,47 @@
+﻿<Window x:Class="LuxuryCarRental.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:vm="clr-namespace:LuxuryCarRental.ViewModels"
+        xmlns:views="clr-namespace:LuxuryCarRental.Views"
+        mc:Ignorable="d"
+        Title="Luxury Car Rental" Height="450" Width="800">
+
+    <!-- 1) ViewModel→View mapping -->
+    <Window.Resources>
+        <DataTemplate DataType="{x:Type vm:CatalogViewModel}">
+            <views:CatalogView/>
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type vm:CategoryViewModel}">
+            <views:CategoryView/>
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type vm:CartViewModel}">
+            <views:CartView/>
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type vm:CheckoutViewModel}">
+            <views:CheckoutView/>
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type vm:ConfirmationViewModel}">
+            <views:ConfirmationView/>
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type vm:DealsViewModel}">
+            <views:DealsView/>
+        </DataTemplate>
+    </Window.Resources>
+
+    <DockPanel>
+        <!-- 2) Navigation bar bound to your MainViewModel commands -->
+        <StackPanel Orientation="Horizontal" DockPanel.Dock="Top" Margin="5">
+            <Button Content="Catalog"     Command="{Binding ShowCatalogCmd}"     Margin="2"/>
+            <Button Content="Categories"  Command="{Binding ShowCategoryCmd}"    Margin="2"/>
+            <Button Content="Cart"        Command="{Binding ShowCartCmd}"        Margin="2"/>
+            <Button Content="Checkout"    Command="{Binding ShowCheckoutCmd}"    Margin="2"/>
+            <Button Content="Confirm"     Command="{Binding ShowConfirmationCmd}" Margin="2"/>
+            <Button Content="Deals"       Command="{Binding ShowDealsCmd}"       Margin="2"/>
+        </StackPanel>
+
+        <!-- 3) Content area: shows whichever VM is CurrentViewModel -->
+        <ContentControl Content="{Binding CurrentViewModel}" />
+    </DockPanel>
+</Window>

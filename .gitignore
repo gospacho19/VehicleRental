@@ -1,0 +1,22 @@
+# Build outputs
+bin/
+obj/
+
+# Visual Studio user files
+*.user
+*.suo
+.vs/
+
+# Rider settings
+.idea/
+
+# SQLite database (if you don't want to push it)
+*.db
+
+# NuGet packages
+*.nupkg
+packages/
+
+# OS files
+Thumbs.db
+desktop.ini
