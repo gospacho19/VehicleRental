@@ -14,6 +14,8 @@ namespace LuxuryCarRental.Models
         // … any other shared props …
         public VehicleStatus Status { get; set; } = VehicleStatus.Available;
         public VehicleType VehicleType { get; set; }
+
+        public string ImagePath { get; set; } = "";
     }
     // hi
     public enum VehicleType
