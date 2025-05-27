@@ -34,6 +34,7 @@ namespace LuxuryCarRental.ViewModels
             Refresh();
         }
 
+
         public IRelayCommand RefreshCommand { get; }
         public IRelayCommand<Vehicle?> AddToCartCommand { get; }
 

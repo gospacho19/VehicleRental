@@ -8,23 +8,13 @@ namespace LuxuryCarRental
 {
     public partial class MainWindow : Window
     {
-        private readonly IServiceProvider _sp;
-
-        // This is the only constructor. DI will call it.
-        public MainWindow(IServiceProvider sp, MainViewModel vm)
+        public MainWindow(MainViewModel vm)
         {
-            _sp = sp ?? throw new ArgumentNullException(nameof(sp));
-
             InitializeComponent();
 
-            // Bind the shell ViewModel
+            // Hook up the VM
             DataContext = vm ?? throw new ArgumentNullException(nameof(vm));
-
-            // Wire up tab‐selection to load the correct UserControl
-            // NavTabs.SelectionChanged += OnTabChanged;
-
-            // Show first tab by default
-            //NavTabs.SelectedIndex = 0;
         }
     }
+
 }

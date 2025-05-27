@@ -19,6 +19,7 @@ namespace LuxuryCarRental
     public partial class App : Application
     {
         private IServiceProvider? _serviceProvider;
+        public IServiceProvider Services => _serviceProvider!;
 
         protected override void OnStartup(StartupEventArgs e)
         {
@@ -26,6 +27,8 @@ namespace LuxuryCarRental
 
             // 1) Configure services
             var services = new ServiceCollection();
+
+            // services.AddSingleton<IServiceProvider>(sp => sp);
 
             services.AddSingleton<IMessenger, WeakReferenceMessenger>();
 

@@ -22,4 +22,26 @@
     </PackageReference>
   </ItemGroup>
 
+	<ItemGroup>
+		<Content Include="Images\Vehicles\*.jpg">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</Content>
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Content Remove="Images\Vehicles\car1.jpg" />
+	  <Content Remove="Images\Vehicles\luxurycar1.jpg" />
+	  <Content Remove="Images\Vehicles\motorcycle1.jpg" />
+	  <Content Remove="Images\Vehicles\yacht1.jpg" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Resource Include="Images\Vehicles\car1.jpg" />
+	  <Resource Include="Images\Vehicles\luxurycar1.jpg">
+	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+	  </Resource>
+	  <Resource Include="Images\Vehicles\motorcycle1.jpg" />
+	  <Resource Include="Images\Vehicles\yacht1.jpg" />
+	</ItemGroup>
+
 </Project>
