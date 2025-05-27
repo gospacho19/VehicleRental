@@ -1,0 +1,31 @@
+[
+  {
+    "Type": "Car",
+    "Key": "2022 Toyota Camry",
+    "Make": "Toyota",
+    "Model": "Camry",
+    "Year": 2022,
+    "DailyRate": 49.99,
+    "ImageUri": "pack://application:,,,/LuxuryCarRental;component/Images/Vehicles/car1.jpg"
+  },
+  {
+    "Type": "Motorcycle",
+    "Key": "Motorcycle 700cc",
+    "EngineCapacityCc": 700,
+    "HasSidecar": false,
+    "DailyRate": 29.99,
+    "ImageUri": "pack://application:,,,/LuxuryCarRental;component/Images/Vehicles/motorcycle1.jpg"
+  },
+  {
+    "Type": "LuxuryCar",
+    "Key": "2023 Mercedes-Benz S-Class",
+    "Make": "Mercedes-Benz",
+    "Model": "S-Class",
+    "Year": 2023,
+    "DailyRate": 199.99,
+    "SecurityDeposit": 500.0,
+    "IncludesChauffeur": false,
+    "OptionalFeatures": "Leather seats",
+    "ImageUri": "pack://application:,,,/LuxuryCarRental;component/Images/Vehicles/luxurycar1.jpg"
+  }
+]

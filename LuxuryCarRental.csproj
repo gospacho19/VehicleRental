@@ -44,4 +44,11 @@
 	  <Resource Include="Images\Vehicles\yacht1.jpg" />
 	</ItemGroup>
 
+	<ItemGroup>
+		<None Include="Data\vehicles.json">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</None>
+	</ItemGroup>
+
+
 </Project>
