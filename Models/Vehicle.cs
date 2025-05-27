@@ -15,7 +15,7 @@ namespace LuxuryCarRental.Models
         public VehicleStatus Status { get; set; } = VehicleStatus.Available;
         public VehicleType VehicleType { get; set; }
     }
-
+    // hi
     public enum VehicleType
     {
         Car,
