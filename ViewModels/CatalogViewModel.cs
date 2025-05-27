@@ -13,6 +13,11 @@ namespace LuxuryCarRental.ViewModels
 
         public ObservableCollection<Vehicle> Vehicles { get; } = new();
 
+        public IEnumerable<Vehicle> Cars => Vehicles.Where(v => v.VehicleType == VehicleType.Car);
+        public IEnumerable<Vehicle> LuxuryCars => Vehicles.Where(v => v.VehicleType == VehicleType.LuxuryCar);
+        public IEnumerable<Vehicle> Motorcycles => Vehicles.Where(v => v.VehicleType == VehicleType.Motorcycle);
+        public IEnumerable<Vehicle> Yachts => Vehicles.Where(v => v.VehicleType == VehicleType.Yacht);
+
         private readonly IUnitOfWork _uow;           // still used for raw fetch
         private readonly IAvailabilityService _availability;
         private readonly IPricingService _pricing;
@@ -49,6 +54,10 @@ namespace LuxuryCarRental.ViewModels
                 if (_availability.IsAvailable(vehicle.Id, defaultPeriod))
                     Vehicles.Add(vehicle);
             }
+            OnPropertyChanged(nameof(Cars));
+            OnPropertyChanged(nameof(LuxuryCars));
+            OnPropertyChanged(nameof(Motorcycles));
+            OnPropertyChanged(nameof(Yachts));
         }
 
         private void OnAddToCart(Vehicle? vehicle)
