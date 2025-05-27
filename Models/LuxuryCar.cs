@@ -8,7 +8,7 @@ namespace LuxuryCarRental.Models
 {
     public class LuxuryCar : Car
     {
-        protected LuxuryCar() { } 
+        public LuxuryCar() { } 
 
         public required decimal SecurityDeposit { get; init; }
         public required bool IncludesChauffeur { get; init; }

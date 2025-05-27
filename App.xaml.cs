@@ -72,8 +72,10 @@ namespace LuxuryCarRental
             using (var scope = _serviceProvider.CreateScope())
             {
                 var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-                db.Database.Migrate();
+                db.Database.Migrate();                 // create/upgrade the file
+                SeedData.Initialize(scope.ServiceProvider);  // <-- seed your Vehicles etc.
             }
+
 
             // 4) Show the main window (it will be constructed via DI)
             var mainWindow = _serviceProvider.GetRequiredService<MainWindow>();

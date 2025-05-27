@@ -9,7 +9,7 @@ namespace LuxuryCarRental.Models
     public class Car : Vehicle
     {
         // EF needs this for materialization
-        protected Car() { }
+        public Car() { }
 
         // Car-specific
         public required string Make { get; init; }

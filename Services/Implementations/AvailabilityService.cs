@@ -16,13 +16,22 @@ namespace LuxuryCarRental.Services.Implementations
 
         public bool IsAvailable(int vehicleId, DateRange period)
         {
+            // 1) Quick out if the vehicle isn’t even “Available”
             var vehicle = _ctx.Set<Vehicle>().Find(vehicleId);
-            if (vehicle?.Status != VehicleStatus.Available) return false;
+            if (vehicle?.Status != VehicleStatus.Available)
+                return false;
 
-            return !_ctx.Rentals
-                .Where(r => r.VehicleId == vehicleId && r.Status == RentalStatus.Active)
-                .Any(r => new DateRange(r.StartDate, r.EndDate).Overlaps(period));
+            // 2) Check for any overlapping Active rentals
+            bool hasOverlap = _ctx.Rentals
+                .Where(r => r.VehicleId == vehicleId
+                         && r.Status == RentalStatus.Active)
+                .Any(r => r.StartDate < period.End
+                       && r.EndDate > period.Start);
+
+            // 3) If there’s an overlap, it’s NOT available
+            return !hasOverlap;
         }
+
     }
 }
 

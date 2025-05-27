@@ -8,6 +8,13 @@ namespace LuxuryCarRental.Models
 {
     public class Yacht : Vehicle
     {
-        protected Yacht() { }
+        public Yacht() { }
+
+        // Yacht-specific properties
+        public required decimal LengthInMeters { get; init; }
+        public required int CabinCount { get; init; }
+
+        public override string Name
+            => $"{LengthInMeters}m Yacht with {CabinCount} cabins";
     }
 }
