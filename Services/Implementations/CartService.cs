@@ -27,19 +27,42 @@ namespace LuxuryCarRental.Services.Implementations
         // new – matches ICartService exactly
         public void AddToCart(int customerId, Vehicle vehicle, DateRange period, IEnumerable<string> options)
         {
-            // 1) Find or create the basket for this customer
+            // 1) Find or create the basket
             var basket = _ctx.Baskets
                 .Include(b => b.Items)
-                .FirstOrDefault(b => b.CustomerId == customerId)
-                         ?? throw new InvalidOperationException("Basket not found");
+                .FirstOrDefault(b => b.CustomerId == customerId);
 
-            // 2) Create the cart item and add it
-            var item = new CartItem(basket, vehicle, period, options);
+            if (basket == null)
+            {
+                // Ensure the customer exists
+                var customer = _ctx.Customers.Find(customerId)
+                    ?? throw new InvalidOperationException($"Customer {customerId} not found");
+
+                // Use the ctor that fulfills the required nav
+                basket = new Basket(customerId, customer);
+                _ctx.Baskets.Add(basket);
+                _ctx.SaveChanges();  // so basket.Id is set and EF is tracking it
+            }
+
+            // 2) Load the EF-tracked Vehicle instance by its Id
+            var trackedVehicle = _ctx.Vehicles
+                .FirstOrDefault(v => v.Id == vehicle.Id)
+                ?? throw new InvalidOperationException($"Vehicle {vehicle.Id} not found");
+
+            // 3) Create the CartItem with the tracked entities
+            var item = new CartItem(
+                basket: basket,
+                vehicle: trackedVehicle,
+                period: period,
+                options: options
+            );
+
             _ctx.CartItems.Add(item);
 
-            // 3) Persist
+            // 4) Persist
             _ctx.SaveChanges();
         }
+
 
 
         public IEnumerable<CartItem> GetCartItems(int customerId)

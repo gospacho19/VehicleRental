@@ -63,16 +63,25 @@ namespace LuxuryCarRental.ViewModels
                 CurrentViewModel = ConfirmVM;
             });
 
+            // Build your one-and-only Catalog command:
+            ShowCatalogCmd = new RelayCommand(() =>
+            {
+                CatalogVM.RefreshCommand.Execute(null);
+                CurrentViewModel = CatalogVM;
+            });
+
             // 6) Build your commands:
-            ShowCatalogCmd = new RelayCommand(() => CurrentViewModel = CatalogVM);
             ShowCategoryCmd = new RelayCommand(() => CurrentViewModel = CategoryVM);
             ShowCartCmd = new RelayCommand(() => CurrentViewModel = CartVM);
             ShowCheckoutCmd = new RelayCommand(() => CurrentViewModel = CheckoutVM);
             ShowDealsCmd = new RelayCommand(() => CurrentViewModel = DealsVM);
             ShowConfirmationCmd = new RelayCommand(() => CurrentViewModel = ConfirmVM);
 
-            // 7) Start on catalog:
-            CurrentViewModel = CatalogVM;
+           
+
+            // At the end of the ctor, *invoke* it so it runs on startup:
+            ShowCatalogCmd.Execute(null);
+
         }
     }
 }

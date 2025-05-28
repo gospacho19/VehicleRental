@@ -5,6 +5,7 @@ using CommunityToolkit.Mvvm.Input;
 using LuxuryCarRental.Models;
 using LuxuryCarRental.Repositories.Interfaces;
 using LuxuryCarRental.Services.Interfaces;
+using System.Linq;
 
 namespace LuxuryCarRental.ViewModels
 {
@@ -46,14 +47,21 @@ namespace LuxuryCarRental.ViewModels
         private void Refresh()
         {
             Vehicles.Clear();
-            // example uses a 1-day default; you can replace with real date picker
-            var defaultPeriod = new DateRange(DateTime.Today, DateTime.Today.AddDays(1));
 
-            foreach (var vehicle in _uow.Vehicles.GetAll())
+            var day = new DateRange(DateTime.Today, DateTime.Today.AddDays(1));
+
+            // ONLY query the DB for AVAILABLE vehicles
+            var available = _uow.Vehicles
+                                .GetAll()
+                                .Where(v => v.Status == VehicleStatus.Available);
+
+            foreach (var v in available)
             {
-                if (_availability.IsAvailable(vehicle.Id, defaultPeriod))
-                    Vehicles.Add(vehicle);
+                if (_availability.IsAvailable(v.Id, day))
+                    Vehicles.Add(v);
             }
+
+            // tell the UI all four collections have changed
             OnPropertyChanged(nameof(Cars));
             OnPropertyChanged(nameof(LuxuryCars));
             OnPropertyChanged(nameof(Motorcycles));
@@ -64,8 +72,23 @@ namespace LuxuryCarRental.ViewModels
         {
             if (vehicle is null) return;
 
+            // 1) Add to your cart service
             var period = new DateRange(DateTime.Today, DateTime.Today.AddDays(1));
             _cart.AddToCart(1, vehicle, period, Array.Empty<string>());
+
+            // 2) Mark it as no longer available in the DB
+            vehicle.Status = VehicleStatus.Rented;
+
+            // DON’T call _uow.Vehicles.Update(vehicle) here—
+            // EF is already tracking `vehicle`.
+            _uow.Commit();    // this will flush the Status change
+
+            // 3) Remove locally for instant feedback
+            Vehicles.Remove(vehicle);
+            OnPropertyChanged(nameof(Cars));
+            OnPropertyChanged(nameof(LuxuryCars));
+            OnPropertyChanged(nameof(Motorcycles));
+            OnPropertyChanged(nameof(Yachts));
         }
     }
 

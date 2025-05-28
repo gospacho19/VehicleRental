@@ -1,9 +1,10 @@
 ﻿using System;
+using System.IO;
 using System.Linq;
+using System.Text.Json;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using LuxuryCarRental.Models;
-using System.IO;
-using System.Text.Json;
 
 namespace LuxuryCarRental.Data
 {
@@ -14,89 +15,92 @@ namespace LuxuryCarRental.Data
             using var scope = services.CreateScope();
             var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
 
-
-            // -- Load the JSON file --
-            var jsonPath = Path.Combine(
-                AppDomain.CurrentDomain.BaseDirectory,
-                "Data", "vehicles.json"
-            );
-            if (!File.Exists(jsonPath))
-                throw new FileNotFoundException("Missing seed file", jsonPath);
-
-            var json = File.ReadAllText(jsonPath);
-            var seeds = JsonSerializer.Deserialize<List<DTO>>(json)
-                           ?? new List<DTO>();
-
-            // -- Purge any vehicles not in the JSON list --
-            var desiredKeys = seeds.Select(s => s.Key).ToHashSet();
-            var toDelete = context.Vehicles
-                                     .Where(v => !desiredKeys.Contains(v.Name))
-                                     .ToList();
-            if (toDelete.Any())
+            // 1) If there are no vehicles yet, seed once from JSON
+            if (!context.Vehicles.Any())
             {
-                context.Vehicles.RemoveRange(toDelete);
+                var jsonPath = Path.Combine(
+                    AppDomain.CurrentDomain.BaseDirectory,
+                    "Data", "vehicles.json"
+                );
+                if (!File.Exists(jsonPath))
+                    throw new FileNotFoundException("Missing seed file", jsonPath);
+
+                var json = File.ReadAllText(jsonPath);
+                var seeds = JsonSerializer.Deserialize<List<DTO>>(json)
+                            ?? throw new InvalidOperationException("Failed to parse vehicles.json");
+
+                foreach (var s in seeds)
+                {
+                    Vehicle v = s.Type switch
+                    {
+                        "Car" => new Car
+                        {
+                            Make = s.Make!,
+                            Model = s.Model!,
+                            Year = s.Year!.Value,
+                            DailyRate = new Money(s.DailyRate!.Value, "USD"),
+                            VehicleType = VehicleType.Car
+                        },
+                        "Motorcycle" => new Motorcycle
+                        {
+                            EngineCapacityCc = s.EngineCapacityCc!.Value,
+                            HasSidecar = s.HasSidecar!.Value,
+                            DailyRate = new Money(s.DailyRate!.Value, "USD"),
+                            VehicleType = VehicleType.Motorcycle
+                        },
+                        "Yacht" => new Yacht
+                        {
+                            LengthInMeters = s.LengthInMeters!.Value,
+                            CabinCount = s.CabinCount!.Value,
+                            DailyRate = new Money(s.DailyRate!.Value, "USD"),
+                            VehicleType = VehicleType.Yacht
+                        },
+                        "LuxuryCar" => new LuxuryCar
+                        {
+                            Make = s.Make!,
+                            Model = s.Model!,
+                            Year = s.Year!.Value,
+                            DailyRate = new Money(s.DailyRate!.Value, "USD"),
+                            VehicleType = VehicleType.LuxuryCar,
+                            SecurityDeposit = s.SecurityDeposit!.Value,
+                            IncludesChauffeur = s.IncludesChauffeur!.Value,
+                            OptionalFeatures = s.OptionalFeatures!
+                        },
+                        _ => throw new InvalidOperationException($"Unknown type {s.Type}")
+                    };
+
+                    v.ImagePath = s.ImageUri;
+                    // Status is left at its default (Available)
+                    context.Vehicles.Add(v);
+                }
+
                 context.SaveChanges();
             }
 
-            // -- Upsert each seed entry --
-            foreach (var s in seeds)
-            {
-                var existing = context.Vehicles
-                                      .FirstOrDefault(v => v.Name == s.Key);
-
-                // Build the proper Vehicle subclass
-                Vehicle build() => s.Type switch
-                {
-                    "Car" => new Car
-                    {
-                        Make = s.Make!,
-                        Model = s.Model!,
-                        Year = s.Year!.Value,
-                        DailyRate = new Money(s.DailyRate!.Value, "USD"),
-                        VehicleType = VehicleType.Car
-                    },
-                    "Motorcycle" => new Motorcycle
-                    {
-                        EngineCapacityCc = s.EngineCapacityCc!.Value,
-                        HasSidecar = s.HasSidecar!.Value,
-                        DailyRate = new Money(s.DailyRate!.Value, "USD"),
-                        VehicleType = VehicleType.Motorcycle
-                    },
-                    "Yacht" => new Yacht
-                    {
-                        LengthInMeters = s.LengthInMeters!.Value,
-                        CabinCount = s.CabinCount!.Value,
-                        DailyRate = new Money(s.DailyRate!.Value, "USD"),
-                        VehicleType = VehicleType.Yacht
-                    },
-                    "LuxuryCar" => new LuxuryCar
-                    {
-                        Make = s.Make!,
-                        Model = s.Model!,
-                        Year = s.Year!.Value,
-                        DailyRate = new Money(s.DailyRate!.Value, "USD"),
-                        VehicleType = VehicleType.LuxuryCar,
-                        SecurityDeposit = s.SecurityDeposit!.Value,
-                        IncludesChauffeur = s.IncludesChauffeur!.Value,
-                        OptionalFeatures = s.OptionalFeatures!
-                    },
-                    _ => throw new InvalidOperationException($"Unknown type {s.Type}")
-                };
-
-                if (existing == null)
-                {
-                    var v = build();
-                    v.ImagePath = s.ImageUri;
-                    context.Vehicles.Add(v);
-                }
-                else if (existing.ImagePath != s.ImageUri)
-                {
-                    existing.ImagePath = s.ImageUri;
-                    context.Vehicles.Update(existing);
-                }
-            }
-
+            // 2) Seed demo customer & basket as before
+            var demoCustomer = context.Customers
+                .FirstOrDefault(c => c.Id == 1)
+              ?? new Customer
+              {
+                  Id = 1,
+                  FullName = "Demo User",
+                  DriverLicenseNumber = "X1234567",
+                  Contact = new ContactInfo
+                  {
+                      Email = "demo@example.com",
+                      Phone = "+1-800-555-1234"
+                  }
+              };
+            if (context.Entry(demoCustomer).State == EntityState.Detached)
+                context.Customers.Add(demoCustomer);
             context.SaveChanges();
+
+            if (!context.Baskets.Any(b => b.CustomerId == 1))
+            {
+                var basket = new Basket(1, demoCustomer);
+                context.Baskets.Add(basket);
+                context.SaveChanges();
+            }
         }
     }
 }

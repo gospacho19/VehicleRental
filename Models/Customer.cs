@@ -8,7 +8,7 @@ namespace LuxuryCarRental.Models
 {
     public class Customer
     {
-        protected Customer() { } 
+        public Customer() { } 
 
         public int Id { get; set; }
         public required string FullName { get; init; }
