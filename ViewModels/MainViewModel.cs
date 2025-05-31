@@ -101,7 +101,7 @@ namespace LuxuryCarRental.ViewModels
             });
 
             // From RegisterView: “Cancel” → go back to LoginView
-            messenger.Register<GoToLoginMessage>(this, (r, msg) =>
+            messenger.Register<GoToLoginMessage>(this, (_, __) =>
             {
                 CurrentViewModel = LoginVM;
             });
@@ -141,6 +141,8 @@ namespace LuxuryCarRental.ViewModels
             {
                 CurrentViewModel = PaymentInfoVM;
             });
+
+          
 
             // When someone says “GoToDeals”, we show the DealsVM
             messenger.Register<GoToDealsMessage>(this, (r, msg) =>

@@ -12,9 +12,6 @@ namespace LuxuryCarRental.Services.Implementations
             CurrentCustomer = customer;
         }
 
-        public void Clear()
-        {
-            CurrentCustomer = null;
-        }
+        public void ClearCurrentCustomer() => CurrentCustomer = null;
     }
 }
