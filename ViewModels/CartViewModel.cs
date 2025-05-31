@@ -121,8 +121,15 @@ namespace LuxuryCarRental.ViewModels
 
         private void OnProceedToCheckout()
         {
-            // Simply broadcast the navigation message;
-            // MainViewModel will catch it, call CheckoutVM.RefreshCommand, then show CheckoutVM.
+            var current = _session.CurrentCustomer;
+            if (current == null)
+            {
+                // Redirect them to Login instead of Checkout
+                _messenger.Send(new GoToLoginMessage());
+                return;
+            }
+
+            // Otherwise, it’s safe to go to Checkout:
             _messenger.Send(new GoToCheckoutMessage());
         }
     }

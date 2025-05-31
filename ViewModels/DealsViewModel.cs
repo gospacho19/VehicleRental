@@ -1,13 +1,11 @@
-﻿// LuxuryCarRental/ViewModels/DealsViewModel.cs
-using System.Collections.ObjectModel;
-using System.Linq;
-using CommunityToolkit.Mvvm.ComponentModel;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
 using LuxuryCarRental.Handlers.Interfaces;
 using LuxuryCarRental.Messaging;
 using LuxuryCarRental.Models;
-using LuxuryCarRental.Services.Implementations;  // for UserSessionService
+using LuxuryCarRental.Services.Implementations;
+using System.Collections.ObjectModel;
 
 namespace LuxuryCarRental.ViewModels
 {
@@ -58,7 +56,7 @@ namespace LuxuryCarRental.ViewModels
             var current = _session.CurrentCustomer;
             if (current == null)
             {
-                // Optionally: do nothing or show a message
+                // Optionally: show a message or do nothing if not logged in
                 return;
             }
             int customerId = current.Id;
@@ -70,7 +68,7 @@ namespace LuxuryCarRental.ViewModels
                 MyDeals.Add(r);
             }
 
-            // Make sure each Cancel button’s CanExecute is re-evaluated
+            // Re-evaluate "Cancel" button state
             CancelRentalCommand.NotifyCanExecuteChanged();
         }
     }

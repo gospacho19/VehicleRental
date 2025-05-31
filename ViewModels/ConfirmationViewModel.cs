@@ -1,11 +1,12 @@
-﻿// LuxuryCarRental/ViewModels/ConfirmationViewModel.cs
-using System.Collections.Generic;
+﻿using System.Linq;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
 using LuxuryCarRental.Handlers.Interfaces;
 using LuxuryCarRental.Messaging;
 using LuxuryCarRental.Models;
+using LuxuryCarRental.Services.Implementations; // for UserSessionService
+using LuxuryCarRental.Services.Interfaces;
 
 namespace LuxuryCarRental.ViewModels
 {
@@ -13,9 +14,8 @@ namespace LuxuryCarRental.ViewModels
     {
         private readonly ICheckoutHandler _checkout;
         private readonly IMessenger _messenger;
+        private readonly UserSessionService _session;   // ← We now need this
 
-        // старый вариант — три отдельных свойства,
-        // чтобы он работал с вашим XAML
         public Money Total { get; private set; } = default!;
         public IEnumerable<CartItem> Items { get; private set; } = default!;
         public Card PaymentCard { get; private set; } = default!;
@@ -25,17 +25,19 @@ namespace LuxuryCarRental.ViewModels
 
         public ConfirmationViewModel(
             ICheckoutHandler checkout,
-            IMessenger messenger)
+            IMessenger messenger,
+            UserSessionService session)        // ← Added session
         {
             _checkout = checkout;
             _messenger = messenger;
+            _session = session;
 
             ConfirmCommand = new RelayCommand(OnConfirm);
             CancelCommand = new RelayCommand(() =>
                                _messenger.Send(new GoToCatalogMessage()));
         }
 
-        /// <summary>Вызывается MainViewModel-ом после создания VM.</summary>
+        /// <summary>Called by MainViewModel right after creating this VM:</summary>
         public void Initialize(Money total,
                                IEnumerable<CartItem> items,
                                Card paymentCard)
@@ -51,13 +53,22 @@ namespace LuxuryCarRental.ViewModels
 
         private void OnConfirm()
         {
-            // здесь можно передать period и paymentToken,
-            // если они нужны вашему CheckoutHandler’у
-            _checkout.Checkout(customerId: 1,
-                               period: new DateRange(Items.First().StartDate,
-                                                            Items.First().EndDate),
-                               paymentToken: "auth:" + PaymentCard.Id);
+            var current = _session.CurrentCustomer
+                         ?? throw new InvalidOperationException("No user logged in");
 
+            var period = new DateRange(
+                Items.First().StartDate,
+                Items.First().EndDate
+            );
+
+            // Persist a “Rental” (deal) for this exact customer
+            _checkout.Checkout(
+                customerId: current.Id,
+                period: period,
+                paymentToken: "auth:" + PaymentCard.Id
+            );
+
+            // Tell the app to navigate to Deals
             _messenger.Send(new GoToDealsMessage());
         }
     }

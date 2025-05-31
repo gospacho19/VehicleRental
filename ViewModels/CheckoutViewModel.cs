@@ -1,7 +1,6 @@
 ﻿// LuxuryCarRental/ViewModels/CheckoutViewModel.cs
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text.RegularExpressions;
 using CommunityToolkit.Mvvm.ComponentModel;
@@ -12,6 +11,7 @@ using LuxuryCarRental.Messaging;
 using LuxuryCarRental.Models;
 using LuxuryCarRental.Services.Interfaces;
 using LuxuryCarRental.Services.Implementations; // for UserSessionService
+using System.Collections.ObjectModel;
 
 namespace LuxuryCarRental.ViewModels
 {
@@ -22,40 +22,6 @@ namespace LuxuryCarRental.ViewModels
         private readonly IMessenger _messenger;
         private readonly AppDbContext _ctx;
         private readonly UserSessionService _session;
-
-        public CheckoutViewModel(
-            ICartService cart,
-            IPaymentService payments,
-            IMessenger messenger,
-            AppDbContext ctx,
-            UserSessionService session)      // inject the session here
-        {
-            _cart = cart;
-            _payments = payments;
-            _messenger = messenger;
-            _ctx = ctx;
-            _session = session;
-
-            StartDate = DateTime.Today;
-            EndDate = DateTime.Today.AddDays(1);
-
-            _savedCardsRO = new ReadOnlyObservableCollection<Card>(_savedCardsOC);
-            // LoadSavedCards();
-
-            PayCommand = new RelayCommand(OnPay, CanPay);
-            RefreshCommand = new RelayCommand(LoadCartItems);
-            NavigateToPaymentInfoCommand = new RelayCommand(() =>
-                                           _messenger.Send(new GoToPaymentInfoMessage()));
-
-            PropertyChanged += (_, e) =>
-            {
-                if (e.PropertyName is nameof(StartDate) or nameof(EndDate))
-                    UpdateCartItemDates();
-            };
-
-            // LoadCartItems();
-            // PrefillCardIfExists();
-        }
 
         // ───── Dates ───────────────────────────────────────────
         [ObservableProperty] private DateTime _startDate;
@@ -99,39 +65,6 @@ namespace LuxuryCarRental.ViewModels
         private Card? _selectedSavedCard;
         public bool CanEditCard => SelectedSavedCard == null;
 
-        private void LoadSavedCards()
-        {
-            _savedCardsOC.Clear();
-
-            var current = _session.CurrentCustomer
-                         ?? throw new InvalidOperationException("No user logged in");
-
-            foreach (var c in _ctx.Cards
-                                  .Where(c => c.CustomerId == current.Id)
-                                  .OrderBy(c => c.ExpiryYear)
-                                  .ThenBy(c => c.ExpiryMonth))
-            {
-                _savedCardsOC.Add(c);
-            }
-        }
-
-        private void PrefillCardIfExists()
-        {
-            var current = _session.CurrentCustomer
-                         ?? throw new InvalidOperationException("No user logged in");
-
-            var recent = _ctx.Cards
-                             .Where(c => c.CustomerId == current.Id)
-                             .OrderByDescending(c => c.Id)
-                             .FirstOrDefault();
-            if (recent == null) return;
-
-            SelectedSavedCard = recent;
-            CardNumber = recent.CardNumber;
-            Expiry = $"{recent.ExpiryMonth:D2}/{recent.ExpiryYear % 100:D2}";
-            Cvv = recent.Cvv;
-        }
-
         // ───── Cart & totals ──────────────────────────────────
         private List<CartItem> _cartItems = new();
         public List<CartItem> CartItems
@@ -148,10 +81,106 @@ namespace LuxuryCarRental.ViewModels
         public decimal TotalCost =>
             CartItems.Sum(ci => ci.Vehicle.DailyRate.Amount * DurationDays);
 
+        // ───── Commands ───────────────────────────────────────
+        [ObservableProperty] private string _errorMessage = string.Empty;
+
+        public IRelayCommand PayCommand { get; }
+        public IRelayCommand RefreshCommand { get; }
+        public IRelayCommand NavigateToPaymentInfoCommand { get; }
+
+        public CheckoutViewModel(
+            ICartService cart,
+            IPaymentService payments,
+            IMessenger messenger,
+            AppDbContext ctx,
+            UserSessionService session)
+        {
+            _cart = cart;
+            _payments = payments;
+            _messenger = messenger;
+            _ctx = ctx;
+            _session = session;
+
+            StartDate = DateTime.Today;
+            EndDate = DateTime.Today.AddDays(1);
+
+            _savedCardsRO = new ReadOnlyObservableCollection<Card>(_savedCardsOC);
+
+            PayCommand = new RelayCommand(OnPay, CanPay);
+            RefreshCommand = new RelayCommand(LoadCartItems);
+            NavigateToPaymentInfoCommand = new RelayCommand(() =>
+                _messenger.Send(new GoToPaymentInfoMessage()));
+
+            PropertyChanged += (_, e) =>
+            {
+                if (e.PropertyName is nameof(StartDate) or nameof(EndDate))
+                    UpdateCartItemDates();
+            };
+
+            // ───── Listen for CartUpdatedMessage so we reload when Cart changes ─────
+            _messenger.Register<CartUpdatedMessage>(this, (_, msg) =>
+            {
+                var current = _session.CurrentCustomer;
+                if (current != null && msg.CustomerId == current.Id)
+                {
+                    LoadCartItems();
+                }
+            });
+
+            // ───── Only load cart & saved cards if a user is already logged in ─────
+            if (_session.CurrentCustomer != null)
+            {
+                LoadCartItems();
+                PrefillCardIfExists();
+            }
+        }
+
+        private void LoadSavedCards()
+        {
+            _savedCardsOC.Clear();
+
+            var current = _session.CurrentCustomer;
+            if (current == null)
+                return;  // skip if not logged in
+
+            foreach (var c in _ctx.Cards
+                                  .Where(c => c.CustomerId == current.Id)
+                                  .OrderBy(c => c.ExpiryYear)
+                                  .ThenBy(c => c.ExpiryMonth))
+            {
+                _savedCardsOC.Add(c);
+            }
+        }
+
+        private void PrefillCardIfExists()
+        {
+            var current = _session.CurrentCustomer;
+            if (current == null)
+                return;  // skip if not logged in
+
+            var recent = _ctx.Cards
+                             .Where(c => c.CustomerId == current.Id)
+                             .OrderByDescending(c => c.Id)
+                             .FirstOrDefault();
+            if (recent == null) return;
+
+            SelectedSavedCard = recent;
+            CardNumber = recent.CardNumber;
+            Expiry = $"{recent.ExpiryMonth:D2}/{recent.ExpiryYear % 100:D2}";
+            Cvv = recent.Cvv;
+        }
+
         public void LoadCartItems()
         {
-            var current = _session.CurrentCustomer
-                         ?? throw new InvalidOperationException("No user logged in");
+            var current = _session.CurrentCustomer;
+            if (current == null)
+            {
+                // Simply clear out the list instead of throwing:
+                CartItems = new List<CartItem>();
+                OnPropertyChanged(nameof(CartItems));
+                OnPropertyChanged(nameof(TotalCost));
+                return;
+            }
 
             CartItems = _cart.GetCartItems(current.Id).ToList();
             UpdateCartItemDates();
@@ -167,13 +196,6 @@ namespace LuxuryCarRental.ViewModels
             OnPropertyChanged(nameof(TotalCost));
             PayCommand.NotifyCanExecuteChanged();
         }
-
-        // ───── Commands ───────────────────────────────────────
-        [ObservableProperty] private string _errorMessage = string.Empty;
-
-        public IRelayCommand PayCommand { get; }
-        public IRelayCommand RefreshCommand { get; }
-        public IRelayCommand NavigateToPaymentInfoCommand { get; }
 
         private bool CanPay()
         {
@@ -196,23 +218,27 @@ namespace LuxuryCarRental.ViewModels
         {
             ErrorMessage = string.Empty;
 
-            var current = _session.CurrentCustomer
-                         ?? throw new InvalidOperationException("No user logged in");
+            var current = _session.CurrentCustomer;
+            if (current == null)
+            {
+                ErrorMessage = "Please log in before checking out.";
+                return;
+            }
 
             // 1) choose / build Card
             Card cardToCharge = SelectedSavedCard ?? BuildNewCard(current);
 
-            // 2) pre-authorise
+            // 2) pre-authorize (charge the card)
             var totalMoney = new Money(TotalCost, "USD");
             _payments.Charge(cardToCharge, totalMoney);
 
-            // 3) navigate to confirmation
+            // 3) navigate to Confirmation, passing total + items + card
             _messenger.Send(new GoToConfirmationMessage(
                 totalMoney,
                 CartItems.ToList(),
                 cardToCharge));
 
-            // 4) clear manual fields
+            // 4) clear manual entry fields
             CardNumber = string.Empty;
             Expiry = string.Empty;
             Cvv = string.Empty;
