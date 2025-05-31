@@ -1,60 +1,100 @@
-﻿<!-- ProfileView.xaml -->
-<UserControl
+﻿<UserControl
     x:Class="LuxuryCarRental.Views.ProfileView"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d"
-    d:DesignHeight="300"
-    d:DesignWidth="400">
+    d:DesignHeight="500"
+    d:DesignWidth="600">
 
-    <Grid Margin="16">
+    <Grid Margin="20">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
-            <RowDefinition Height="*"/>
+            <!-- Personal info -->
             <RowDefinition Height="Auto"/>
+            <!-- Save button -->
+            <RowDefinition Height="Auto"/>
+            <!-- Divider -->
+            <RowDefinition Height="*"/>
+            <!-- Cards list -->
+            <RowDefinition Height="Auto"/>
+            <!-- Add/Delete buttons -->
+            <RowDefinition Height="Auto"/>
+            <!-- Logout button -->
         </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
 
-        <TextBlock 
-            Text="My Profile"
-            FontSize="20"
-            FontWeight="Bold"
-            Grid.Row="0"
-            Margin="0,0,0,12"/>
+        <!-- Personal Info Fields -->
+        <TextBlock Text="Full Name:" Grid.Row="0" Grid.Column="0" VerticalAlignment="Center"/>
+        <TextBox Grid.Row="0" Grid.Column="1"
+                 Text="{Binding FullName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                 Margin="4"/>
 
-        <StackPanel Grid.Row="1" Orientation="Vertical" VerticalAlignment="Top" Margin="0,0,0,16">
-            <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
-                <TextBlock Text="Full Name:" Width="120" VerticalAlignment="Center"/>
-                <TextBox
-                    Text="{Binding FullName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                    Width="220"/>
-            </StackPanel>
-            <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
-                <TextBlock Text="Driver License:" Width="120" VerticalAlignment="Center"/>
-                <TextBox
-                    Text="{Binding DriverLicenseNumber, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                    Width="220"/>
-            </StackPanel>
-            <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
-                <TextBlock Text="Email:" Width="120" VerticalAlignment="Center"/>
-                <TextBox
-                    Text="{Binding Email, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                    Width="220"/>
-            </StackPanel>
-            <StackPanel Orientation="Horizontal">
-                <TextBlock Text="Phone:" Width="120" VerticalAlignment="Center"/>
-                <TextBox
-                    Text="{Binding Phone, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                    Width="220"/>
-            </StackPanel>
+        <TextBlock Text="Driver's License:" Grid.Row="1" Grid.Column="0" VerticalAlignment="Center"/>
+        <TextBox Grid.Row="1" Grid.Column="1"
+                 Text="{Binding DriverLicenseNumber, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                 Margin="4"/>
+
+        <TextBlock Text="Email:" Grid.Row="2" Grid.Column="0" VerticalAlignment="Center"/>
+        <TextBox Grid.Row="2" Grid.Column="1"
+                 Text="{Binding Email, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                 Margin="4"/>
+
+        <TextBlock Text="Phone:" Grid.Row="3" Grid.Column="0" VerticalAlignment="Center"/>
+        <TextBox Grid.Row="3" Grid.Column="1"
+                 Text="{Binding Phone, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                 Margin="4"/>
+
+        <Button
+            Grid.Row="4"
+            Grid.Column="1"
+            Content="Save Profile"
+            Command="{Binding SaveProfileCommand}"
+            HorizontalAlignment="Right"
+            Padding="8,4"
+            Margin="0,8,0,8"/>
+
+        <Separator Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="2" Margin="0,8"/>
+
+        <!-- Saved Cards List -->
+        <TextBlock Text="Saved Cards:" Grid.Row="6" Grid.Column="0" Grid.ColumnSpan="2" FontWeight="Bold"/>
+
+        <ListBox
+            Grid.Row="7"
+            Grid.Column="0"
+            Grid.ColumnSpan="2"
+            ItemsSource="{Binding SavedCards}"
+            SelectedItem="{Binding SelectedCardToDelete, Mode=TwoWay}"
+            DisplayMemberPath="Nickname"
+            Height="150"
+            Margin="0,4"/>
+
+        <StackPanel Grid.Row="8" Grid.Column="0" Grid.ColumnSpan="2" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,4">
+            <Button
+                Content="Add Card"
+                Command="{Binding AddCardCommand}"
+                Width="100"
+                Margin="4"/>
+            <Button
+                Content="Delete Card"
+                Command="{Binding DeleteCardCommand}"
+                CommandParameter="{Binding SelectedCardToDelete}"
+                Width="100"
+                Margin="4"/>
         </StackPanel>
 
         <Button
-            Grid.Row="2"
-            Content="Save Profile"
-            Command="{Binding SaveCommand}"
-            HorizontalAlignment="Right"
-            Padding="8,4"/>
+            Grid.Row="9"
+            Grid.Column="0"
+            Grid.ColumnSpan="2"
+            Content="Log Out"
+            Command="{Binding LogoutCommand}"
+            HorizontalAlignment="Center"
+            Padding="8,4"
+            Margin="0,12,0,0"/>
     </Grid>
 </UserControl>

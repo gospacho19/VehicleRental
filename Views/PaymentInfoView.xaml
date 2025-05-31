@@ -61,14 +61,12 @@
                 Margin="0,0,8,0"/>
             <Button
                 Content="Edit Card"
-                Command="{Binding EditCardCommand}"
-                IsEnabled="{Binding EditCardCommand.CanExecute(null)}"
+                Command="{Binding EditCardCommand}"          
                 Padding="8,4"
                 Margin="0,0,8,0"/>
             <Button
                 Content="Delete Card"
                 Command="{Binding DeleteCardCommand}"
-                IsEnabled="{Binding DeleteCardCommand.CanExecute(null)}"
                 Padding="8,4"/>
         </StackPanel>
     </Grid>

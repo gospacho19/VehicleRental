@@ -97,11 +97,8 @@
                 Command="{Binding ClearCommand}"
                 Margin="0,0,10,0"/>
 
-            <Button
-                Content="Proceed to Checkout"
-                Command="{Binding DataContext.ShowCheckoutCmd,
-                          RelativeSource={RelativeSource AncestorType=Window}}"
-                Margin="0,0,10,0"/>
+            <Button Content="Proceed to Checkout"
+                    Command="{Binding ProceedToCheckoutCommand}"/>
 
         </StackPanel>
     </Grid>

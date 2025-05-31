@@ -9,7 +9,13 @@ namespace LuxuryCarRental.Services.Interfaces
 {
     public interface IAvailabilityService
     {
-        /// <summary>Returns true if car is free over the given date range.</summary>
-        bool IsAvailable(int vehicleId, DateRange period);
+        /// <summary>
+        /// Returns true when <paramref name="vehicleId"/> is free.
+        /// When <paramref name="ignoreCustomerId"/> is supplied, any
+        /// CartItems that belong to that customer are ignored.
+        /// </summary>
+        bool IsAvailable(int vehicleId,
+                         DateRange period,
+                         int? ignoreCustomerId = null);
     }
 }

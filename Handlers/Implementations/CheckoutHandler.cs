@@ -24,6 +24,7 @@ namespace LuxuryCarRental.Handlers.Implementations
         public IEnumerable<Rental> Checkout(int customerId, DateRange period, string paymentToken)
         {
             // 1) Load all CartItems
+           
             var items = _cart.GetCartItems(customerId).ToList();
             var createdRentals = new List<Rental>();
 

@@ -83,12 +83,14 @@
             <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
                 <TextBlock Text="Use Saved Card:" VerticalAlignment="Center"/>
                 <ComboBox
-                    ItemsSource="{Binding SavedCards}"
-                    DisplayMemberPath="Nickname"
-                    SelectedItem="{Binding SelectedSavedCard, Mode=TwoWay}"
-                    Width="200"
-                    Margin="8,0,0,0"/>
-                <TextBlock
+                        ItemsSource="{Binding SavedCards}"
+                        DisplayMemberPath="Nickname"
+                        SelectedItem="{Binding SelectedSavedCard, Mode=TwoWay}"
+                        IsSynchronizedWithCurrentItem="False"
+                        SelectedIndex="-1"                 
+                                        Width="200"
+                        Margin="8,0,0,0"/>
+                    <TextBlock
                     Text="(optional)"
                     VerticalAlignment="Center"
                     FontStyle="Italic"
@@ -105,9 +107,7 @@
             <!-- 3c) Manual entry fields: bind IsEnabled to CanEditCard -->
             <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
                 <TextBlock
-                    Text="Card #:"
-                    VerticalAlignment="Center"
-                    Width="80"/>
+                    Text="Card #:" VerticalAlignment="Center" Width="80"/>
                 <TextBox
                     Width="120"
                     Text="{Binding CardNumber, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
@@ -116,9 +116,7 @@
             </StackPanel>
             <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
                 <TextBlock
-                    Text="Expiry (MM/YY):"
-                    VerticalAlignment="Center"
-                    Width="80"/>
+                    Text="Expiry (MM/YY):" VerticalAlignment="Center" Width="80"/>
                 <TextBox
                     Width="80"
                     Text="{Binding Expiry, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
@@ -127,9 +125,7 @@
             </StackPanel>
             <StackPanel Orientation="Horizontal">
                 <TextBlock
-                    Text="CVV:"
-                    VerticalAlignment="Center"
-                    Width="80"/>
+                    Text="CVV:" VerticalAlignment="Center" Width="80"/>
                 <TextBox
                     Width="60"
                     Text="{Binding Cvv, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
@@ -140,12 +136,42 @@
         <!-- 4) Spacer -->
         <Grid Grid.Row="3"/>
 
-        <!-- 5) Confirm & Pay button -->
-        <Button
-            Grid.Row="4"
-            Content="Confirm &amp; Pay"
-            Command="{Binding PayCommand}"
-            HorizontalAlignment="Right"
-            Padding="8,4"/>
+        <!-- 5) Error message + Confirm & Pay button -->
+        <StackPanel Grid.Row="4" Orientation="Vertical" Margin="0,12,0,0">
+
+            <!--
+              A TextBlock whose Style collapses it when ErrorMessage is null or empty.
+              By default we set Visibility=Visible, then use DataTriggers to collapse
+              when the underlying string is either "" or null.
+            -->
+            <TextBlock
+                Text="{Binding ErrorMessage}"
+                Foreground="Red"
+                Margin="0,0,0,8">
+                <TextBlock.Style>
+                    <Style TargetType="TextBlock">
+                        <!-- default is to show it -->
+                        <Setter Property="Visibility" Value="Visible"/>
+                        <Style.Triggers>
+                            <!-- if ErrorMessage == "" (empty), collapse -->
+                            <DataTrigger Binding="{Binding ErrorMessage}" Value="">
+                                <Setter Property="Visibility" Value="Collapsed"/>
+                            </DataTrigger>
+                            <!-- if ErrorMessage is null, also collapse -->
+                            <DataTrigger Binding="{Binding ErrorMessage}" Value="{x:Null}">
+                                <Setter Property="Visibility" Value="Collapsed"/>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </TextBlock.Style>
+            </TextBlock>
+
+            <!-- Confirm & Pay button -->
+            <Button
+                Content="Confirm &amp; Pay"
+                Command="{Binding PayCommand}"
+                HorizontalAlignment="Right"
+                Padding="8,4"/>
+        </StackPanel>
     </Grid>
 </UserControl>

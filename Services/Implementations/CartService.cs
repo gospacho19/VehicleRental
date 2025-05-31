@@ -83,28 +83,39 @@ namespace LuxuryCarRental.Services.Implementations
         {
             // 1) Load the CartItem *and* its Vehicle
             var item = _ctx.CartItems
-                               .Include(ci => ci.Vehicle)
-                               .FirstOrDefault(ci => ci.Id == cartItemId);
+                           .Include(ci => ci.Vehicle)
+                           .FirstOrDefault(ci => ci.Id == cartItemId);
             if (item != null)
             {
+                // 2) Reset that vehicle’s status to Available
                 item.Vehicle.Status = VehicleStatus.Available;
+
+                // 3) Remove the CartItem
                 _ctx.CartItems.Remove(item);
+
+                // 4) Persist both changes
                 _ctx.SaveChanges();
             }
         }
 
+
         public void ClearCart(int customerId)
         {
             var items = _ctx.CartItems
-                    .Include(ci => ci.Vehicle)
-                    .Where(ci => ci.Basket.CustomerId == customerId)
-                    .ToList();
+                            .Include(ci => ci.Vehicle)
+                            .Where(ci => ci.Basket.CustomerId == customerId)
+                            .ToList();
 
+            // 1) Mark each vehicle as Available
             foreach (var ci in items)
                 ci.Vehicle.Status = VehicleStatus.Available;
 
+            // 2) Remove all CartItems
             _ctx.CartItems.RemoveRange(items);
+
+            // 3) Persist
             _ctx.SaveChanges();
         }
+
     }
 }

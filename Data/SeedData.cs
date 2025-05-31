@@ -77,30 +77,37 @@ namespace LuxuryCarRental.Data
                 context.SaveChanges();
             }
 
-            // 2) Seed demo customer & basket as before
+            // 2) Seed a “demo” user if none exists
             var demoCustomer = context.Customers
-                .FirstOrDefault(c => c.Id == 1)
-              ?? new Customer
-              {
-                  Id = 1,
-                  FullName = "Demo User",
-                  DriverLicenseNumber = "X1234567",
-                  Contact = new ContactInfo
-                  {
-                      Email = "demo@example.com",
-                      Phone = "+1-800-555-1234"
-                  }
-              };
-            if (context.Entry(demoCustomer).State == EntityState.Detached)
+                   .FirstOrDefault(c => c.Username == "demo");
+            
+              if (demoCustomer == null)
+                   {
+                demoCustomer = new Customer
+                       {
+                    Username = "demo",
+                    PasswordHash = "",      // blank for now
+                    PasswordSalt = "",
+                    FullName = "Demo User",
+                    DriverLicenseNumber = "X1234567",
+                    Contact = new ContactInfo
+                               {
+                    Email = "demo@example.com",
+                    Phone = "+1-800-555-1234"
+                    }
+                       }
+                ;
                 context.Customers.Add(demoCustomer);
-            context.SaveChanges();
-
-            if (!context.Baskets.Any(b => b.CustomerId == 1))
-            {
-                var basket = new Basket(1, demoCustomer);
+                context.SaveChanges(); // demoCustomer.Id is now assigned by EF
+                   }
+            
+               // 3) Ensure DemoUser has a Basket
+               if (!context.Baskets.Any(b => b.CustomerId == demoCustomer.Id))
+                   {
+                var basket = new Basket(demoCustomer.Id, demoCustomer);
                 context.Baskets.Add(basket);
                 context.SaveChanges();
-            }
+                   }
         }
     }
 }

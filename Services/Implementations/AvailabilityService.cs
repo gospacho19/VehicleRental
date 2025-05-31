@@ -14,23 +14,35 @@ namespace LuxuryCarRental.Services.Implementations
         private readonly AppDbContext _ctx;
         public AvailabilityService(AppDbContext ctx) => _ctx = ctx;
 
-        public bool IsAvailable(int vehicleId, DateRange period)
+        // Services/Implementations/AvailabilityService.cs
+        public bool IsAvailable(int vehicleId,
+                                DateRange period,
+                                int? ignoreCustomerId = null)
         {
-            // 1) Quick out if the vehicle isn’t even “Available”
-            var vehicle = _ctx.Set<Vehicle>().Find(vehicleId);
-            if (vehicle?.Status != VehicleStatus.Available)
+            // 0) Vehicle must not be out of service / under repair
+            var vehicle = _ctx.Vehicles.Find(vehicleId);
+            if (vehicle is null || vehicle.Status == VehicleStatus.Maintenance)
                 return false;
 
-            // 2) Check for any overlapping Active rentals
-            bool hasOverlap = _ctx.Rentals
-                .Where(r => r.VehicleId == vehicleId
-                         && r.Status == RentalStatus.Active)
-                .Any(r => r.StartDate < period.End
-                       && r.EndDate > period.Start);
+            // 1) any overlap with confirmed (=Booked/Active) rentals?
+            bool rentalClash = _ctx.Rentals.Any(r =>
+                r.VehicleId == vehicleId &&
+                (r.Status == RentalStatus.Booked || r.Status == RentalStatus.Active) &&   // ← plain OR
+                r.StartDate < period.End &&
+                period.Start < r.EndDate);
 
-            // 3) If there’s an overlap, it’s NOT available
-            return !hasOverlap;
+            if (rentalClash) return false;
+
+            // 2) any overlap with *other people’s* cart items?
+            bool cartClash = _ctx.CartItems.Any(ci =>
+                ci.VehicleId == vehicleId &&
+                (ignoreCustomerId == null || ci.Basket.CustomerId != ignoreCustomerId) &&
+                ci.StartDate < period.End &&
+                period.Start < ci.EndDate);
+
+            return !cartClash;
         }
+
 
     }
 }

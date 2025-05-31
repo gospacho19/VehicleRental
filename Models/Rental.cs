@@ -40,8 +40,5 @@ namespace LuxuryCarRental.Models
             Status = RentalStatus.Booked;
         }
 
-
-
-
     }
 }

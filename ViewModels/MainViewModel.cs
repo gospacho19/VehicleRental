@@ -1,5 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿// LuxuryCarRental/ViewModels/MainViewModel.cs
+using System;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
@@ -10,7 +10,7 @@ namespace LuxuryCarRental.ViewModels
 {
     public class MainViewModel : ObservableObject
     {
-        // 1) Screen VMs, now including confirm:
+        // 1) Screen VMs
         public CatalogViewModel CatalogVM { get; }
         public CategoryViewModel CategoryVM { get; }
         public CartViewModel CartVM { get; }
@@ -19,9 +19,10 @@ namespace LuxuryCarRental.ViewModels
         public DealsViewModel DealsVM { get; }
         public ProfileViewModel ProfileVM { get; }
         public PaymentInfoViewModel PaymentInfoVM { get; }
+        public LoginViewModel LoginVM { get; }
+        public RegisterViewModel RegisterVM { get; }
 
-
-        // 2) The “current” VM shown in your ContentControl:
+        // 2) “Current” VM shown in the ContentControl:
         private object _currentViewModel = null!;
         public object CurrentViewModel
         {
@@ -29,7 +30,7 @@ namespace LuxuryCarRental.ViewModels
             set => SetProperty(ref _currentViewModel, value);
         }
 
-        // 3) All of your navigation commands:
+        // 3) Navigation commands (all must be initialized in ctor)
         public IRelayCommand ShowCatalogCmd { get; }
         public IRelayCommand ShowCategoryCmd { get; }
         public IRelayCommand ShowCartCmd { get; }
@@ -46,8 +47,10 @@ namespace LuxuryCarRental.ViewModels
             CheckoutViewModel checkout,
             ConfirmationViewModel confirm,
             DealsViewModel deals,
-            ProfileViewModel profile,
-            PaymentInfoViewModel paymentInfo,
+            ProfileViewModel profileVm,
+            PaymentInfoViewModel paymentInfoVm,
+            LoginViewModel loginVm,
+            RegisterViewModel registerVm,
             IMessenger messenger)
         {
             // 4) Assign injected VMs:
@@ -57,50 +60,98 @@ namespace LuxuryCarRental.ViewModels
             CheckoutVM = checkout;
             ConfirmVM = confirm;
             DealsVM = deals;
-            ProfileVM = profile;
-            PaymentInfoVM = paymentInfo;
+            ProfileVM = profileVm;
+            PaymentInfoVM = paymentInfoVm;
+            LoginVM = loginVm;
+            RegisterVM = registerVm;
 
+            // 5) Subscribe to messages for navigation:
 
-            // Cart → Checkout
+            // When login succeeds, show the Catalog (and refresh Cart & Checkout Views):
+            messenger.Register<LoginSuccessfulMessage>(this, (r, msg) =>
+            {
+                // A) Refresh cart (so CartVM.Find(…) uses the new CurrentCustomer.Id)
+                cart.RefreshCommand.Execute(null);
+
+                // B) Refresh checkout (load their saved cards + cart items)
+                checkout.RefreshCommand.Execute(null);
+
+                // C) Refresh catalog (mark rented vehicles appropriately)
+                catalog.RefreshCommand.Execute(null);
+
+                // D) Show the Catalog screen
+                CurrentViewModel = catalog;
+            });
+
+            // From LoginView: “Register” button → go to RegisterView
+            messenger.Register<GoToRegisterMessage>(this, (r, msg) =>
+            {
+                CurrentViewModel = RegisterVM;
+            });
+
+            // After a successful registration, return to LoginView (prefill username):
+            messenger.Register<RegistrationSuccessfulMessage>(this, (r, msg) =>
+            {
+                LoginVM.Username = msg.Value;
+                CurrentViewModel = LoginVM;
+            });
+
+            // From RegisterView: “Cancel” → go back to LoginView
+            messenger.Register<GoToLoginMessage>(this, (r, msg) =>
+            {
+                CurrentViewModel = LoginVM;
+            });
+
+            // From anywhere: navigate to CheckoutView
             messenger.Register<GoToCheckoutMessage>(this, (_, __) =>
-                CurrentViewModel = CheckoutVM);
+            {
+                    // First, tell the Checkout VM to reload its cart items (and saved cards)
+                CheckoutVM.RefreshCommand.Execute(null);
+                    // Now show the Checkout screen
+                CurrentViewModel = CheckoutVM;
+            });
 
-            // Checkout → Confirmation
+            // From CheckoutViewModel when payment is done → go to ConfirmationView
             messenger.Register<GoToConfirmationMessage>(this, (r, msg) =>
             {
                 ConfirmVM.Initialize(msg.Total, msg.Items, msg.PaymentCard);
                 CurrentViewModel = ConfirmVM;
             });
 
-            // Build your one-and-only Catalog command:
+            // From anywhere: navigate to ProfileView
+            messenger.Register<GoToProfileMessage>(this, (_, __) =>
+            {
+                CurrentViewModel = ProfileVM;
+            });
+
+            // From anywhere: navigate to PaymentInfoView
+            messenger.Register<GoToPaymentInfoMessage>(this, (_, __) =>
+            {
+                CurrentViewModel = PaymentInfoVM;
+            });
+
+            // When someone says “GoToDeals”, we show the DealsVM
+            messenger.Register<GoToDealsMessage>(this, (r, msg) =>
+            {
+                CurrentViewModel = DealsVM;
+            });
+
+            // 6) Build the navigation commands – all must be non-nullable:
             ShowCatalogCmd = new RelayCommand(() =>
             {
                 CatalogVM.RefreshCommand.Execute(null);
                 CurrentViewModel = CatalogVM;
             });
-
-            // 6) Build your commands:
             ShowCategoryCmd = new RelayCommand(() => CurrentViewModel = CategoryVM);
-            ShowCartCmd = new RelayCommand(() =>
-            {
-                CartVM.RefreshCommand.Execute(null);    
-                CurrentViewModel = CartVM;
-            });
-            ShowCheckoutCmd = new RelayCommand(() =>
-            {
-                // Before showing Checkout, reload cart items there
-                CheckoutVM.LoadCartItems();      // call our new method to refetch current cart
-                CurrentViewModel = CheckoutVM;
-            });
+            ShowCartCmd = new RelayCommand(() => CurrentViewModel = CartVM);
+            ShowCheckoutCmd = new RelayCommand(() => CurrentViewModel = CheckoutVM);
             ShowDealsCmd = new RelayCommand(() => CurrentViewModel = DealsVM);
             ShowConfirmationCmd = new RelayCommand(() => CurrentViewModel = ConfirmVM);
             ShowProfileCmd = new RelayCommand(() => CurrentViewModel = ProfileVM);
             ShowPaymentInfoCmd = new RelayCommand(() => CurrentViewModel = PaymentInfoVM);
 
-
-            // At the end of the ctor, *invoke* it so it runs on startup:
-            ShowCatalogCmd.Execute(null);
-
+            // 7) Finally, show the Login screen at startup:
+            CurrentViewModel = LoginVM;
         }
     }
 }

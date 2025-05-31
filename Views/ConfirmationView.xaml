@@ -1,4 +1,5 @@
-﻿<UserControl 
+﻿<!-- LuxuryCarRental/Views/ConfirmationView.xaml -->
+<UserControl 
     x:Class="LuxuryCarRental.Views.ConfirmationView"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
@@ -10,44 +11,49 @@
 
         <!-- Title with bottom gap -->
         <TextBlock Text="Confirm Your Rental"
-               FontSize="20" 
-               FontWeight="Bold"
-               Margin="0,0,0,10"/>
+                   FontSize="20" 
+                   FontWeight="Bold"
+                   Margin="0,0,0,10"/>
 
-        <!-- List of cars: each TextBlock in the item template has its own bottom margin -->
+        <!-- 1) List of cars: each TextBlock in the item template has its own bottom margin -->
         <ItemsControl ItemsSource="{Binding Items}">
             <ItemsControl.ItemTemplate>
                 <DataTemplate DataType="{x:Type models:CartItem}">
-                    <TextBlock Text="{Binding CarName}" Margin="0,0,0,5"/>
+                    <!-- Display vehicle name and model in each row -->
+                    <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
+                        <TextBlock Text="{Binding Vehicle.Make}" FontWeight="SemiBold"/>
+                        <TextBlock Text="  "/>
+                        <TextBlock Text="{Binding Vehicle.Model}"/>
+                    </StackPanel>
                 </DataTemplate>
             </ItemsControl.ItemTemplate>
         </ItemsControl>
 
-        <!-- Total line -->
+        <!-- 2) Total line -->
         <TextBlock Text="{Binding Total.Amount, StringFormat='Total: {0:C}'}"
-               FontWeight="SemiBold"
-               Margin="0,10,0,10"/>
+                   FontWeight="SemiBold"
+                   Margin="0,10,0,10"/>
 
-        <!-- Payment info heading -->
+        <!-- 3) Payment info heading -->
         <TextBlock Text="Card:" 
-               FontWeight="SemiBold" 
-               Margin="0,0,0,5"/>
+                   FontWeight="SemiBold" 
+                   Margin="0,0,0,5"/>
 
-        <!-- Card number -->
+        <!-- 4) Card number -->
         <TextBlock Text="{Binding PaymentCard.CardNumber, StringFormat='Number: {0}'}"
-               Margin="0,0,0,2"/>
+                   Margin="0,0,0,2"/>
 
-        <!-- Expiry date on one line -->
+        <!-- 5) Expiry date on one line -->
         <TextBlock Margin="0,0,0,20">
-      <Run Text="{Binding PaymentCard.ExpiryMonth}"/>
-      <Run Text="/"/>
-      <Run Text="{Binding PaymentCard.ExpiryYear}"/>
+            <Run Text="{Binding PaymentCard.ExpiryMonth}"/>
+            <Run Text="/"/>
+            <Run Text="{Binding PaymentCard.ExpiryYear}"/>
         </TextBlock>
 
-        <!-- Confirm button -->
+        <!-- 6) Confirm button -->
         <Button Content="Confirm"
-            Command="{Binding ConfirmCommand}"
-            Width="120"
-            HorizontalAlignment="Right"/>
+                Command="{Binding ConfirmCommand}"
+                Width="120"
+                HorizontalAlignment="Right"/>
     </StackPanel>
 </UserControl>

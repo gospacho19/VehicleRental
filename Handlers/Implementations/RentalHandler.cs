@@ -27,26 +27,30 @@ namespace LuxuryCarRental.Handlers.Implementations
             _availability = availability;
         }
 
-        public Rental BookVehicle(int customerId, int VehicleId, DateRange period, IEnumerable<string> options)
+        // Handlers/Implementations/RentalHandler.cs
+        public Rental BookVehicle(int customerId,
+                                  int vehicleId,                     // ← camelCase
+                                  DateRange period,
+                                  IEnumerable<string> options)
         {
-            if (!_availability.IsAvailable(VehicleId, period))
+            // availability guard
+            if (!_availability.IsAvailable(vehicleId, period, customerId))
                 throw new InvalidOperationException("Car not available.");
 
-            // 1) Load the domain objects
+            // load domain objects
             var customer = _ctx.Customers.Find(customerId)
-                         ?? throw new InvalidOperationException("Customer not found.");
-            var vehicle = _ctx.Vehicles.Find(VehicleId)
-                     ?? throw new InvalidOperationException("Vehicle not found.");
+                           ?? throw new InvalidOperationException("Customer not found.");
 
-            // 2) Calculate the price
+            var vehicle = _ctx.Vehicles.Find(vehicleId)
+                           ?? throw new InvalidOperationException("Vehicle not found.");
+
+            // price, create, persist
             var cost = _pricing.CalculateTotal(vehicle, period, options);
-
-            // 3) Create the Rental via the public constructor
-            // new 4-arg constructor
             var rental = new Rental(customer, vehicle, period, cost);
 
+            vehicle.Status = VehicleStatus.Rented;
+            rental.Status = RentalStatus.Active;
 
-            // 4) Persist
             _ctx.Rentals.Add(rental);
             _ctx.SaveChanges();
 
@@ -72,6 +76,7 @@ namespace LuxuryCarRental.Handlers.Implementations
         {
             var r = _ctx.Rentals.Find(rentalId) ?? throw new ArgumentException("Not found");
             r.Status = RentalStatus.Cancelled;
+            r.Vehicle.Status = VehicleStatus.Available;
             _ctx.SaveChanges();
         }
 

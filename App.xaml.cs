@@ -30,12 +30,16 @@ namespace LuxuryCarRental
             var services = new ServiceCollection();
             services.AddSingleton<IMessenger, WeakReferenceMessenger>();
 
+            services.AddSingleton<UserSessionService>();
+
             // EF Core + SQLite
             services.AddDbContext<AppDbContext>(opts =>
                 opts.UseSqlite("Data Source=LuxuryRental.db"));
 
             // Repositories / Unit of Work
             services.AddScoped<IUnitOfWork, EfUnitOfWork>();
+
+            services.AddScoped<IAuthService, AuthService>();
 
             // Services
             services.AddScoped<IPricingService, PricingService>();
@@ -58,6 +62,10 @@ namespace LuxuryCarRental
             services.AddTransient<DealsViewModel>();
             services.AddTransient<ProfileViewModel>();
             services.AddTransient<PaymentInfoViewModel>();
+            services.AddTransient<LoginViewModel>();
+            services.AddTransient<RegisterViewModel>();
+
+
 
             // Views
             services.AddTransient<MainWindow>();
@@ -69,6 +77,8 @@ namespace LuxuryCarRental
             services.AddTransient<DealsView>();
             services.AddTransient<ProfileView>();
             services.AddTransient<PaymentInfoView>();
+            services.AddTransient<LoginView>();
+            services.AddTransient<RegisterView>();
 
             // Build the DI container
             _serviceProvider = services.BuildServiceProvider();
