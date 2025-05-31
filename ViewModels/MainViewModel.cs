@@ -147,8 +147,7 @@ namespace LuxuryCarRental.ViewModels
             {
                 if (_session.CurrentCustomer != null)
                 {
-                    // Optionally refresh deals here if needed:
-                    // DealsVM.RefreshCommand.Execute(null);
+                    DealsVM.RefreshCommand.Execute(null);  // ← refresh here
                     CurrentViewModel = DealsVM;
                 }
                 else
@@ -196,6 +195,7 @@ namespace LuxuryCarRental.ViewModels
                 if (_session.CurrentCustomer != null)
                 {
                     // Optionally: DealsVM.RefreshCommand.Execute(null);
+                    DealsVM.RefreshCommand.Execute(null);
                     CurrentViewModel = DealsVM;
                 }
                 else
