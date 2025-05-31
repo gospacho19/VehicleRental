@@ -1,6 +1,8 @@
 ﻿// LuxuryCarRental/ViewModels/CheckoutViewModel.cs
+
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text.RegularExpressions;
 using CommunityToolkit.Mvvm.ComponentModel;
@@ -11,83 +13,19 @@ using LuxuryCarRental.Messaging;
 using LuxuryCarRental.Models;
 using LuxuryCarRental.Services.Interfaces;
 using LuxuryCarRental.Services.Implementations; // for UserSessionService
-using System.Collections.ObjectModel;
 
 namespace LuxuryCarRental.ViewModels
 {
     public partial class CheckoutViewModel : ObservableObject
     {
+        // ────────── Dependencies ──────────
         private readonly ICartService _cart;
         private readonly IPaymentService _payments;
         private readonly IMessenger _messenger;
         private readonly AppDbContext _ctx;
         private readonly UserSessionService _session;
 
-        // ───── Dates ───────────────────────────────────────────
-        [ObservableProperty] private DateTime _startDate;
-        partial void OnStartDateChanged(DateTime oldValue, DateTime newValue)
-        {
-            if (EndDate <= newValue) EndDate = newValue.AddDays(1);
-            if ((EndDate - StartDate).TotalDays > 30)
-                EndDate = StartDate.AddDays(30);
-            OnPropertyChanged(nameof(DurationDays));
-        }
-
-        [ObservableProperty] private DateTime _endDate;
-        partial void OnEndDateChanged(DateTime oldValue, DateTime newValue)
-        {
-            if (newValue <= StartDate) EndDate = StartDate.AddDays(1);
-            if ((newValue - StartDate).TotalDays > 30)
-                EndDate = StartDate.AddDays(30);
-            OnPropertyChanged(nameof(DurationDays));
-        }
-
-        public int DurationDays => (int)Math.Ceiling((EndDate - StartDate).TotalDays);
-
-        // ───── Manual-entry card fields ───────────────────────
-        [ObservableProperty, NotifyCanExecuteChangedFor(nameof(PayCommand))]
-        private string _cardNumber = string.Empty;
-
-        [ObservableProperty, NotifyCanExecuteChangedFor(nameof(PayCommand))]
-        private string _expiry = string.Empty;               // MM/YY
-
-        [ObservableProperty, NotifyCanExecuteChangedFor(nameof(PayCommand))]
-        private string _cvv = string.Empty;
-
-        [ObservableProperty] private bool _rememberCard;
-
-        // ───── Saved cards ────────────────────────────────────
-        private readonly ObservableCollection<Card> _savedCardsOC = new();
-        private readonly ReadOnlyObservableCollection<Card> _savedCardsRO;
-        public ReadOnlyObservableCollection<Card> SavedCards => _savedCardsRO;
-
-        [ObservableProperty, NotifyCanExecuteChangedFor(nameof(PayCommand))]
-        private Card? _selectedSavedCard;
-        public bool CanEditCard => SelectedSavedCard == null;
-
-        // ───── Cart & totals ──────────────────────────────────
-        private List<CartItem> _cartItems = new();
-        public List<CartItem> CartItems
-        {
-            get => _cartItems;
-            private set
-            {
-                SetProperty(ref _cartItems, value);
-                OnPropertyChanged(nameof(TotalCost));
-                PayCommand.NotifyCanExecuteChanged();
-            }
-        }
-
-        public decimal TotalCost =>
-            CartItems.Sum(ci => ci.Vehicle.DailyRate.Amount * DurationDays);
-
-        // ───── Commands ───────────────────────────────────────
-        [ObservableProperty] private string _errorMessage = string.Empty;
-
-        public IRelayCommand PayCommand { get; }
-        public IRelayCommand RefreshCommand { get; }
-        public IRelayCommand NavigateToPaymentInfoCommand { get; }
-
+        // ────────── Constructor ──────────
         public CheckoutViewModel(
             ICartService cart,
             IPaymentService payments,
@@ -104,81 +42,134 @@ namespace LuxuryCarRental.ViewModels
             StartDate = DateTime.Today;
             EndDate = DateTime.Today.AddDays(1);
 
+            // Initialize the ReadOnly wrapper around our internal ObservableCollection:
             _savedCardsRO = new ReadOnlyObservableCollection<Card>(_savedCardsOC);
 
+            // Commands:
+            RefreshCommand = new RelayCommand(LoadAll);
             PayCommand = new RelayCommand(OnPay, CanPay);
-            RefreshCommand = new RelayCommand(LoadCartItems);
             NavigateToPaymentInfoCommand = new RelayCommand(() =>
                 _messenger.Send(new GoToPaymentInfoMessage()));
 
+            // Any time StartDate/EndDate changes, update the cart item date ranges:
             PropertyChanged += (_, e) =>
             {
                 if (e.PropertyName is nameof(StartDate) or nameof(EndDate))
                     UpdateCartItemDates();
             };
 
-            // ───── Listen for CartUpdatedMessage so we reload when Cart changes ─────
-            _messenger.Register<CartUpdatedMessage>(this, (_, msg) =>
-            {
-                var current = _session.CurrentCustomer;
-                if (current != null && msg.CustomerId == current.Id)
-                {
-                    LoadCartItems();
-                }
-            });
+            // Immediately load (will handle null‐user gracefully):
+            LoadAll();
+        }
 
-            // ───── Only load cart & saved cards if a user is already logged in ─────
-            if (_session.CurrentCustomer != null)
+        // ────────── Date Range Properties ──────────
+        [ObservableProperty]
+        private DateTime _startDate;
+
+        partial void OnStartDateChanged(DateTime oldValue, DateTime newValue)
+        {
+            // Ensure EndDate is always at least one day after StartDate and no more than 30 days:
+            if (EndDate <= newValue) EndDate = newValue.AddDays(1);
+            if ((EndDate - StartDate).TotalDays > 30)
+                EndDate = StartDate.AddDays(30);
+
+            OnPropertyChanged(nameof(DurationDays));
+        }
+
+        [ObservableProperty]
+        private DateTime _endDate;
+
+        partial void OnEndDateChanged(DateTime oldValue, DateTime newValue)
+        {
+            if (newValue <= StartDate) EndDate = StartDate.AddDays(1);
+            if ((newValue - StartDate).TotalDays > 30)
+                EndDate = StartDate.AddDays(30);
+
+            OnPropertyChanged(nameof(DurationDays));
+        }
+
+        public int DurationDays => (int)Math.Ceiling((EndDate - StartDate).TotalDays);
+
+
+        // ────────── Manual‐entry Card Fields ──────────
+        [ObservableProperty]
+        [NotifyCanExecuteChangedFor(nameof(PayCommand))]
+        private string _cardNumber = string.Empty;
+
+        [ObservableProperty]
+        [NotifyCanExecuteChangedFor(nameof(PayCommand))]
+        private string _expiry = string.Empty; // e.g. "01/25"
+
+        [ObservableProperty]
+        [NotifyCanExecuteChangedFor(nameof(PayCommand))]
+        private string _cvv = string.Empty;
+
+        [ObservableProperty]
+        private bool _rememberCard;
+
+
+        // ────────── Saved Cards Collection ──────────
+        // Backing ObservableCollection:
+        private readonly ObservableCollection<Card> _savedCardsOC = new();
+
+        // Read‐only wrapper exposed publicly:
+        private readonly ReadOnlyObservableCollection<Card> _savedCardsRO;
+        public ReadOnlyObservableCollection<Card> SavedCards => _savedCardsRO;
+
+        // The currently‐selected card from the ComboBox.
+        // If its Id == -1, that means “Use a new card” placeholder.
+        [ObservableProperty]
+        [NotifyCanExecuteChangedFor(nameof(PayCommand))]
+        private Card _selectedSavedCard = null!;
+
+
+        // ────────── Cart Items & Total ──────────
+        private List<CartItem> _cartItems = new();
+        public List<CartItem> CartItems
+        {
+            get => _cartItems;
+            private set
             {
-                LoadCartItems();
-                PrefillCardIfExists();
+                SetProperty(ref _cartItems, value);
+                OnPropertyChanged(nameof(TotalCost));
+                PayCommand.NotifyCanExecuteChanged();
             }
         }
 
-        private void LoadSavedCards()
+        public decimal TotalCost =>
+            CartItems.Sum(ci => ci.Vehicle.DailyRate.Amount * DurationDays);
+
+
+        // ────────── Commands ──────────
+        [ObservableProperty]
+        private string _errorMessage = string.Empty;
+
+        public IRelayCommand PayCommand { get; }
+        public IRelayCommand RefreshCommand { get; }
+        public IRelayCommand NavigateToPaymentInfoCommand { get; }
+
+
+        // ────────── Public Methods ──────────
+
+        /// <summary>
+        /// Refresh both cart items and saved cards.
+        /// If no user is logged in, we simply show empty data rather than throwing.
+        /// </summary>
+        private void LoadAll()
         {
-            _savedCardsOC.Clear();
-
-            var current = _session.CurrentCustomer;
-            if (current == null)
-                return;  // skip if not logged in
-
-            foreach (var c in _ctx.Cards
-                                  .Where(c => c.CustomerId == current.Id)
-                                  .OrderBy(c => c.ExpiryYear)
-                                  .ThenBy(c => c.ExpiryMonth))
-            {
-                _savedCardsOC.Add(c);
-            }
+            LoadCartItems();
+            LoadSavedCards();
         }
 
-        private void PrefillCardIfExists()
-        {
-            var current = _session.CurrentCustomer;
-            if (current == null)
-                return;  // skip if not logged in
-
-            var recent = _ctx.Cards
-                             .Where(c => c.CustomerId == current.Id)
-                             .OrderByDescending(c => c.Id)
-                             .FirstOrDefault();
-            if (recent == null) return;
-
-            SelectedSavedCard = recent;
-            CardNumber = recent.CardNumber;
-            Expiry = $"{recent.ExpiryMonth:D2}/{recent.ExpiryYear % 100:D2}";
-            Cvv = recent.Cvv;
-        }
-
+        /// <summary>
+        /// Loads CartItems for the current customer, or empties the list if no one is logged in.
+        /// </summary>
         public void LoadCartItems()
         {
             var current = _session.CurrentCustomer;
             if (current == null)
             {
-                // Simply clear out the list instead of throwing:
                 CartItems = new List<CartItem>();
-                OnPropertyChanged(nameof(CartItems));
-                OnPropertyChanged(nameof(TotalCost));
                 return;
             }
 
@@ -186,34 +177,136 @@ namespace LuxuryCarRental.ViewModels
             UpdateCartItemDates();
         }
 
+        /// <summary>
+        /// When StartDate or EndDate changes, update each CartItem’s StartDate/EndDate
+        /// so the DataGrid subtotal reflects the new duration.
+        /// </summary>
         private void UpdateCartItemDates()
         {
-            foreach (var i in CartItems)
+            foreach (var item in CartItems)
             {
-                i.StartDate = StartDate;
-                i.EndDate = EndDate;
+                item.StartDate = StartDate;
+                item.EndDate = EndDate;
             }
             OnPropertyChanged(nameof(TotalCost));
             PayCommand.NotifyCanExecuteChanged();
         }
 
+        /// <summary>
+        /// Loads SavedCards for the current customer with a dummy placeholder (Id = -1).
+        /// If no user is logged in, we nevertheless add the dummy so the user can still type a new card.
+        /// </summary>
+        private void LoadSavedCards()
+        {
+            _savedCardsOC.Clear();
+
+            var current = _session.CurrentCustomer;
+            if (current == null)
+            {
+                // Add only the placeholder:
+                var dummyNoUser = new Card
+                {
+                    Id = -1,
+                    Nickname = "(Use a new card)",
+                    CardNumber = string.Empty,
+                    ExpiryMonth = 0,
+                    ExpiryYear = 0,
+                    Cvv = string.Empty,
+                    CustomerId = -1
+                };
+                _savedCardsOC.Add(dummyNoUser);
+                SelectedSavedCard = dummyNoUser;
+                return;
+            }
+
+            // 1) First the placeholder for “Use a new card”:
+            var placeholder = new Card
+            {
+                Id = -1,
+                Nickname = "(Use a new card)",
+                CardNumber = string.Empty,
+                ExpiryMonth = 0,
+                ExpiryYear = 0,
+                Cvv = string.Empty,
+                CustomerId = current.Id
+            };
+            _savedCardsOC.Add(placeholder);
+
+            // 2) Then load real cards from the database:
+            var realCards = _ctx.Cards
+                                .Where(c => c.CustomerId == current.Id)
+                                .OrderBy(c => c.ExpiryYear)
+                                .ThenBy(c => c.ExpiryMonth);
+
+            foreach (var c in realCards)
+                _savedCardsOC.Add(c);
+
+            // 3) Set the placeholder as the default selection:
+            SelectedSavedCard = placeholder;
+            PayCommand.NotifyCanExecuteChanged();
+        }
+
+        /// <summary>
+        /// Called whenever the ComboBox selection changes.
+        /// If SelectedSavedCard.Id >= 0, it's a real card—prefill the manual fields for clarity.
+        /// If SelectedSavedCard.Id == -1, it's our “new card” placeholder—clear the manual fields.
+        /// </summary>
+        partial void OnSelectedSavedCardChanged(Card? oldValue, Card? newValue)
+        {
+            if (newValue != null && newValue.Id >= 0)
+            {
+                CardNumber = newValue.CardNumber;
+                Expiry = $"{newValue.ExpiryMonth:D2}/{newValue.ExpiryYear % 100:D2}";
+                Cvv = newValue.Cvv;
+            }
+            else
+            {
+                CardNumber = string.Empty;
+                Expiry = string.Empty;
+                Cvv = string.Empty;
+            }
+
+            PayCommand.NotifyCanExecuteChanged();
+        }
+
+        /// <summary>
+        /// Determines whether the “Confirm & Pay” button is enabled:
+        /// - If any saved card (Id>=0) is selected, we just require that its CardNumber isn't empty.
+        /// - If the placeholder is selected (Id==-1), we require valid manual fields (CardNumber, Expiry, CVV).
+        /// - Also requires at least one cart item.
+        /// </summary>
         private bool CanPay()
         {
+            // 1) Must have at least one cart item
             if (!CartItems.Any()) return false;
 
-            if (SelectedSavedCard != null)
+            // 2) If a saved card is selected (Id >= 0), check that it has a nonempty CardNumber
+            if (SelectedSavedCard != null && SelectedSavedCard.Id >= 0)
+            {
                 return !string.IsNullOrWhiteSpace(SelectedSavedCard.CardNumber);
+            }
 
-            if (string.IsNullOrWhiteSpace(CardNumber) ||
-                string.IsNullOrWhiteSpace(Expiry) ||
-                string.IsNullOrWhiteSpace(Cvv))
+            // 3) Otherwise, we’re in “new card” mode: all three manual fields must be nonblank
+            if (string.IsNullOrWhiteSpace(CardNumber)
+                || string.IsNullOrWhiteSpace(Expiry)
+                || string.IsNullOrWhiteSpace(Cvv))
+            {
                 return false;
+            }
 
+            // 4) Validate expiry format “MM/YY” and CVV format 3–4 digits
             bool okExpiry = Regex.IsMatch(Expiry, @"^(0[1-9]|1[0-2])/[0-9]{2}$");
             bool okCvv = Regex.IsMatch(Cvv, @"^\d{3,4}$");
             return okExpiry && okCvv;
         }
 
+        /// <summary>
+        /// Called when the user clicks Confirm &amp; Pay:
+        /// - If a real saved card is selected, charge it.
+        /// - Otherwise build a new Card from the manual fields (auto‐generate nickname),
+        ///   save it (if RememberCard==true), then charge it.
+        /// Then navigate to the confirmation screen and clear out the form.
+        /// </summary>
         private void OnPay()
         {
             ErrorMessage = string.Empty;
@@ -221,54 +314,71 @@ namespace LuxuryCarRental.ViewModels
             var current = _session.CurrentCustomer;
             if (current == null)
             {
-                ErrorMessage = "Please log in before checking out.";
+                ErrorMessage = "No user is currently logged in.";
                 return;
             }
 
-            // 1) choose / build Card
-            Card cardToCharge = SelectedSavedCard ?? BuildNewCard(current);
+            Card cardToCharge;
 
-            // 2) pre-authorize (charge the card)
+            if (SelectedSavedCard != null && SelectedSavedCard.Id >= 0)
+            {
+                // 1) Charge the existing saved card
+                cardToCharge = SelectedSavedCard;
+            }
+            else
+            {
+                // 2) Build a brand‐new Card from the manual fields
+                //    We already validated “MM/YY” and CVV in CanPay()
+                var parts = Expiry.Split('/');
+                int m = int.Parse(parts[0]);
+                int y = 2000 + int.Parse(parts[1]);
+
+                // Generate nickname “Card ending ####”
+                string last4 = CardNumber.Trim().Substring(CardNumber.Trim().Length - 4);
+                string nickname = "Card ending " + last4;
+
+                cardToCharge = new Card
+                {
+                    CustomerId = current.Id,
+                    CardNumber = CardNumber.Trim(),
+                    ExpiryMonth = m,
+                    ExpiryYear = y,
+                    Cvv = Cvv.Trim(),
+                    Nickname = nickname
+                };
+
+                if (RememberCard)
+                {
+                    _ctx.Cards.Add(cardToCharge);
+                    _ctx.SaveChanges();
+
+                    // Refresh so the new card appears in the dropdown
+                    LoadSavedCards();
+                }
+            }
+
+            // 3) Pre‐authorize / Charge
             var totalMoney = new Money(TotalCost, "USD");
             _payments.Charge(cardToCharge, totalMoney);
 
-            // 3) navigate to Confirmation, passing total + items + card
+            // 4) Navigate to confirmation (passing total, cart items, and the card used)
             _messenger.Send(new GoToConfirmationMessage(
                 totalMoney,
                 CartItems.ToList(),
                 cardToCharge));
 
-            // 4) clear manual entry fields
+            // 5) Clear the form for next time:
             CardNumber = string.Empty;
             Expiry = string.Empty;
             Cvv = string.Empty;
             RememberCard = false;
-            SelectedSavedCard = null;
-        }
 
-        private Card BuildNewCard(Customer current)
-        {
-            var parts = Expiry.Split('/');
-            int m = int.Parse(parts[0]);
-            int y = 2000 + int.Parse(parts[1]);
-
-            var card = new Card
+            // Reset to the dummy “Use a new card” placeholder
+            var placeholder = _savedCardsOC.FirstOrDefault(c => c.Id == -1);
+            if (placeholder != null)
             {
-                CustomerId = current.Id,
-                CardNumber = CardNumber,
-                ExpiryMonth = m,
-                ExpiryYear = y,
-                Cvv = Cvv,
-                Nickname = $"Card ending {CardNumber[^4..]}"
-            };
-
-            if (RememberCard)
-            {
-                _ctx.Cards.Add(card);
-                _ctx.SaveChanges();
-                _savedCardsOC.Add(card);
+                SelectedSavedCard = placeholder;
             }
-            return card;
         }
     }
 }
