@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-
 using System.Collections.Generic;
 using System.Linq;
 using LuxuryCarRental.Data;
@@ -66,7 +65,10 @@ namespace LuxuryCarRental.Services.Implementations
 
 
         public IEnumerable<CartItem> GetCartItems(int customerId)
-            => _ctx.CartItems.Where(ci => ci.Basket.CustomerId == customerId).ToList();
+            => _ctx.CartItems
+                   .Include(ci => ci.Vehicle)   // ← pull in the Vehicle
+                   .Where(ci => ci.Basket.CustomerId == customerId)
+                   .ToList();
 
         public Money GetCartTotal(int customerId)
         {
@@ -79,9 +81,13 @@ namespace LuxuryCarRental.Services.Implementations
 
         public void RemoveFromCart(int customerId, int cartItemId)
         {
-            var item = _ctx.CartItems.Find(cartItemId);
+            // 1) Load the CartItem *and* its Vehicle
+            var item = _ctx.CartItems
+                               .Include(ci => ci.Vehicle)
+                               .FirstOrDefault(ci => ci.Id == cartItemId);
             if (item != null)
             {
+                item.Vehicle.Status = VehicleStatus.Available;
                 _ctx.CartItems.Remove(item);
                 _ctx.SaveChanges();
             }
@@ -89,7 +95,14 @@ namespace LuxuryCarRental.Services.Implementations
 
         public void ClearCart(int customerId)
         {
-            var items = _ctx.CartItems.Where(ci => ci.Basket.CustomerId == customerId);
+            var items = _ctx.CartItems
+                    .Include(ci => ci.Vehicle)
+                    .Where(ci => ci.Basket.CustomerId == customerId)
+                    .ToList();
+
+            foreach (var ci in items)
+                ci.Vehicle.Status = VehicleStatus.Available;
+
             _ctx.CartItems.RemoveRange(items);
             _ctx.SaveChanges();
         }

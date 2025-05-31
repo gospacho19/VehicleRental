@@ -72,8 +72,17 @@ namespace LuxuryCarRental.ViewModels
 
             // 6) Build your commands:
             ShowCategoryCmd = new RelayCommand(() => CurrentViewModel = CategoryVM);
-            ShowCartCmd = new RelayCommand(() => CurrentViewModel = CartVM);
-            ShowCheckoutCmd = new RelayCommand(() => CurrentViewModel = CheckoutVM);
+            ShowCartCmd = new RelayCommand(() =>
+            {
+                CartVM.RefreshCommand.Execute(null);    
+                CurrentViewModel = CartVM;
+            });
+            ShowCheckoutCmd = new RelayCommand(() =>
+            {
+                // Before showing Checkout, reload cart items there
+                CheckoutVM.LoadCartItems();      // call our new method to refetch current cart
+                CurrentViewModel = CheckoutVM;
+            });
             ShowDealsCmd = new RelayCommand(() => CurrentViewModel = DealsVM);
             ShowConfirmationCmd = new RelayCommand(() => CurrentViewModel = ConfirmVM);
 

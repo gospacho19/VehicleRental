@@ -7,6 +7,8 @@ using LuxuryCarRental.Services.Interfaces;
 using LuxuryCarRental.Services.Implementations;
 using LuxuryCarRental.Handlers.Interfaces;
 using LuxuryCarRental.Handlers.Implementations;
+using CommunityToolkit.Mvvm.Messaging;
+using LuxuryCarRental.Messaging;
 
 namespace LuxuryCarRental.ViewModels
 {
@@ -18,25 +20,35 @@ namespace LuxuryCarRental.ViewModels
         private readonly ICartService _cart;
         private readonly ICheckoutHandler _checkoutHandler;
 
+        private readonly IMessenger _messenger;
         public CartViewModel(
             ICartService cart,
-            ICheckoutHandler checkoutHandler)
+            ICheckoutHandler checkoutHandler,
+            IMessenger messenger)
         {
             _cart = cart;
             _checkoutHandler = checkoutHandler;
+            _messenger = messenger;
 
             RefreshCommand = new RelayCommand(Refresh);
             RemoveCommand = new RelayCommand<CartItem?>(Remove);
             ClearCommand = new RelayCommand(Clear);
-            CheckoutCommand = new RelayCommand(Checkout);
+
+            NavigateToCheckoutCommand = new RelayCommand(() =>
+            {
+                // Let MainViewModel know to show CheckoutView
+                _messenger.Send(new GoToCheckoutMessage());
+            });
+
 
             Refresh();
         }
 
+        public IRelayCommand NavigateToCheckoutCommand { get; }
+
         public IRelayCommand RefreshCommand { get; }
         public IRelayCommand<CartItem?> RemoveCommand { get; }
         public IRelayCommand ClearCommand { get; }
-        public IRelayCommand CheckoutCommand { get; }
 
         private void Refresh()
         {
@@ -61,12 +73,6 @@ namespace LuxuryCarRental.ViewModels
             Refresh();
         }
 
-        private void Checkout()
-        {
-            // returns new rentals if you need them
-            var rentals = _checkoutHandler.Checkout(1, /*paymentToken*/"demo");
-            Refresh();
-        }
     }
 
 }

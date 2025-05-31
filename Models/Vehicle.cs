@@ -28,18 +28,31 @@ namespace LuxuryCarRental.Models
                 if (string.IsNullOrWhiteSpace(ImagePath))
                     return null;
 
-                // normalize & build full path...
+                // If ImagePath is a pack URI, just load it directly:
+                if (ImagePath.StartsWith("pack://", StringComparison.OrdinalIgnoreCase))
+                {
+                    try
+                    {
+                        return new BitmapImage(new Uri(ImagePath, UriKind.Absolute));
+                    }
+                    catch
+                    {
+                        return null;
+                    }
+                }
+
+                // Otherwise, assume it's a relative file on disk
                 var fullPath = Path.Combine(
                     AppDomain.CurrentDomain.BaseDirectory,
                     ImagePath.Replace('/', Path.DirectorySeparatorChar)
                 );
-
                 if (!File.Exists(fullPath))
                     return null;
 
                 return new BitmapImage(new Uri(fullPath, UriKind.Absolute));
             }
         }
+
 
     }
     // hi

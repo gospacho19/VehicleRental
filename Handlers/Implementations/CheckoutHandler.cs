@@ -1,8 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using LuxuryCarRental.Handlers.Interfaces;
 using LuxuryCarRental.Models;
 using LuxuryCarRental.Services.Interfaces;
@@ -20,19 +17,32 @@ namespace LuxuryCarRental.Handlers.Implementations
             _rentalHandler = rentalHandler;
         }
 
-        public IEnumerable<Rental> Checkout(int customerId, string paymentToken)
+        /// <summary>
+        /// For each CartItem in the basket, create a Rental with the EXACT same date range (period).
+        /// Then remove that CartItem from the basket, and return the list of created rentals.
+        /// </summary>
+        public IEnumerable<Rental> Checkout(int customerId, DateRange period, string paymentToken)
         {
-            // You may want to call a payment service here...
+            // 1) Load all CartItems
             var items = _cart.GetCartItems(customerId).ToList();
-            var rentals = new List<Rental>();
+            var createdRentals = new List<Rental>();
+
+            // 2) For each CartItem, book the vehicle exactly for the given(period):
             foreach (var item in items)
             {
-                var period = new DateRange(item.StartDate, item.EndDate);
-                rentals.Add(_rentalHandler.BookVehicle(customerId, item.VehicleId, period, Enumerable.Empty<string>()));
+                var rental = _rentalHandler.BookVehicle(
+                    customerId: customerId,
+                    VehicleId: item.VehicleId,
+                    period: period,
+                    options: Enumerable.Empty<string>()   // or pass real optional features
+                );
+                createdRentals.Add(rental);
             }
+
+            // 3) Clear the cart—i.e., remove all CartItems from the basket
             _cart.ClearCart(customerId);
-            return rentals;
+
+            return createdRentals;
         }
     }
 }
-

@@ -7,13 +7,15 @@ using System.Threading.Tasks;
 using System.Collections.Generic;
 using LuxuryCarRental.Models;
 
+
 namespace LuxuryCarRental.Handlers.Interfaces
 {
     public interface ICheckoutHandler
     {
         /// <summary>
-        /// Turns all items in the customer's cart into Rentals, processes payment, and returns the new Rental objects.
+        /// Turns all items in the customer's cart into Rentals, using the given date range for every vehicle.
+        /// Returns the newly‐created Rental objects.
         /// </summary>
-        IEnumerable<Rental> Checkout(int customerId, string paymentToken);
+        IEnumerable<Rental> Checkout(int customerId, DateRange period, string paymentToken);
     }
 }
