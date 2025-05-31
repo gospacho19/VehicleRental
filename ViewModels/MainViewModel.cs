@@ -17,6 +17,9 @@ namespace LuxuryCarRental.ViewModels
         public CheckoutViewModel CheckoutVM { get; }
         public ConfirmationViewModel ConfirmVM { get; }
         public DealsViewModel DealsVM { get; }
+        public ProfileViewModel ProfileVM { get; }
+        public PaymentInfoViewModel PaymentInfoVM { get; }
+
 
         // 2) The “current” VM shown in your ContentControl:
         private object _currentViewModel = null!;
@@ -33,6 +36,8 @@ namespace LuxuryCarRental.ViewModels
         public IRelayCommand ShowCheckoutCmd { get; }
         public IRelayCommand ShowDealsCmd { get; }
         public IRelayCommand ShowConfirmationCmd { get; }
+        public IRelayCommand ShowProfileCmd { get; }
+        public IRelayCommand ShowPaymentInfoCmd { get; }
 
         public MainViewModel(
             CatalogViewModel catalog,
@@ -41,6 +46,8 @@ namespace LuxuryCarRental.ViewModels
             CheckoutViewModel checkout,
             ConfirmationViewModel confirm,
             DealsViewModel deals,
+            ProfileViewModel profile,
+            PaymentInfoViewModel paymentInfo,
             IMessenger messenger)
         {
             // 4) Assign injected VMs:
@@ -50,6 +57,8 @@ namespace LuxuryCarRental.ViewModels
             CheckoutVM = checkout;
             ConfirmVM = confirm;
             DealsVM = deals;
+            ProfileVM = profile;
+            PaymentInfoVM = paymentInfo;
 
 
             // Cart → Checkout
@@ -85,8 +94,9 @@ namespace LuxuryCarRental.ViewModels
             });
             ShowDealsCmd = new RelayCommand(() => CurrentViewModel = DealsVM);
             ShowConfirmationCmd = new RelayCommand(() => CurrentViewModel = ConfirmVM);
+            ShowProfileCmd = new RelayCommand(() => CurrentViewModel = ProfileVM);
+            ShowPaymentInfoCmd = new RelayCommand(() => CurrentViewModel = PaymentInfoVM);
 
-           
 
             // At the end of the ctor, *invoke* it so it runs on startup:
             ShowCatalogCmd.Execute(null);

@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text.RegularExpressions;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
+using LuxuryCarRental.Data;
 using LuxuryCarRental.Handlers.Interfaces;
 using LuxuryCarRental.Messaging;
 using LuxuryCarRental.Models;
@@ -18,50 +20,81 @@ namespace LuxuryCarRental.ViewModels
         private readonly IPaymentService _payments;
         private readonly ICheckoutHandler _checkoutHandler;
         private readonly IMessenger _messenger;
+        private readonly AppDbContext _ctx;
+
+        private const int DemoCustomerId = 1;
 
         public CheckoutViewModel(
             ICartService cart,
             IPaymentService payments,
             ICheckoutHandler checkoutHandler,
-            IMessenger messenger)
+            IMessenger messenger,
+            AppDbContext ctx)
         {
             _cart = cart;
             _payments = payments;
             _checkoutHandler = checkoutHandler;
             _messenger = messenger;
+            _ctx = ctx;
 
-            // Initialize default dates:
+            // Initialize Start/End dates
             StartDate = DateTime.Today;
             EndDate = DateTime.Today.AddDays(1);
 
-            PayCommand = new RelayCommand(OnPay, CanPay);
+            // Prepare SavedCards collection
+            _savedCardsRO = new ReadOnlyObservableCollection<Card>(_savedCardsOC);
+            LoadSavedCards();
 
-            // Preload any existing cart items (if you wish, though we’ll ignore their dates)
+            // Wire up commands
+            PayCommand = new RelayCommand(OnPay, CanPay);
+            RefreshCommand = new RelayCommand(LoadCartItems);
+            NavigateToPaymentInfoCommand = new RelayCommand(OnNavigateToPaymentInfo);
+
+            // Whenever the user picks or clears a saved card, re‐evaluate CanEditCard and PayCommand
+            this.PropertyChanged += (s, e) =>
+            {
+                if (e.PropertyName == nameof(SelectedSavedCard))
+                {
+                    OnPropertyChanged(nameof(CanEditCard));
+                    PayCommand.NotifyCanExecuteChanged();
+                }
+            };
+
+            // Whenever the user changes StartDate or EndDate, push those dates into each CartItem
+            this.PropertyChanged += (s, e) =>
+            {
+                if (e.PropertyName == nameof(StartDate) ||
+                    e.PropertyName == nameof(EndDate))
+                {
+                    UpdateCartItemDates();
+                    OnPropertyChanged(nameof(TotalCost)); // total cost may have changed
+                }
+            };
+
+            // Initial load
+            RememberCard = false;
             LoadCartItems();
+            PrefillCardIfExists();
         }
 
-        // 1) Two new properties for date selection:
+        // ─────────────────────────────────────────────────────────
+        // 1) Date picker properties & validation
+        // ─────────────────────────────────────────────────────────
+
         [ObservableProperty]
         private DateTime _startDate;
-
         partial void OnStartDateChanged(DateTime oldValue, DateTime newValue)
         {
             if (EndDate <= newValue)
                 EndDate = newValue.AddDays(1);
-
             if ((EndDate - StartDate).TotalDays > 30)
                 EndDate = StartDate.AddDays(30);
 
-            // 1) Tell WPF to re-read DurationDays
             OnPropertyChanged(nameof(DurationDays));
-
-            // 2) Tell WPF to re-compute TotalCost (if you show that too)
-            OnPropertyChanged(nameof(TotalCost));
         }
 
         [ObservableProperty]
         private DateTime _endDate;
-
         partial void OnEndDateChanged(DateTime oldValue, DateTime newValue)
         {
             if (newValue <= StartDate)
@@ -69,44 +102,131 @@ namespace LuxuryCarRental.ViewModels
                 EndDate = StartDate.AddDays(1);
                 return;
             }
-
             if ((newValue - StartDate).TotalDays > 30)
             {
                 EndDate = StartDate.AddDays(30);
                 return;
             }
-
-            // 1) DurationDays changed
             OnPropertyChanged(nameof(DurationDays));
-
-            // 2) TotalCost changed
-            OnPropertyChanged(nameof(TotalCost));
         }
 
-        /// <summary>
-        /// Number of days (always ≥ 1, ≤ 30).
-        /// This is used to compute TotalCost if your PricingService multiplies daily rate by days.
-        /// </summary>
         public int DurationDays => (int)Math.Ceiling((EndDate - StartDate).TotalDays);
 
-        // 2) Re‐use your existing card‐fields + validation:
-        [ObservableProperty] private string cardNumber = string.Empty;
-        [ObservableProperty] private string expiry = string.Empty;
-        [ObservableProperty] private string cvv = string.Empty;
+        // ─────────────────────────────────────────────────────────
+        // 2) Manual card entry fields
+        // ─────────────────────────────────────────────────────────
 
-        partial void OnCardNumberChanged(string? oldValue, string newValue)
-            => PayCommand.NotifyCanExecuteChanged();
+        // *** ADDED [NotifyCanExecuteChangedFor(nameof(PayCommand))] ***
+        [ObservableProperty]
+        [NotifyCanExecuteChangedFor(nameof(PayCommand))]
+        private string _cardNumber = string.Empty;
 
-        partial void OnExpiryChanged(string? oldValue, string newValue)
-            => PayCommand.NotifyCanExecuteChanged();
+        [ObservableProperty]
+        [NotifyCanExecuteChangedFor(nameof(PayCommand))]
+        private string _expiry = string.Empty; // format “MM/YY”
 
-        partial void OnCvvChanged(string? oldValue, string newValue)
-            => PayCommand.NotifyCanExecuteChanged();
+        [ObservableProperty]
+        [NotifyCanExecuteChangedFor(nameof(PayCommand))]
+        private string _cvv = string.Empty;
+
+        [ObservableProperty]
+        private bool _rememberCard;
+
+        // ─────────────────────────────────────────────────────────
+        // 3) Saved cards collection and selection
+        // ─────────────────────────────────────────────────────────
+
+        public ReadOnlyObservableCollection<Card> SavedCards => _savedCardsRO;
+        private readonly ObservableCollection<Card> _savedCardsOC = new();
+        private readonly ReadOnlyObservableCollection<Card> _savedCardsRO;
+
+        // Already had [NotifyCanExecuteChangedFor(nameof(PayCommand))]
+        [ObservableProperty]
+        [NotifyCanExecuteChangedFor(nameof(PayCommand))]
+        private Card? _selectedSavedCard;
+
+        public bool CanEditCard => SelectedSavedCard == null;
+
+        private void LoadSavedCards()
+        {
+            _savedCardsOC.Clear();
+            var cards = _ctx.Cards
+                            .Where(c => c.CustomerId == DemoCustomerId)
+                            .OrderBy(c => c.ExpiryYear)
+                            .ThenBy(c => c.ExpiryMonth)
+                            .ToList();
+            foreach (var c in cards)
+                _savedCardsOC.Add(c);
+        }
+
+        private void PrefillCardIfExists()
+        {
+            var recent = _ctx.Cards
+                             .Where(c => c.CustomerId == DemoCustomerId)
+                             .OrderByDescending(c => c.Id)
+                             .FirstOrDefault();
+            if (recent != null)
+            {
+                SelectedSavedCard = recent;
+                CardNumber = recent.CardNumber;
+                Expiry = $"{recent.ExpiryMonth:D2}/{recent.ExpiryYear % 100:D2}";
+                Cvv = recent.Cvv;
+            }
+        }
+
+        // ─────────────────────────────────────────────────────────
+        // 4) Cart items & TotalCost
+        // ─────────────────────────────────────────────────────────
+
+        private List<CartItem> _cartItems = new();
+        public List<CartItem> CartItems
+        {
+            get => _cartItems;
+            private set
+            {
+                SetProperty(ref _cartItems, value);
+                OnPropertyChanged(nameof(TotalCost));
+                PayCommand.NotifyCanExecuteChanged();
+            }
+        }
+
+        public decimal TotalCost =>
+            CartItems.Sum(ci => ci.Vehicle.DailyRate.Amount * DurationDays);
+
+        public void LoadCartItems()
+        {
+            CartItems = _cart.GetCartItems(DemoCustomerId).ToList();
+            UpdateCartItemDates();
+        }
+
+        private void UpdateCartItemDates()
+        {
+            foreach (var item in CartItems)
+            {
+                item.StartDate = StartDate;
+                item.EndDate = EndDate;
+            }
+            OnPropertyChanged(nameof(CartItems));
+            OnPropertyChanged(nameof(TotalCost));
+            PayCommand.NotifyCanExecuteChanged();
+        }
+
+        // ─────────────────────────────────────────────────────────
+        // 5) Commands
+        // ─────────────────────────────────────────────────────────
 
         public IRelayCommand PayCommand { get; }
+        public IRelayCommand RefreshCommand { get; }
+        public IRelayCommand NavigateToPaymentInfoCommand { get; }
 
         private bool CanPay()
         {
+            if (SelectedSavedCard != null)
+                return CartItems.Any();
+
+            if (!CartItems.Any())
+                return false;
+
             if (string.IsNullOrWhiteSpace(CardNumber)) return false;
             if (string.IsNullOrWhiteSpace(Expiry)) return false;
             if (string.IsNullOrWhiteSpace(Cvv)) return false;
@@ -117,78 +237,58 @@ namespace LuxuryCarRental.ViewModels
             return okExpiry && okCvv;
         }
 
-        // 3) We still want to show WHAT is in the cart while user chooses dates:
-        public List<CartItem> CartItems { get; private set; } = new();
-
-        public void LoadCartItems()
-        {
-            CartItems = _cart.GetCartItems(1).ToList();  // 1 = demo customer
-            OnPropertyChanged(nameof(CartItems));
-            OnPropertyChanged(nameof(TotalCost));
-        }
-
-        /// <summary>
-        /// Total cost for ALL vehicles in cart, given the chosen date range.
-        /// We assume your PricingService.CalculateTotal(...) does something like:
-        ///     (vehicle.DailyRate × DurationDays) + any extras.
-        /// If you don’t have a pricing‐per‐day logic yet, you can compute manually:
-        ///     CartItems.Sum(ci => ci.Vehicle.DailyRate.Amount) * DurationDays
-        /// </summary>
-        public decimal TotalCost
-        {
-            get
-            {
-                // If you already have a PricingService.CalculateTotal for a single vehicle:
-                // return CartItems.Sum(ci =>
-                //     _pricing.CalculateTotal(ci.Vehicle,
-                //                             new DateRange(StartDate, EndDate),
-                //                             Enumerable.Empty<string>())
-                //             .Amount);
-
-                // Otherwise, do a simple: daily rate * days:
-                return CartItems.Sum(ci =>
-                    ci.Vehicle.DailyRate.Amount * DurationDays
-                );
-            }
-        }
-
-        /// <summary>
-        /// When PayCommand is clicked, we:
-        ///  1) Charge the card via _payments.Charge(...)
-        ///  2) Call _checkoutHandler.Checkout(customerId, chosenPeriod, transactionId)
-        ///  3) Send confirmation message
-        ///  4) Clear out card fields and (optionally) clear local cart‐view
-        /// </summary>
         private void OnPay()
         {
-            const int customerId = 1;
+            Card cardToCharge;
 
-            // 1) Charge the card
-            var parts = Expiry.Split('/');
-            var card = new Card
+            if (SelectedSavedCard != null)
             {
-                CustomerId = customerId,
-                CardNumber = CardNumber,
-                ExpiryMonth = int.Parse(parts[0]),
-                ExpiryYear = 2000 + int.Parse(parts[1]),
-                Cvv = Cvv
-            };
+                cardToCharge = SelectedSavedCard;
+            }
+            else
+            {
+                var parts = Expiry.Split('/');
+                int month = int.Parse(parts[0]);
+                int year = 2000 + int.Parse(parts[1]);
+
+                cardToCharge = new Card
+                {
+                    CustomerId = DemoCustomerId,
+                    CardNumber = CardNumber,
+                    ExpiryMonth = month,
+                    ExpiryYear = year,
+                    Cvv = Cvv,
+                    Nickname = $"Card ending {CardNumber[^4..]}"
+                };
+
+                if (RememberCard)
+                {
+                    _ctx.Cards.Add(cardToCharge);
+                    _ctx.SaveChanges();
+                    _savedCardsOC.Add(cardToCharge);
+                }
+            }
 
             var totalMoney = new Money(TotalCost, "USD");
-            var transactionId = _payments.Charge(card, totalMoney);
+            var transactionId = _payments.Charge(cardToCharge, totalMoney);
+            var period = new DateRange(StartDate, EndDate);
 
-            // 2) Build a DateRange from the user’s chosen dates:
-            var chosenRange = new DateRange(StartDate, EndDate);
+            var rentals = _checkoutHandler.Checkout(DemoCustomerId, period, transactionId);
 
-            // 3) Call the updated Checkout method (we’ll modify the interface shortly)
-            var rentals = _checkoutHandler.Checkout(customerId, chosenRange, transactionId);
+            _messenger.Send(new GoToConfirmationMessage(totalMoney, CartItems, cardToCharge));
 
-            // 4) Notify the ConfirmationView, passing along total & items & card
-            _messenger.Send(new GoToConfirmationMessage(totalMoney, CartItems, card));
+            CardNumber = string.Empty;
+            Expiry = string.Empty;
+            Cvv = string.Empty;
+            RememberCard = false;
+            SelectedSavedCard = null;
 
-            // 5) Optionally, clear local fields:
-            CardNumber = Expiry = Cvv = string.Empty;
-            LoadCartItems();   // reload in case Cart was cleared
+            LoadCartItems();
+        }
+
+        private void OnNavigateToPaymentInfo()
+        {
+            _messenger.Send(new GoToPaymentInfoMessage());
         }
     }
 }

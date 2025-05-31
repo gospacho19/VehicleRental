@@ -1,0 +1,75 @@
+﻿<UserControl
+    x:Class="LuxuryCarRental.Views.PaymentInfoView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    mc:Ignorable="d"
+    d:DesignHeight="400"
+    d:DesignWidth="600">
+
+    <Grid Margin="16">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <TextBlock
+            Text="Payment Information"
+            FontSize="20"
+            FontWeight="Bold"
+            Grid.Row="0"
+            Margin="0,0,0,12"/>
+
+        <DataGrid
+            Grid.Row="1"
+            ItemsSource="{Binding SavedCards}"
+            SelectedItem="{Binding SelectedCard, Mode=TwoWay}"
+            AutoGenerateColumns="False"
+            CanUserAddRows="False"
+            CanUserDeleteRows="False"
+            IsReadOnly="True"
+            Margin="0,0,0,12">
+            <DataGrid.Columns>
+                <DataGridTextColumn
+                    Header="Nickname"
+                    Binding="{Binding Nickname}"
+                    Width="2*" />
+                <DataGridTextColumn
+                    Header="Card Number"
+                    Binding="{Binding CardNumber}"
+                    Width="2*" />
+
+                <!-- Corrected Expiry column; no nested binding -->
+                <DataGridTextColumn
+                    Header="Expiry"
+                    Binding="{Binding FormattedExpiry}"
+                    Width="Auto" />
+            </DataGrid.Columns>
+        </DataGrid>
+
+        <StackPanel
+            Grid.Row="2"
+            Orientation="Horizontal"
+            HorizontalAlignment="Right"
+            Margin="0">
+            <Button
+                Content="Add Card"
+                Command="{Binding AddCardCommand}"
+                Padding="8,4"
+                Margin="0,0,8,0"/>
+            <Button
+                Content="Edit Card"
+                Command="{Binding EditCardCommand}"
+                IsEnabled="{Binding EditCardCommand.CanExecute(null)}"
+                Padding="8,4"
+                Margin="0,0,8,0"/>
+            <Button
+                Content="Delete Card"
+                Command="{Binding DeleteCardCommand}"
+                IsEnabled="{Binding DeleteCardCommand.CanExecute(null)}"
+                Padding="8,4"/>
+        </StackPanel>
+    </Grid>
+</UserControl>

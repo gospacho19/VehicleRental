@@ -62,6 +62,12 @@ namespace LuxuryCarRental.Data
                     mb.Property(m => m.Currency).HasColumnName("Currency");
                 });
 
+            // 2) One-to-many: Customer → Cards
+            modelBuilder.Entity<Card>()
+                .HasOne(c => c.Customer)
+                .WithMany(cu => cu.Cards)
+                .HasForeignKey(c => c.CustomerId)
+                .OnDelete(DeleteBehavior.Cascade);
         }
     }
 }

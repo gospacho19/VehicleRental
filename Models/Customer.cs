@@ -8,17 +8,21 @@ namespace LuxuryCarRental.Models
 {
     public class Customer
     {
-        public Customer() { } 
+        public Customer() { }
 
         public int Id { get; set; }
-        public required string FullName { get; init; }
-        public required string DriverLicenseNumber { get; init; }
-        public required ContactInfo Contact { get; init; }
+
+        // Remove `init;` and replace with a normal setter:
+        public string FullName { get; set; } = string.Empty;
+        public string DriverLicenseNumber { get; set; } = string.Empty;
+
+        // If ContactInfo’s properties were init‐only, also change Contact.
+        public ContactInfo Contact { get; set; } = new ContactInfo();
+
         public bool IsBlacklisted { get; set; }
 
         // nav
         public ICollection<Rental> Rentals { get; init; } = new List<Rental>();
-
         public ICollection<Card> Cards { get; set; } = new List<Card>();
     }
 }

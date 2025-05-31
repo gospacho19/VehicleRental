@@ -1,15 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-// Models/CartItem.cs
 using System.Diagnostics.CodeAnalysis;
+using CommunityToolkit.Mvvm.ComponentModel;
 
 namespace LuxuryCarRental.Models
 {
-    public class CartItem
+    /// <summary>
+    /// Make CartItem inherit ObservableObject so we can raise PropertyChanged.
+    /// </summary>
+    public class CartItem : ObservableObject
     {
         protected CartItem() { }
 
@@ -21,11 +20,31 @@ namespace LuxuryCarRental.Models
         public required int VehicleId { get; init; }
         public required Vehicle Vehicle { get; init; }
 
-        public required DateTime StartDate { get; init; }
-        public required DateTime EndDate { get; init; }
+        //
+        // Change StartDate/EndDate to use private backing fields + SetProperty,
+        // so that setting them raises a PropertyChanged event.
+        //
 
+        private DateTime _startDate;
+        public DateTime StartDate
+        {
+            get => _startDate;
+            set => SetProperty(ref _startDate, value);
+        }
+
+        private DateTime _endDate;
+        public DateTime EndDate
+        {
+            get => _endDate;
+            set => SetProperty(ref _endDate, value);
+        }
+
+        // Subtotal was `init;` only, which is fine, since you never need to reassign it.
         public required Money Subtotal { get; init; }
 
+        /// <summary>
+        /// Public constructor that builds a CartItem from basket, vehicle, and period.
+        /// </summary>
         [SetsRequiredMembers]
         public CartItem(Basket basket, Vehicle vehicle, DateRange period, IEnumerable<string> options)
         {
@@ -33,18 +52,17 @@ namespace LuxuryCarRental.Models
             BasketId = basket.Id;
             Basket = basket;
 
-            // 2) Link to car
+            // 2) Link to vehicle
             VehicleId = vehicle.Id;
             Vehicle = vehicle;
 
-            // 3) Dates
+            // 3) Set both dates via the backing fields so that the first assignment also raises a change notification
             StartDate = period.Start;
             EndDate = period.End;
 
-            // 4) Compute subtotal (example: daily rate × days)
+            // 4) Compute subtotal at creation (we assume daily‐rate × number of days)
             var days = period.Days;
             Subtotal = vehicle.DailyRate * days;
-            // (You could integrate IPricingService here if you prefer.)
         }
     }
 }

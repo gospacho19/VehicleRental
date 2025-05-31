@@ -9,46 +9,42 @@
     d:DesignHeight="450"
     d:DesignWidth="800">
 
-    <!-- NOTE: We do NOT set DataContext here. Instead, we’ll set it in code-behind via DI. -->
+    <!-- DataContext is set in code‐behind via DI -->
 
     <Grid Margin="16">
-        <!-- Define four rows: 
-             1) Date-pickers (Auto), 
-             2) CartItems DataGrid (Auto),
-             3) Total cost (Auto),
-             4) Card fields + Pay button (Auto) 
-        -->
         <Grid.RowDefinitions>
-            <RowDefinition Height="Auto" />
-            <!-- Date pickers + duration -->
-            <RowDefinition Height="Auto" />
-            <!-- CartItems grid -->
-            <RowDefinition Height="Auto" />
-            <!-- Total cost line -->
-            <RowDefinition Height="Auto" />
-            <!-- Card input + Pay button -->
+            <RowDefinition Height="Auto"/>
+            <!-- Date pickers -->
+            <RowDefinition Height="Auto"/>
+            <!-- Cart items -->
+            <RowDefinition Height="Auto"/>
+            <!-- Payment section -->
+            <RowDefinition Height="*"/>
+            <!-- Spacer -->
+            <RowDefinition Height="Auto"/>
+            <!-- Pay button -->
         </Grid.RowDefinitions>
 
-        <!-- 1) DATE PICKERS ROW -->
+        <!-- 1) Date pickers -->
         <StackPanel Orientation="Horizontal" Grid.Row="0" Margin="0,0,0,16">
             <TextBlock Text="Start Date:" VerticalAlignment="Center" Margin="0,0,8,0"/>
             <DatePicker
                 SelectedDate="{Binding StartDate, Mode=TwoWay}"
                 DisplayDateStart="{x:Static sys:DateTime.Today}"
-                Width="120"/>
-
-            <TextBlock Text="   End Date:" VerticalAlignment="Center" Margin="24,0,8,0"/>
+                Width="120"
+                Margin="0,0,16,0"/>
+            <TextBlock Text="End Date:" VerticalAlignment="Center" Margin="0,0,8,0"/>
             <DatePicker
                 SelectedDate="{Binding EndDate, Mode=TwoWay}"
                 DisplayDateStart="{Binding StartDate}"
-                Width="120"/>
-
-            <TextBlock Text="   Duration:" VerticalAlignment="Center" Margin="24,0,8,0"/>
-            <TextBlock Text="{Binding DurationDays}" VerticalAlignment="Center"/>
-            <TextBlock Text=" days" VerticalAlignment="Center" Margin="4,0,0,0"/>
+                Width="120"
+                Margin="0,0,16,0"/>
+            <TextBlock Text="Duration:" VerticalAlignment="Center" Margin="0,0,8,0"/>
+            <TextBlock Text="{Binding DurationDays}" VerticalAlignment="Center" Margin="0,0,4,0"/>
+            <TextBlock Text="days" VerticalAlignment="Center"/>
         </StackPanel>
 
-        <!-- 2) CART ITEMS DATA GRID -->
+        <!-- 2) Cart items DataGrid -->
         <DataGrid
             Grid.Row="1"
             ItemsSource="{Binding CartItems}"
@@ -56,7 +52,7 @@
             CanUserAddRows="False"
             IsReadOnly="True"
             Margin="0,0,0,16"
-            Height="200">
+            RowHeight="30">
             <DataGrid.Columns>
                 <DataGridTextColumn
                     Header="Vehicle"
@@ -67,44 +63,89 @@
                     Binding="{Binding Vehicle.Model}"
                     Width="*" />
                 <DataGridTextColumn
-                    Header="Rate/Day"
-                    Binding="{Binding Vehicle.DailyRate.Amount, StringFormat=C}"
+                    Header="Start"
+                    Binding="{Binding StartDate, StringFormat=d}"
+                    Width="Auto" />
+                <DataGridTextColumn
+                    Header="End"
+                    Binding="{Binding EndDate, StringFormat=d}"
+                    Width="Auto" />
+                <DataGridTextColumn
+                    Header="Subtotal"
+                    Binding="{Binding Subtotal, StringFormat=C}"
                     Width="Auto" />
             </DataGrid.Columns>
         </DataGrid>
 
-        <!-- 3) TOTAL COST LINE -->
-        <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,0,0,16">
-            <TextBlock Text="Total Cost: " FontWeight="Bold" VerticalAlignment="Center" />
-            <TextBlock Text="{Binding TotalCost, StringFormat=C}" FontWeight="Bold" Margin="4,0,0,0" VerticalAlignment="Center" />
+        <!-- 3) PAYMENT SECTION -->
+        <StackPanel Grid.Row="2" Orientation="Vertical" Margin="0,0,0,16">
+            <!-- 3a) Use Saved Card -->
+            <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
+                <TextBlock Text="Use Saved Card:" VerticalAlignment="Center"/>
+                <ComboBox
+                    ItemsSource="{Binding SavedCards}"
+                    DisplayMemberPath="Nickname"
+                    SelectedItem="{Binding SelectedSavedCard, Mode=TwoWay}"
+                    Width="200"
+                    Margin="8,0,0,0"/>
+                <TextBlock
+                    Text="(optional)"
+                    VerticalAlignment="Center"
+                    FontStyle="Italic"
+                    Foreground="Gray"
+                    Margin="8,0,0,0"/>
+            </StackPanel>
+
+            <!-- 3b) Remember this card -->
+            <CheckBox
+                Content="Remember this card"
+                IsChecked="{Binding RememberCard, Mode=TwoWay}"
+                Margin="0,0,0,8"/>
+
+            <!-- 3c) Manual entry fields: bind IsEnabled to CanEditCard -->
+            <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
+                <TextBlock
+                    Text="Card #:"
+                    VerticalAlignment="Center"
+                    Width="80"/>
+                <TextBox
+                    Width="120"
+                    Text="{Binding CardNumber, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                    IsEnabled="{Binding CanEditCard}"
+                    Margin="0,0,8,0"/>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
+                <TextBlock
+                    Text="Expiry (MM/YY):"
+                    VerticalAlignment="Center"
+                    Width="80"/>
+                <TextBox
+                    Width="80"
+                    Text="{Binding Expiry, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                    IsEnabled="{Binding CanEditCard}"
+                    Margin="0,0,8,0"/>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal">
+                <TextBlock
+                    Text="CVV:"
+                    VerticalAlignment="Center"
+                    Width="80"/>
+                <TextBox
+                    Width="60"
+                    Text="{Binding Cvv, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                    IsEnabled="{Binding CanEditCard}"/>
+            </StackPanel>
         </StackPanel>
 
-        <!-- 4) CARD FIELDS + PAY BUTTON -->
-        <StackPanel Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Right">
-            <!-- Instead of PlaceholderText, we use a preceding label or a tooltip. -->
-            <TextBlock Text="Card #" VerticalAlignment="Center" Margin="0,0,4,0"/>
-            <TextBox
-    Width="120"
-    Text="{Binding CardNumber, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-    ToolTip="Enter card number"/>
+        <!-- 4) Spacer -->
+        <Grid Grid.Row="3"/>
 
-            <TextBlock Text="  Expiry (MM/YY):" VerticalAlignment="Center" Margin="8,0,4,0"/>
-            <TextBox
-    Width="80"
-    Text="{Binding Expiry, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-    ToolTip="MM/YY" />
-
-            <TextBlock Text="  CVV:" VerticalAlignment="Center" Margin="8,0,4,0"/>
-            <TextBox
-    Width="60"
-    Text="{Binding Cvv, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-    ToolTip="3- or 4-digit CVV" />
-
-            <Button
-                Content="Confirm &amp; Pay"
-                Command="{Binding PayCommand}"
-                Margin="12,0,0,0"
-                Width="120"/>
-        </StackPanel>
+        <!-- 5) Confirm & Pay button -->
+        <Button
+            Grid.Row="4"
+            Content="Confirm &amp; Pay"
+            Command="{Binding PayCommand}"
+            HorizontalAlignment="Right"
+            Padding="8,4"/>
     </Grid>
 </UserControl>

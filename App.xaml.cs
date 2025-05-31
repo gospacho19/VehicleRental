@@ -5,14 +5,14 @@ using Microsoft.Extensions.DependencyInjection;
 using LuxuryCarRental.Data;
 using LuxuryCarRental.Repositories.Implementations;
 using LuxuryCarRental.Repositories.Interfaces;
-using LuxuryCarRental.ViewModels;
-using LuxuryCarRental.Views;
 using LuxuryCarRental.Services.Implementations;
 using LuxuryCarRental.Services.Interfaces;
-using LuxuryCarRental.Handlers.Interfaces;
-using LuxuryCarRental.Managers.Implementations;
 using LuxuryCarRental.Handlers.Implementations;
+using LuxuryCarRental.Handlers.Interfaces;
+using LuxuryCarRental.ViewModels;
+using LuxuryCarRental.Views;
 using CommunityToolkit.Mvvm.Messaging;
+using LuxuryCarRental.Managers.Implementations;
 
 namespace LuxuryCarRental
 {
@@ -21,15 +21,13 @@ namespace LuxuryCarRental
         private IServiceProvider? _serviceProvider;
         public IServiceProvider Services => _serviceProvider!;
 
+        // Override the OnStartup method
         protected override void OnStartup(StartupEventArgs e)
         {
             base.OnStartup(e);
 
             // 1) Configure services
             var services = new ServiceCollection();
-
-            // services.AddSingleton<IServiceProvider>(sp => sp);
-
             services.AddSingleton<IMessenger, WeakReferenceMessenger>();
 
             // EF Core + SQLite
@@ -38,24 +36,6 @@ namespace LuxuryCarRental
 
             // Repositories / Unit of Work
             services.AddScoped<IUnitOfWork, EfUnitOfWork>();
-
-            // ViewModels
-            services.AddTransient<MainViewModel>();
-            services.AddTransient<CatalogViewModel>();
-            services.AddTransient<CategoryViewModel>();
-            services.AddTransient<CartViewModel>();
-            services.AddTransient<CheckoutViewModel>();
-            services.AddTransient<ConfirmationViewModel>();
-            services.AddTransient<DealsViewModel>();
-
-            // Views
-            services.AddTransient<CatalogView>();
-            services.AddTransient<CategoryView>();
-            services.AddTransient<CartView>();
-            services.AddTransient<CheckoutView>();
-            services.AddTransient<ConfirmationView>();
-            services.AddTransient<DealsView>();
-            services.AddTransient<MainWindow>();
 
             // Services
             services.AddScoped<IPricingService, PricingService>();
@@ -68,19 +48,40 @@ namespace LuxuryCarRental
             services.AddScoped<IBasketHandler, BasketHandler>();
             services.AddScoped<ICheckoutHandler, CheckoutHandler>();
 
-            // 2) Build the provider
+            // ViewModels
+            services.AddTransient<MainViewModel>();
+            services.AddTransient<CatalogViewModel>();
+            services.AddTransient<CategoryViewModel>();
+            services.AddTransient<CartViewModel>();
+            services.AddTransient<CheckoutViewModel>();
+            services.AddTransient<ConfirmationViewModel>();
+            services.AddTransient<DealsViewModel>();
+            services.AddTransient<ProfileViewModel>();
+            services.AddTransient<PaymentInfoViewModel>();
+
+            // Views
+            services.AddTransient<MainWindow>();
+            services.AddTransient<CatalogView>();
+            services.AddTransient<CategoryView>();
+            services.AddTransient<CartView>();
+            services.AddTransient<CheckoutView>();
+            services.AddTransient<ConfirmationView>();
+            services.AddTransient<DealsView>();
+            services.AddTransient<ProfileView>();
+            services.AddTransient<PaymentInfoView>();
+
+            // Build the DI container
             _serviceProvider = services.BuildServiceProvider();
 
-            // 3) Apply any pending EF Core migrations
+            // 2) Apply migrations & seed data
             using (var scope = _serviceProvider.CreateScope())
             {
                 var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-                db.Database.Migrate();                 // create/upgrade the file
-                SeedData.Initialize(scope.ServiceProvider);  // <-- seed your Vehicles etc.
+                db.Database.Migrate();
+                SeedData.Initialize(scope.ServiceProvider);
             }
 
-
-            // 4) Show the main window (it will be constructed via DI)
+            // 3) Show the main window
             var mainWindow = _serviceProvider.GetRequiredService<MainWindow>();
             mainWindow.Show();
         }

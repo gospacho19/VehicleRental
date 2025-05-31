@@ -10,24 +10,38 @@
 
     <!-- 1) ViewModel→View mapping -->
     <Window.Resources>
+        <!-- Whenever the ContentControl’s Content is a CatalogViewModel, show a CatalogView: -->
         <DataTemplate DataType="{x:Type vm:CatalogViewModel}">
-            <views:CatalogView/>
+            <views:CatalogView />
         </DataTemplate>
-        <DataTemplate DataType="{x:Type vm:CategoryViewModel}">
-            <views:CategoryView/>
-        </DataTemplate>
+
+        <!-- Whenever it’s a CartViewModel, show a CartView: -->
         <DataTemplate DataType="{x:Type vm:CartViewModel}">
-            <views:CartView/>
+            <views:CartView />
         </DataTemplate>
+
+        <!-- Here’s the missing piece: when it’s a CheckoutViewModel, show CheckoutView: -->
         <DataTemplate DataType="{x:Type vm:CheckoutViewModel}">
-            <views:CheckoutView/>
+            <views:CheckoutView />
         </DataTemplate>
+
+        <!-- And similarly for ConfirmationViewModel, ProfileViewModel, etc. -->
         <DataTemplate DataType="{x:Type vm:ConfirmationViewModel}">
-            <views:ConfirmationView/>
+            <views:ConfirmationView />
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type vm:ProfileViewModel}">
+            <views:ProfileView />
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type vm:PaymentInfoViewModel}">
+            <views:PaymentInfoView />
         </DataTemplate>
         <DataTemplate DataType="{x:Type vm:DealsViewModel}">
-            <views:DealsView/>
+            <views:DealsView />
         </DataTemplate>
+        <DataTemplate DataType="{x:Type vm:CategoryViewModel}">
+            <views:CategoryView />
+        </DataTemplate>
+        <!-- …and so on for any other ViewModel types -->
     </Window.Resources>
 
     <DockPanel>
@@ -39,6 +53,8 @@
             <Button Content="Checkout"    Command="{Binding ShowCheckoutCmd}"    Margin="2"/>
             <Button Content="Confirm"     Command="{Binding ShowConfirmationCmd}" Margin="2"/>
             <Button Content="Deals"       Command="{Binding ShowDealsCmd}"       Margin="2"/>
+            <Button Content="Payment Info"     Command="{Binding ShowPaymentInfoCmd}" Margin="2"/>
+            <Button Content="Profile"       Command="{Binding ShowProfileCmd}"       Margin="2"/>
         </StackPanel>
 
         <!-- 3) Content area: shows whichever VM is CurrentViewModel -->

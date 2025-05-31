@@ -8,9 +8,9 @@ namespace LuxuryCarRental.Models
 {
     public class ContactInfo
     {
-        public ContactInfo() { } 
-
-        public required string Email { get; init; }
-        public required string Phone { get; init; }
+        public ContactInfo() { }
+        // Change them to `get; set;`:
+        public string Email { get; set; } = string.Empty;
+        public string Phone { get; set; } = string.Empty;
     }
 }
