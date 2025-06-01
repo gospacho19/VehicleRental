@@ -1,4 +1,5 @@
-﻿using LuxuryCarRental.Data;
+﻿// LuxuryCarRental/Services/Implementations/AuthService.cs
+using LuxuryCarRental.Data;
 using LuxuryCarRental.Models;
 using LuxuryCarRental.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
@@ -41,7 +42,7 @@ namespace LuxuryCarRental.Services.Implementations
                 FullName = fullName,
                 DriverLicenseNumber = driverLicenseNumber,
                 Contact = contact,
-                // RememberMeToken is initially null
+                RememberMe = false   // initially false
             };
             _ctx.Customers.Add(newCustomer);
             _ctx.SaveChanges();
@@ -67,41 +68,24 @@ namespace LuxuryCarRental.Services.Implementations
 
         public void Logout(Customer customer)
         {
-            // Just clear the remember‐me token
-            customer.RememberMeToken = null;
+            // On logout, clear the RememberMe boolean
+            customer.RememberMe = false;
             _ctx.SaveChanges();
         }
 
-        public string? SetRememberMe(Customer customer, bool remember)
+        public void SetRememberMe(Customer customer, bool remember)
         {
-            if (remember)
-            {
-                // Generate a new token (GUID)
-                var token = Guid.NewGuid().ToString("N");
-
-                // Save to DB
-                customer.RememberMeToken = token;
-                _ctx.SaveChanges();
-                return token;
-            }
-            else
-            {
-                customer.RememberMeToken = null;
-                _ctx.SaveChanges();
-                return null;
-            }
+            customer.RememberMe = remember;
+            _ctx.SaveChanges();
         }
 
-        public Customer? LoginWithToken(string token)
+        public Customer? GetRememberedUser()
         {
-            if (string.IsNullOrEmpty(token))
-                return null;
-
-            var customer = _ctx.Customers
-                               .Include(c => c.Cards)
-                               .Include(c => c.Rentals)
-                               .FirstOrDefault(c => c.RememberMeToken == token);
-            return customer;
+            // Find the single user where RememberMe == true
+            return _ctx.Customers
+                       .Include(c => c.Cards)
+                       .Include(c => c.Rentals)
+                       .FirstOrDefault(c => c.RememberMe);
         }
 
         #region ─── Private helpers ───────────────────────────────────
@@ -118,10 +102,8 @@ namespace LuxuryCarRental.Services.Implementations
         {
             var saltBytes = Convert.FromBase64String(saltBase64);
             using var sha256 = SHA256.Create();
-            // Combine salt + password bytes
             byte[] passwordBytes = Encoding.UTF8.GetBytes(password);
             byte[] toHash = saltBytes.Concat(passwordBytes).ToArray();
-
             var hashBytes = sha256.ComputeHash(toHash);
             return Convert.ToBase64String(hashBytes);
         }

@@ -62,16 +62,16 @@ namespace LuxuryCarRental.ViewModels
                 return;
             }
 
-            // Store in session
+            // 1) Store in session
             _session.SetCurrentCustomer(customer);
 
-            // “Remember Me” ...
+            // 2) “Remember Me” ...
             if (RememberMe)
                 _auth.SetRememberMe(customer, true);
             else
                 _auth.SetRememberMe(customer, false);
 
-            // Notify MainVM
+            // 3) Notify MainVM
             _messenger.Send(new LoginSuccessfulMessage(customer));
         }
 

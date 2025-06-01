@@ -5,6 +5,7 @@ using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
 using LuxuryCarRental.Messaging;
 using LuxuryCarRental.Services.Implementations; // for UserSessionService
+using LuxuryCarRental.Services.Interfaces;
 
 namespace LuxuryCarRental.ViewModels
 {
@@ -54,6 +55,7 @@ namespace LuxuryCarRental.ViewModels
             LoginViewModel loginVm,
             RegisterViewModel registerVm,
             IMessenger messenger,
+            IAuthService auth,
             UserSessionService session)   // ← inject session here
         {
             // 4) Assign injected VMs:
@@ -219,7 +221,25 @@ namespace LuxuryCarRental.ViewModels
             });
 
             // 7) Finally, show the Login screen at startup:
-            CurrentViewModel = LoginVM;
+            var rememberedCustomer = auth.GetRememberedUser();
+            if (rememberedCustomer != null)
+            {
+                // A) Store in session
+                session.SetCurrentCustomer(rememberedCustomer);
+
+                // B) Refresh dependent VMs
+                CartVM.RefreshCommand.Execute(null);
+                CheckoutVM.RefreshCommand.Execute(null);
+                CatalogVM.RefreshCommand.Execute(null);
+
+                // C) Show Catalog immediately
+                CurrentViewModel = CatalogVM;
+            }
+            else
+            {
+                // If no one was remembered, show Login
+                CurrentViewModel = LoginVM;
+            }
         }
     }
 }

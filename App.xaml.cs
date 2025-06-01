@@ -79,7 +79,7 @@ namespace LuxuryCarRental
             services.AddTransient<PaymentInfoView>();
             services.AddTransient<LoginView>();
             services.AddTransient<RegisterView>();
-
+            // 
             // Build the DI container
             _serviceProvider = services.BuildServiceProvider();
 

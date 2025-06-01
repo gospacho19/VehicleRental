@@ -17,21 +17,19 @@ namespace LuxuryCarRental.Services.Interfaces
         Customer? Login(string username, string password);
 
         /// <summary>
-        /// Logs out the given user (clears RememberMeToken).
+        /// Logs out the given user (clears RememberMe).
         /// </summary>
         void Logout(Customer customer);
 
         /// <summary>
-        /// Generates or clears a “remember‐me” token for that user.
-        /// If remember = true, create a new random token and save to DB.
-        /// If remember = false, clear the token from DB.
-        /// Returns the new token (or null if cleared).
+        /// Sets or clears the “Remember Me” boolean on that user.
+        /// Returns nothing.
         /// </summary>
-        string? SetRememberMe(Customer customer, bool remember);
+        void SetRememberMe(Customer customer, bool remember);
 
         /// <summary>
-        /// Tries to find a customer by their RememberMeToken. Returns null if not found or token is invalid.
+        /// Finds the one Customer whose RememberMe == true (or null if none).
         /// </summary>
-        Customer? LoginWithToken(string token);
+        Customer? GetRememberedUser();
     }
 }

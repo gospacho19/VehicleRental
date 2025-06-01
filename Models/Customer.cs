@@ -19,13 +19,10 @@ namespace LuxuryCarRental.Models
         public ContactInfo Contact { get; set; } = new ContactInfo();
         public bool IsBlacklisted { get; set; }
 
-        // Optional “Remember Me” token (nullable)
-        private string? _rememberMeToken;
-        public string? RememberMeToken
-        {
-            get => _rememberMeToken;
-            set => SetProperty(ref _rememberMeToken, value);
-        }
+        // wow
+        // Optional “Remember Me” bool
+        public bool RememberMe { get; set; } = false;
+
         // nav
         public ICollection<Rental> Rentals { get; init; } = new List<Rental>();
         public ICollection<Card> Cards { get; set; } = new List<Card>();
