@@ -20,6 +20,8 @@ namespace LuxuryCarRental.Models
 
         public string ImagePath { get; set; } = "";
 
+        public bool CurrentlyAvailable { get; set; } = false;
+
 
         public ImageSource? ImageSource
         {

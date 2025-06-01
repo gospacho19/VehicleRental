@@ -120,7 +120,7 @@ namespace LuxuryCarRental.ViewModels
         // If its Id == -1, that means “Use a new card” placeholder.
         [ObservableProperty]
         [NotifyCanExecuteChangedFor(nameof(PayCommand))]
-        private Card _selectedSavedCard = null!;
+        private Card? _selectedSavedCard = null!;
 
 
         // ────────── Cart Items & Total ──────────

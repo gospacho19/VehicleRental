@@ -1,15 +1,141 @@
-﻿<UserControl x:Class="LuxuryCarRental.Views.CategoryView"
-             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
-             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:local="clr-namespace:LuxuryCarRental.Views"
-             mc:Ignorable="d" 
-             d:DesignHeight="450" d:DesignWidth="800">
-    <Grid>
-        <TextBlock Text="CATEGORY SCREEN" 
-               FontSize="32" 
-               HorizontalAlignment="Center" 
-               VerticalAlignment="Center"/>
+﻿<UserControl
+    x:Class="LuxuryCarRental.Views.CategoryView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:vm="clr-namespace:LuxuryCarRental.ViewModels"
+    mc:Ignorable="d"
+    d:DesignHeight="600"
+    d:DesignWidth="900">
+
+    <!-- No DataContext here—MainViewModel supplies CategoryViewModel -->
+
+    <Grid Margin="16">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <!-- Filters row -->
+            <RowDefinition Height="*"/>
+            <!-- DataGrid -->
+            <RowDefinition Height="Auto"/>
+            <!-- Refresh button -->
+        </Grid.RowDefinitions>
+
+        <!-- ─────────── 1) FILTER ROW (Vehicle Type / Availability / Sort) ─────────── -->
+        <StackPanel Orientation="Horizontal" Grid.Row="0" Margin="0,0,0,12" VerticalAlignment="Center">
+            <!-- (A) Vehicle Type -->
+            <TextBlock Text="Category:" VerticalAlignment="Center" Margin="0,0,8,0"/>
+            <ComboBox
+                Width="140"
+                ItemsSource="{Binding Categories}"
+                SelectedItem="{Binding SelectedCategory, Mode=TwoWay}"
+                Margin="0,0,16,0"/>
+
+            <!-- (B) Availability -->
+            <TextBlock Text="Availability:" VerticalAlignment="Center" Margin="0,0,8,0"/>
+            <ComboBox
+                Width="120"
+                ItemsSource="{Binding AvailabilityOptions}"
+                SelectedItem="{Binding SelectedAvailability, Mode=TwoWay}"
+                Margin="0,0,16,0"/>
+
+            <!-- (C) Sort -->
+            <TextBlock Text="Sort by:" VerticalAlignment="Center" Margin="0,0,8,0"/>
+            <ComboBox
+                Width="160"
+                ItemsSource="{Binding SortOptions}"
+                SelectedItem="{Binding SelectedSortOption, Mode=TwoWay}"/>
+        </StackPanel>
+
+        <!-- ─────────── 2) VEHICLE LIST DATA GRID ─────────── -->
+        <DataGrid
+            Grid.Row="1"
+            ItemsSource="{Binding Vehicles}"
+            AutoGenerateColumns="False"
+            CanUserAddRows="False"
+            IsReadOnly="True"
+            RowHeight="64"
+            RowHeaderWidth="0"
+            HeadersVisibility="Column"
+            Margin="0,0,0,12">
+
+            <DataGrid.Columns>
+                <!-- (A) Image Column -->
+                <DataGridTemplateColumn Header="Image" Width="100">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <Image
+                                Source="{Binding ImageSource}"
+                                Width="100"
+                                Height="64"
+                                Stretch="UniformToFill"
+                                VerticalAlignment="Center"
+                                HorizontalAlignment="Center"/>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+
+                <!-- (B) Name Column -->
+                <DataGridTextColumn
+                    Header="Name"
+                    Binding="{Binding Name}"
+                    Width="2*"/>
+
+                <!-- (C) Type Column -->
+                <DataGridTextColumn
+                    Header="Type"
+                    Binding="{Binding VehicleType}"
+                    Width="Auto"/>
+
+                <!-- (D) Price Column -->
+                <DataGridTextColumn
+                    Header="Price"
+                    Binding="{Binding DailyRate.Amount, StringFormat=C}"
+                    Width="Auto"/>
+
+                <!-- (E) Status Column -->
+                <DataGridTextColumn
+                    Header="Status"
+                    Binding="{Binding Status}"
+                    Width="Auto"/>
+
+                <!-- (F) Rent Now Button Column -->
+                <DataGridTemplateColumn Header="Action" Width="120">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <Button
+                                Content="Rent Now"
+                                Width="100"
+                                HorizontalAlignment="Center"
+                                Command="{Binding DataContext.RentNowCommand, 
+                                           RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                CommandParameter="{Binding}">
+
+                                <!-- Style to enable only when Status == Available -->
+                                <Button.Style>
+                                    <Style TargetType="Button">
+                                        <Setter Property="IsEnabled" Value="False"/>
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding CurrentlyAvailable}" Value="True">
+                                                <Setter Property="IsEnabled" Value="True"/>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Button.Style>
+                            </Button>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+
+            </DataGrid.Columns>
+        </DataGrid>
+
+        <!-- ─────────── 3) Refresh Button ─────────── -->
+        <Button
+            Grid.Row="2"
+            Content="Refresh"
+            Command="{Binding RefreshCommand}"
+            HorizontalAlignment="Right"
+            Padding="8,4"/>
     </Grid>
 </UserControl>

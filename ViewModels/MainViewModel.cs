@@ -166,10 +166,16 @@ namespace LuxuryCarRental.ViewModels
                 CatalogVM.RefreshCommand.Execute(null);
                 CurrentViewModel = CatalogVM;
             });
+
             ShowCategoryCmd = new RelayCommand(() =>
             {
+                // 1) Tell CategoryVM to re‐fetch/filter/sort its list
+                CategoryVM.RefreshCommand.Execute(null);
+
+                // 2) Then actually show the Category screen
                 CurrentViewModel = CategoryVM;
             });
+
             ShowCartCmd = new RelayCommand(() =>
             {
                 if (_session.CurrentCustomer != null)
