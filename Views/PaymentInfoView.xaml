@@ -10,10 +10,8 @@
     Background="{StaticResource LightBackgroundBrush}">
 
     <UserControl.Resources>
-        <!-- Converter for Visibility -->
         <BooleanToVisibilityConverter x:Key="BoolToVis"/>
 
-        <!-- Disable Delete/Edit buttons when no card is selected -->
         <Style x:Key="DisableWhenNoSelection" TargetType="Button">
             <Setter Property="IsEnabled" Value="True"/>
             <Style.Triggers>
@@ -23,7 +21,6 @@
             </Style.Triggers>
         </Style>
 
-        <!-- Consistent TextBox styling -->
         <Style x:Key="MyTextBoxStyle" TargetType="TextBox">
             <Setter Property="FontSize" Value="14"/>
             <Setter Property="BorderBrush" Value="Gray"/>
@@ -73,19 +70,15 @@
             <Grid>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>
-                    <!-- “Saved Cards” header -->
                     <RowDefinition Height="Auto"/>
-                    <!-- ListBox -->
                 </Grid.RowDefinitions>
 
-                <!-- Section Header -->
                 <TextBlock
                     Grid.Row="0"
                     Text="Saved Cards"
                     Style="{StaticResource SectionTitleText}"
                     Margin="0,0,0,12" />
 
-                <!-- List of saved cards -->
                 <ListBox
                     Grid.Row="1"
                     ItemsSource="{Binding SavedCards}"
@@ -98,7 +91,6 @@
             </Grid>
         </Border>
 
-        <!-- 3) Add / Delete Buttons -->
         <StackPanel
             Grid.Row="2"
             Orientation="Horizontal"
@@ -119,7 +111,6 @@
                 Width="100" />
         </StackPanel>
 
-        <!-- 4) Add/Edit Card Panel -->
         <Border
             Grid.Row="3"
             Style="{StaticResource CardPanel}"
@@ -146,7 +137,6 @@
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
 
-                <!-- Panel Header (static, since VM has no EditHeaderText) -->
                 <TextBlock
                     Grid.Row="0"
                     Grid.Column="0"
@@ -155,7 +145,6 @@
                     Style="{StaticResource SectionTitleText}"
                     Margin="0,0,0,16" />
 
-                <!-- Card Number -->
                 <TextBlock
                     Grid.Row="1"
                     Grid.Column="0"
@@ -170,7 +159,6 @@
                     Text="{Binding NewCardNumber, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                     Margin="0,0,0,8" />
 
-                <!-- Expiry -->
                 <TextBlock
                     Grid.Row="2"
                     Grid.Column="0"
@@ -185,7 +173,6 @@
                     Text="{Binding NewExpiry, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                     Margin="0,0,0,8" />
 
-                <!-- CVV -->
                 <TextBlock
                     Grid.Row="3"
                     Grid.Column="0"
@@ -200,7 +187,6 @@
                     Text="{Binding NewCvv, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                     Margin="0,0,0,8" />
 
-                <!-- Save / Cancel Buttons -->
                 <StackPanel
                     Grid.Row="4"
                     Grid.Column="1"
@@ -224,10 +210,8 @@
             </Grid>
         </Border>
 
-        <!-- 5) Separator -->
         <Separator Grid.Row="4" Margin="0,0,0,16"/>
 
-        <!-- 6) Error Message / Filler -->
         <TextBlock
             Grid.Row="5"
             Text="{Binding ErrorMessage}"

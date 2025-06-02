@@ -5,44 +5,34 @@
     xmlns:vm="clr-namespace:LuxuryCarRental.ViewModels"
     Background="{StaticResource LightBackgroundBrush}">
 
-    <!-- Outer ScrollViewer for vertical scrolling -->
     <ScrollViewer 
       VerticalScrollBarVisibility="Auto"
       HorizontalScrollBarVisibility="Disabled">
 
         <StackPanel Margin="{StaticResource ContentPadding}">
 
-            <!-- ────────── CARS SECTION ────────── -->
-            <!-- ────────── CARS SECTION ────────── -->
+            <!-- CARS SECTION -->
             <Border Style="{StaticResource CardPanel}" Margin="0,0,0,16">
                 <Grid>
                     <Grid.RowDefinitions>
-                        <!-- Row 0: the title ("Cars") -->
                         <RowDefinition Height="Auto"/>
 
-                        <!-- Row 1: holds the arrows + carousel side by side -->
                         <RowDefinition Height="230"/>
                     </Grid.RowDefinitions>
 
-                    <!-- 1) SECTION TITLE in Row 0 -->
                     <TextBlock
       Grid.Row="0"
       Text="Cars"
       Style="{StaticResource SectionTitleText}"
       Margin="0,0,0,8" />
 
-                    <!-- 2) GRID in Row 1 with three columns: LeftArrow | Carousel | RightArrow -->
                     <Grid Grid.Row="1">
                         <Grid.ColumnDefinitions>
-                            <!-- Column 0: auto‐width for left arrow -->
                             <ColumnDefinition Width="Auto"/>
-                            <!-- Column 1: *‐width for the carousel itself -->
                             <ColumnDefinition Width="*"/>
-                            <!-- Column 2: auto‐width for right arrow -->
                             <ColumnDefinition Width="Auto"/>
                         </Grid.ColumnDefinitions>
 
-                        <!-- 2A) LEFT ARROW in Column 0 -->
                         <Button
         Grid.Column="0"
         Content="◀"
@@ -55,7 +45,6 @@
         Background="#80FFFFFF"
         ToolTip="Scroll left" />
 
-                        <!-- 2B) CAROUSEL (ScrollViewer → ItemsControl) in Column 1 -->
                         <ScrollViewer
         Grid.Column="1"
         x:Name="CarsScrollViewer"
@@ -63,7 +52,6 @@
         VerticalScrollBarVisibility="Disabled"
         PreviewMouseWheel="Carousel_PreviewMouseWheel"
         Margin="4,0">
-                            <!-- small left/right margin so cards aren’t flush to arrows -->
 
                             <ItemsControl
           ItemsSource="{Binding Cars}"
@@ -76,7 +64,6 @@
                             </ItemsControl>
                         </ScrollViewer>
 
-                        <!-- 2C) RIGHT ARROW in Column 2 -->
                         <Button
         Grid.Column="2"
         Content="▶"
@@ -93,8 +80,8 @@
             </Border>
 
 
-            <!-- ────────── LUXURY CARS SECTION ────────── -->
-            <!-- ────────── LUXURY CARS SECTION ────────── -->
+            <!-- LUXURY CARS SECTION -->
+
             <Border Style="{StaticResource CardPanel}" Margin="0,0,0,16">
                 <Grid>
                     <Grid.RowDefinitions>
@@ -102,14 +89,13 @@
                         <RowDefinition Height="230"/>
                     </Grid.RowDefinitions>
 
-                    <!-- Title -->
                     <TextBlock
       Grid.Row="0"
       Text="Luxury Cars"
       Style="{StaticResource SectionTitleText}"
       Margin="0,0,0,8" />
 
-                    <!-- Three‐column layout in Row 1 -->
+
                     <Grid Grid.Row="1">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="Auto"/>
@@ -117,7 +103,6 @@
                             <ColumnDefinition Width="Auto"/>
                         </Grid.ColumnDefinitions>
 
-                        <!-- Left arrow -->
                         <Button
         Grid.Column="0"
         Content="◀"
@@ -130,7 +115,6 @@
         Background="#80FFFFFF"
         ToolTip="Scroll left" />
 
-                        <!-- Carousel -->
                         <ScrollViewer
         Grid.Column="1"
         x:Name="LuxuryScrollViewer"
@@ -149,7 +133,6 @@
                             </ItemsControl>
                         </ScrollViewer>
 
-                        <!-- Right arrow -->
                         <Button
         Grid.Column="2"
         Content="▶"
@@ -166,8 +149,8 @@
             </Border>
 
 
-            <!-- ────────── MOTORCYCLES SECTION ────────── -->
-            <!-- ────────── MOTORCYCLES SECTION ────────── -->
+            <!-- MOTORCYCLES SECTION -->
+
             <Border Style="{StaticResource CardPanel}" Margin="0,0,0,16">
                 <Grid>
                     <Grid.RowDefinitions>
@@ -175,14 +158,12 @@
                         <RowDefinition Height="230"/>
                     </Grid.RowDefinitions>
 
-                    <!-- Title -->
                     <TextBlock
       Grid.Row="0"
       Text="Motorcycles"
       Style="{StaticResource SectionTitleText}"
       Margin="0,0,0,8" />
 
-                    <!-- Three‐column layout in Row 1 -->
                     <Grid Grid.Row="1">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="Auto"/>
@@ -190,7 +171,6 @@
                             <ColumnDefinition Width="Auto"/>
                         </Grid.ColumnDefinitions>
 
-                        <!-- Left arrow -->
                         <Button
         Grid.Column="0"
         Content="◀"
@@ -203,7 +183,6 @@
         Background="#80FFFFFF"
         ToolTip="Scroll left" />
 
-                        <!-- Carousel -->
                         <ScrollViewer
         Grid.Column="1"
         x:Name="MotorcycleScrollViewer"
@@ -222,7 +201,6 @@
                             </ItemsControl>
                         </ScrollViewer>
 
-                        <!-- Right arrow -->
                         <Button
         Grid.Column="2"
         Content="▶"
@@ -239,8 +217,7 @@
             </Border>
 
 
-            <!-- ────────── YACHTS SECTION ────────── -->
-            <!-- ────────── YACHTS SECTION ────────── -->
+            <!-- YACHTS SECTION -->
             <Border Style="{StaticResource CardPanel}" Margin="0,0,0,16">
                 <Grid>
                     <Grid.RowDefinitions>
@@ -255,7 +232,6 @@
       Style="{StaticResource SectionTitleText}"
       Margin="0,0,0,8" />
 
-                    <!-- Three‐column layout in Row 1 -->
                     <Grid Grid.Row="1">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="Auto"/>
@@ -263,7 +239,6 @@
                             <ColumnDefinition Width="Auto"/>
                         </Grid.ColumnDefinitions>
 
-                        <!-- Left arrow -->
                         <Button
         Grid.Column="0"
         Content="◀"
@@ -295,7 +270,6 @@
                             </ItemsControl>
                         </ScrollViewer>
 
-                        <!-- Right arrow -->
                         <Button
         Grid.Column="2"
         Content="▶"

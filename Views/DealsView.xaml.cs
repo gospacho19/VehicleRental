@@ -16,9 +16,7 @@ using LuxuryCarRental.ViewModels;
 
 namespace LuxuryCarRental.Views
 {
-    /// <summary>
-    /// Логика взаимодействия для DealsView.xaml
-    /// </summary>
+
     public partial class DealsView : UserControl
     {
         public DealsView()

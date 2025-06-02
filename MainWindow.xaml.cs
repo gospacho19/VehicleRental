@@ -12,7 +12,6 @@ namespace LuxuryCarRental
         {
             InitializeComponent();
 
-            // Hook up the VM
             DataContext = vm ?? throw new ArgumentNullException(nameof(vm));
         }
     }

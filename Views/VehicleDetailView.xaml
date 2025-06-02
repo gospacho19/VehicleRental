@@ -12,21 +12,16 @@
 
     <Grid Margin="{StaticResource ContentPadding}">
         <Grid.RowDefinitions>
-            <!-- 1) Page Title -->
             <RowDefinition Height="Auto"/>
-
-            <!-- 2) CardPanel with Image + Details + Buttons -->
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
-        <!-- 1) Page Title -->
         <TextBlock
             Grid.Row="0"
             Text="Vehicle Details"
             Style="{StaticResource SectionTitleText}"
             Margin="0,0,0,12" />
 
-        <!-- 2) CardPanel Container -->
         <Border
             Grid.Row="1"
             Style="{StaticResource CardPanel}"
@@ -36,31 +31,27 @@
 
             <Grid>
                 <Grid.RowDefinitions>
-                    <!-- 2A) Header: Image + Name -->
                     <RowDefinition Height="Auto"/>
-
-                    <!-- 2B) Details (scrollable) -->
                     <RowDefinition Height="*"/>
-
-                    <!-- 2C) Buttons -->
                     <RowDefinition Height="Auto"/>
                 </Grid.RowDefinitions>
 
-                <!-- 2A) Vehicle Image & Name -->
+
                 <StackPanel Orientation="Horizontal" Grid.Row="0" Margin="0,0,0,16">
-                    <Border BorderBrush="{StaticResource BorderBrushColor}"
-                            BorderThickness="1"
-                            CornerRadius="4"
-                            Padding="4">
+                    <Border
+                        BorderBrush="{StaticResource BorderBrushColor}"
+                        BorderThickness="1"
+                        CornerRadius="4"
+                        Padding="4">
                         <Image
-                            Source="{Binding Vehicle.ImageSource}"
+                            Source="{Binding Vehicle.ImageSource, FallbackValue=''}"
                             Width="200"
                             Height="120"
                             Stretch="UniformToFill" />
                     </Border>
 
                     <TextBlock
-                        Text="{Binding Vehicle.Name}"
+                        Text="{Binding Vehicle.Name, FallbackValue=''}"
                         FontSize="24"
                         FontWeight="Bold"
                         Margin="16,0,0,0"
@@ -68,11 +59,10 @@
                         Foreground="{StaticResource PrimaryBrush}" />
                 </StackPanel>
 
-                <!-- 2B) Common + Type‐Specific Fields -->
+
                 <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
                     <StackPanel>
 
-                        <!-- 2B.1) General Information -->
                         <StackPanel Margin="0,0,0,16">
                             <TextBlock
                                 Text="General Information"
@@ -85,7 +75,7 @@
                                     Style="{StaticResource LabelText}"
                                     Width="150" />
                                 <TextBlock
-                                    Text="{Binding Vehicle.VehicleType}"
+                                    Text="{Binding Vehicle.VehicleType, FallbackValue=''}"
                                     Style="{StaticResource ValueText}" />
                             </StackPanel>
 
@@ -95,22 +85,20 @@
                                     Style="{StaticResource LabelText}"
                                     Width="150" />
                                 <TextBlock
-                                    Text="{Binding Vehicle.DailyRate, StringFormat=C}"
+                                    Text="{Binding Vehicle.DailyRate, StringFormat=C, FallbackValue=''}"
                                     Style="{StaticResource ValueText}" />
                             </StackPanel>
                         </StackPanel>
 
-                        <!-- 2B.2) Car & LuxuryCar Fields -->
+
                         <StackPanel Margin="0,0,0,16">
                             <StackPanel.Style>
                                 <Style TargetType="StackPanel">
                                     <Setter Property="Visibility" Value="Collapsed"/>
                                     <Style.Triggers>
-                                        <!-- Show if VehicleType == Car -->
                                         <DataTrigger Binding="{Binding Vehicle.VehicleType}" Value="Car">
                                             <Setter Property="Visibility" Value="Visible"/>
                                         </DataTrigger>
-                                        <!-- Show if VehicleType == LuxuryCar -->
                                         <DataTrigger Binding="{Binding Vehicle.VehicleType}" Value="LuxuryCar">
                                             <Setter Property="Visibility" Value="Visible"/>
                                         </DataTrigger>
@@ -129,7 +117,7 @@
                                     Style="{StaticResource LabelText}"
                                     Width="150" />
                                 <TextBlock
-                                    Text="{Binding Vehicle.Make}"
+                                    Text="{Binding Vehicle.Make, FallbackValue=''}"
                                     Style="{StaticResource ValueText}" />
                             </StackPanel>
 
@@ -139,7 +127,7 @@
                                     Style="{StaticResource LabelText}"
                                     Width="150" />
                                 <TextBlock
-                                    Text="{Binding Vehicle.Model}"
+                                    Text="{Binding Vehicle.Model, FallbackValue=''}"
                                     Style="{StaticResource ValueText}" />
                             </StackPanel>
 
@@ -149,12 +137,12 @@
                                     Style="{StaticResource LabelText}"
                                     Width="150" />
                                 <TextBlock
-                                    Text="{Binding Vehicle.Year}"
+                                    Text="{Binding Vehicle.Year, FallbackValue=''}"
                                     Style="{StaticResource ValueText}" />
                             </StackPanel>
                         </StackPanel>
 
-                        <!-- 2B.3) LuxuryCar Only -->
+
                         <StackPanel Margin="0,0,0,16">
                             <StackPanel.Style>
                                 <Style TargetType="StackPanel">
@@ -178,7 +166,7 @@
                                     Style="{StaticResource LabelText}"
                                     Width="150" />
                                 <TextBlock
-                                    Text="{Binding Vehicle.SecurityDeposit, StringFormat=C}"
+                                    Text="{Binding Vehicle.SecurityDeposit, StringFormat=C, FallbackValue=''}"
                                     Style="{StaticResource ValueText}" />
                             </StackPanel>
 
@@ -188,7 +176,7 @@
                                     Style="{StaticResource LabelText}"
                                     Width="150" />
                                 <TextBlock
-                                    Text="{Binding Vehicle.IncludesChauffeur}"
+                                    Text="{Binding Vehicle.IncludesChauffeur, FallbackValue=''}"
                                     Style="{StaticResource ValueText}" />
                             </StackPanel>
 
@@ -198,14 +186,14 @@
                                     Style="{StaticResource LabelText}"
                                     Width="150" />
                                 <TextBlock
-                                    Text="{Binding Vehicle.OptionalFeatures}"
+                                    Text="{Binding Vehicle.OptionalFeatures, FallbackValue=''}"
                                     Style="{StaticResource ValueText}"
                                     TextWrapping="Wrap"
                                     Width="400" />
                             </StackPanel>
                         </StackPanel>
 
-                        <!-- 2B.4) Motorcycle Only -->
+
                         <StackPanel Margin="0,0,0,16">
                             <StackPanel.Style>
                                 <Style TargetType="StackPanel">
@@ -229,9 +217,10 @@
                                     Style="{StaticResource LabelText}"
                                     Width="150" />
                                 <TextBlock
-                                    Text="{Binding Vehicle.EngineCapacityCc}"
+                                    Text="{Binding Vehicle.EngineCapacityCc, FallbackValue=''}"
                                     Style="{StaticResource ValueText}" />
                             </StackPanel>
+
 
                             <StackPanel Orientation="Horizontal" Margin="0,4">
                                 <TextBlock
@@ -239,12 +228,12 @@
                                     Style="{StaticResource LabelText}"
                                     Width="150" />
                                 <TextBlock
-                                    Text="{Binding Vehicle.HasSidecar}"
+                                    Text="{Binding Vehicle.HasSidecar, FallbackValue=''}"
                                     Style="{StaticResource ValueText}" />
                             </StackPanel>
                         </StackPanel>
 
-                        <!-- 2B.5) Yacht Only -->
+
                         <StackPanel Margin="0,0,0,16">
                             <StackPanel.Style>
                                 <Style TargetType="StackPanel">
@@ -268,7 +257,7 @@
                                     Style="{StaticResource LabelText}"
                                     Width="150" />
                                 <TextBlock
-                                    Text="{Binding Vehicle.LengthInMeters}"
+                                    Text="{Binding Vehicle.LengthInMeters, FallbackValue=''}"
                                     Style="{StaticResource ValueText}" />
                             </StackPanel>
 
@@ -278,7 +267,7 @@
                                     Style="{StaticResource LabelText}"
                                     Width="150" />
                                 <TextBlock
-                                    Text="{Binding Vehicle.CabinCount}"
+                                    Text="{Binding Vehicle.CabinCount, FallbackValue=''}"
                                     Style="{StaticResource ValueText}" />
                             </StackPanel>
                         </StackPanel>
@@ -286,7 +275,7 @@
                     </StackPanel>
                 </ScrollViewer>
 
-                <!-- 2C) Action Buttons -->
+
                 <StackPanel
                     Grid.Row="2"
                     Orientation="Horizontal"

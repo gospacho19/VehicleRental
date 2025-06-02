@@ -12,7 +12,6 @@ namespace LuxuryCarRental.Views
             InitializeComponent();
         }
 
-        // Called whenever the user types in the “Password” box:
         private void PasswordBox_PasswordChanged(object sender, RoutedEventArgs e)
         {
             if (DataContext is RegisterViewModel vm)
@@ -21,7 +20,6 @@ namespace LuxuryCarRental.Views
             }
         }
 
-        // Called whenever the user types in the “Confirm Password” box:
         private void ConfirmPasswordBox_PasswordChanged(object sender, RoutedEventArgs e)
         {
             if (DataContext is RegisterViewModel vm)

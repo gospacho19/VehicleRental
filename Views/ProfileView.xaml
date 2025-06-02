@@ -11,7 +11,6 @@
     Background="{StaticResource LightBackgroundBrush}">
 
     <UserControl.Resources>
-        <!-- TextBox styling (same as in PaymentInfoView) -->
         <Style x:Key="MyTextBoxStyle" TargetType="TextBox">
             <Setter Property="FontSize" Value="14"/>
             <Setter Property="BorderBrush" Value="Gray"/>
@@ -23,21 +22,17 @@
 
     <Grid Margin="{StaticResource ContentPadding}">
         <Grid.RowDefinitions>
-            <!-- 1) Section Title -->
             <RowDefinition Height="Auto"/>
 
-            <!-- 2) CardPanel containing form + buttons -->
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
-        <!-- 1) Section Title -->
         <TextBlock
             Grid.Row="0"
             Text="Profile"
             Style="{StaticResource SectionTitleText}"
             Margin="0,0,0,12" />
 
-        <!-- 2) CardPanel -->
         <Border
             Grid.Row="1"
             Style="{StaticResource CardPanel}"
@@ -163,8 +158,6 @@
                         Width="100"
                         Height="32" />
                 </StackPanel>
-
-                <!-- Filler (no controls needed) -->
             </Grid>
         </Border>
     </Grid>

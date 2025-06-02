@@ -9,10 +9,7 @@ namespace LuxuryCarRental.Services.Interfaces
 {
     public interface IPaymentService
     {
-        /// <summary>Process payment for the given amount. Returns transaction ID or throws on failure.</summary>
-        /// <summary>
-        /// Charge the given card for the amount, returns a transaction ID.
-        /// </summary>
+        // process payment for the given amount
         string Charge(Card card, Money amount);
 
     }

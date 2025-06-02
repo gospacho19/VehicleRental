@@ -11,14 +11,13 @@ namespace LuxuryCarRental.Data
 {
     public class AppDbContext : DbContext
     {
-        // Parameterless ctor for EF tooling
         public AppDbContext() { }
 
         // ctor for DI
         public AppDbContext(DbContextOptions<AppDbContext> options)
             : base(options) { }
 
-        // DbSets for all your entities
+        // DbSets
         public DbSet<Vehicle> Vehicles { get; set; }
         public DbSet<Car> Cars { get; set; }
         public DbSet<Motorcycle> Motorcycles { get; set; }
@@ -34,26 +33,21 @@ namespace LuxuryCarRental.Data
         {
             if (!options.IsConfigured)
             {
-                // Uses a file named LuxuryRental.db in your app's working directory
                 options.UseSqlite("Data Source=LuxuryRental.db");
             }
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            // If you want EF to treat ContactInfo as an owned (complex) type:
             modelBuilder.Entity<Customer>()
                 .OwnsOne(c => c.Contact);
 
-            
-            // TPH inheritance:
             modelBuilder.Entity<Vehicle>()
                    .HasDiscriminator(v => v.VehicleType) 
                    .HasValue<Car>(VehicleType.Car)
                    .HasValue<Motorcycle>(VehicleType.Motorcycle)
                    .HasValue<Yacht>(VehicleType.Yacht)
                    .HasValue<LuxuryCar>(VehicleType.LuxuryCar);
-
 
             modelBuilder.Entity<Vehicle>()
                 .OwnsOne(v => v.DailyRate, mb =>
@@ -62,7 +56,6 @@ namespace LuxuryCarRental.Data
                     mb.Property(m => m.Currency).HasColumnName("Currency");
                 });
 
-            // 2) One-to-many: Customer → Cards
             modelBuilder.Entity<Card>()
                 .HasOne(c => c.Customer)
                 .WithMany(cu => cu.Cards)

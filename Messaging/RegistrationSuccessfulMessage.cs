@@ -8,10 +8,6 @@ using CommunityToolkit.Mvvm.Messaging.Messages;
 
 namespace LuxuryCarRental.Messaging
 {
-    /// <summary>
-    /// Sent after a new user has successfully registered.
-    /// Carries the new username as its Value.
-    /// </summary>
     public class RegistrationSuccessfulMessage : ValueChangedMessage<string>
     {
         public RegistrationSuccessfulMessage(string username)

@@ -1,5 +1,4 @@
-﻿// LuxuryCarRental/ViewModels/CategoryViewModel.cs
-
+﻿
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -18,14 +17,13 @@ namespace LuxuryCarRental.ViewModels
 {
     public class CategoryViewModel : ObservableObject, IRecipient<CartUpdatedMessage>, IDisposable
     {
-        // ────────── Dependencies ──────────
         private readonly IUnitOfWork _uow;
         private readonly ICartService _cartService;
         private readonly IAvailabilityService _availability;
         private readonly IMessenger _messenger;
         private readonly UserSessionService _session;
 
-        // ────────── Constructor ──────────
+        // Constructor 
         public CategoryViewModel(
             IUnitOfWork uow,
             ICartService cartService,
@@ -41,7 +39,6 @@ namespace LuxuryCarRental.ViewModels
 
             _messenger.Register<CartUpdatedMessage>(this);
 
-            // Populate filter dropdowns …
             Categories.Add("All");
             foreach (var vt in Enum.GetValues(typeof(VehicleType)).Cast<VehicleType>())
                 Categories.Add(vt.ToString());
@@ -59,18 +56,16 @@ namespace LuxuryCarRental.ViewModels
             SortOptions.Add("Price (High → Low)");
             SelectedSortOption = "None";
 
-            // Commands
+            // commands
             RefreshCommand = new AsyncRelayCommand(RefreshAsync);
             RentNowCommand = new RelayCommand<Vehicle?>(OnRentNow, CanRentNow);
 
-            // *** Change here: LearnMoreCommand must be RelayCommand<Vehicle?>, not RelayCommand<Vehicle> ***
+
             LearnMoreCommand = new RelayCommand<Vehicle?>(OnLearnMore);
 
-            // Initial load
+            // initial load
             RefreshCommand.Execute(null);
         }
-
-        // ────────── PUBLIC COLLECTIONS & PROPERTIES ──────────
 
         public ObservableCollection<string> Categories { get; } = new();
         private string _selectedCategory = string.Empty;
@@ -113,27 +108,22 @@ namespace LuxuryCarRental.ViewModels
         public IAsyncRelayCommand RefreshCommand { get; }
         public IRelayCommand<Vehicle?> RentNowCommand { get; }
 
-        // *** Change here: use Vehicle? in the type argument ***
         public IRelayCommand<Vehicle?> LearnMoreCommand { get; }
 
-        // ────────── PRIVATE BACKING LIST ──────────
         private List<Vehicle> _allVehicles = new();
 
         private async Task RefreshAsync()
         {
             Vehicles.Clear();
 
-            // 1) Fetch all vehicles from the database
             _allVehicles = _uow.Vehicles.GetAll().ToList();
 
-            // 2) Determine “todayRange”
             var todayRange = new DateRange(DateTime.Today, DateTime.Today.AddDays(1));
             int? ignoreId = _session.CurrentCustomer?.Id;
 
-            // 3) Batch‐fetch blocked IDs
             var blockedIds = await _availability.GetBlockedVehicleIdsAsync(todayRange, ignoreId);
 
-            // 4) Filter by Category + Availability + Sort
+            // Filter 
             IEnumerable<Vehicle> temp = _allVehicles;
 
             if (!string.Equals(SelectedCategory, "All", StringComparison.OrdinalIgnoreCase) &&
@@ -142,14 +132,12 @@ namespace LuxuryCarRental.ViewModels
                 temp = temp.Where(v => v.VehicleType == vt);
             }
 
-            // Compute CurrentlyAvailable
             foreach (var v in temp)
             {
                 bool freeNow = (v.Status == VehicleStatus.Available) && !blockedIds.Contains(v.Id);
                 v.CurrentlyAvailable = freeNow;
             }
 
-            // Filter by Availability selection
             if (string.Equals(SelectedAvailability, "Available", StringComparison.OrdinalIgnoreCase))
             {
                 temp = temp.Where(v => v.CurrentlyAvailable);
@@ -169,7 +157,7 @@ namespace LuxuryCarRental.ViewModels
                 _ => temp
             };
 
-            // 5) Push results into the ObservableCollection
+            // Push results into ObservableCollection
             Vehicles.Clear();
             foreach (var v in temp)
                 Vehicles.Add(v);
@@ -203,7 +191,6 @@ namespace LuxuryCarRental.ViewModels
             _ = RefreshAsync();
         }
 
-        // *** Change here: Accept Vehicle? instead of Vehicle ***
         private void OnLearnMore(Vehicle? vehicle)
         {
             if (vehicle == null) return;

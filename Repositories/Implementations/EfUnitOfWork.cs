@@ -14,7 +14,6 @@ namespace LuxuryCarRental.Repositories.Implementations
     {
         private readonly AppDbContext _ctx;
 
-        // repositories
         public IRepository<Vehicle> Vehicles { get; }
         public IRepository<Motorcycle> Motorcycles { get; }
         public IRepository<Yacht> Yachts { get; }

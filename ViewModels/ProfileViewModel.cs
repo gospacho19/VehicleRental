@@ -1,10 +1,10 @@
-﻿// LuxuryCarRental/ViewModels/ProfileViewModel.cs
+﻿
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
 using LuxuryCarRental.Messaging;
 using LuxuryCarRental.Data;
-using LuxuryCarRental.Services.Implementations; // for UserSessionService
+using LuxuryCarRental.Services.Implementations; 
 using LuxuryCarRental.Services.Interfaces;
 
 namespace LuxuryCarRental.ViewModels
@@ -16,9 +16,7 @@ namespace LuxuryCarRental.ViewModels
         private readonly IMessenger _messenger;
         private readonly UserSessionService _session;
 
-        // ─────────────────────────────────────────────────────
-        // 1) Personal Info fields, bound to the UI
-        // ─────────────────────────────────────────────────────
+
         [ObservableProperty]
         [NotifyCanExecuteChangedFor(nameof(SaveProfileCommand))]
         private string _fullName = string.Empty;
@@ -35,9 +33,9 @@ namespace LuxuryCarRental.ViewModels
         [NotifyCanExecuteChangedFor(nameof(SaveProfileCommand))]
         private string _phone = string.Empty;
 
-        // ─────────────────────────────────────────────────────
-        // 2) Commands
-        // ─────────────────────────────────────────────────────
+
+        // Commands
+
         public IRelayCommand SaveProfileCommand { get; }
         public IRelayCommand AddCardCommand { get; }
         public IRelayCommand LogoutCommand { get; }
@@ -53,7 +51,7 @@ namespace LuxuryCarRental.ViewModels
             _messenger = messenger;
             _session = session;
 
-            // If a user is already logged in, prefill their info:
+            // if a user is already logged in, prefill their info
             if (_session.CurrentCustomer is not null)
             {
                 var c = _session.CurrentCustomer!;
@@ -84,7 +82,6 @@ namespace LuxuryCarRental.ViewModels
             var customer = _session.CurrentCustomer;
             if (customer is null) return;
 
-            // Update the Customer’s details
             customer.FullName = FullName;
             customer.DriverLicenseNumber = DriverLicenseNumber;
             customer.Contact.Email = Email;
@@ -96,7 +93,7 @@ namespace LuxuryCarRental.ViewModels
 
         private void OnAddCard()
         {
-            // Simply navigate to the Payment Info screen:
+            // navigate to the Payment Info screen
             _messenger.Send(new GoToPaymentInfoMessage());
         }
 
@@ -105,13 +102,11 @@ namespace LuxuryCarRental.ViewModels
             var customer = _session.CurrentCustomer;
             if (customer is null) return;
 
-            // Clear “Remember Me” / token in the database if needed
             _auth.Logout(customer);
 
-            // Clear session
+            // clear session
             _session.ClearCurrentCustomer();
 
-            // Tell the app to go back to the Login screen
             _messenger.Send(new GoToLoginMessage());
         }
     }

@@ -26,19 +26,15 @@ namespace LuxuryCarRental
         {
             base.OnStartup(e);
 
-            // 1) Configure services
             var services = new ServiceCollection();
             services.AddSingleton<IMessenger, WeakReferenceMessenger>();
 
             services.AddSingleton<UserSessionService>();
 
-            // EF Core + SQLite
             services.AddDbContext<AppDbContext>(opts =>
                 opts.UseSqlite("Data Source=LuxuryRental.db"));
 
-            // Repositories / Unit of Work
             services.AddScoped<IUnitOfWork, EfUnitOfWork>();
-
             services.AddScoped<IAuthService, AuthService>();
 
             // Services
@@ -66,8 +62,6 @@ namespace LuxuryCarRental
             services.AddTransient<RegisterViewModel>();
             services.AddTransient<VehicleDetailViewModel>();
 
-
-
             // Views
             services.AddTransient<MainWindow>();
             services.AddTransient<CatalogView>();
@@ -82,10 +76,9 @@ namespace LuxuryCarRental
             services.AddTransient<RegisterView>();
             services.AddTransient<VehicleDetailView>();
             // 
-            // Build the DI container
             _serviceProvider = services.BuildServiceProvider();
 
-            // 2) Apply migrations & seed data
+            // Apply migrations & seed data
             using (var scope = _serviceProvider.CreateScope())
             {
                 var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
@@ -93,7 +86,7 @@ namespace LuxuryCarRental
                 SeedData.Initialize(scope.ServiceProvider);
             }
 
-            // 3) Show the main window
+            // Show the main window
             var mainWindow = _serviceProvider.GetRequiredService<MainWindow>();
             mainWindow.Show();
         }

@@ -15,7 +15,7 @@ namespace LuxuryCarRental.Data
             using var scope = services.CreateScope();
             var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
 
-            // Always read the JSON file on startup:
+            // read the JSON file on startup
             var jsonPath = Path.Combine(
                 AppDomain.CurrentDomain.BaseDirectory,
                 "Data", "vehicles.json"
@@ -29,15 +29,13 @@ namespace LuxuryCarRental.Data
 
             foreach (var s in seeds)
             {
-                // Decide how to detect “already in DB.” 
-                // Here, we treat DTO.Key as a unique name for vehicle.
                 bool alreadyExists = context.Vehicles
                     .Any(v => v.Name == s.Key);
 
                 if (alreadyExists)
                     continue;
 
-                // Otherwise, create a new entity of the right subtype:
+                // create a new entity of the right subtype:
                 Vehicle v = s.Type switch
                 {
                     "Car" => new Car
@@ -47,7 +45,6 @@ namespace LuxuryCarRental.Data
                         Year = s.Year!.Value,
                         DailyRate = new Money(s.DailyRate!.Value, "USD"),
                         VehicleType = VehicleType.Car
-                        // Note: Car.Name will be "{Year} {Make} {Model}"
                     },
                     "Motorcycle" => new Motorcycle
                     {
@@ -55,7 +52,6 @@ namespace LuxuryCarRental.Data
                         HasSidecar = s.HasSidecar!.Value,
                         DailyRate = new Money(s.DailyRate!.Value, "USD"),
                         VehicleType = VehicleType.Motorcycle
-                        // Motorcycle.Name is computed from VehicleType + engine size
                     },
                     "Yacht" => new Yacht
                     {
@@ -63,7 +59,6 @@ namespace LuxuryCarRental.Data
                         CabinCount = s.CabinCount!.Value,
                         DailyRate = new Money(s.DailyRate!.Value, "USD"),
                         VehicleType = VehicleType.Yacht
-                        // Yacht.Name is computed from length + cabin count
                     },
                     "LuxuryCar" => new LuxuryCar
                     {
@@ -75,26 +70,22 @@ namespace LuxuryCarRental.Data
                         SecurityDeposit = s.SecurityDeposit!.Value,
                         IncludesChauffeur = s.IncludesChauffeur!.Value,
                         OptionalFeatures = s.OptionalFeatures!
-                        // LuxuryCar.Name inherits Car’s Name override
                     },
                     _ => throw new InvalidOperationException($"Unknown type {s.Type}")
                 };
 
-                // Set the “Key” into the .Name property (so we can detect duplicates by Name):
                 v.Name = s.Key;
-                // Store the image URI/path exactly as given in JSON:
+                // store the image URI/path 
                 v.ImagePath = s.ImageUri;
 
-                // Default Status remains VehicleStatus.Available:
                 context.Vehicles.Add(v);
             }
 
             context.SaveChanges();
 
 
-            // ───────────────────────────────────────
-            // 2) Seed a “demo” user if none exists
-            // ───────────────────────────────────────
+
+            // Seed a demo user if none exists
             var demoCustomer = context.Customers
                    .FirstOrDefault(c => c.Username == "demo");
 
@@ -103,7 +94,7 @@ namespace LuxuryCarRental.Data
                 demoCustomer = new Customer
                 {
                     Username = "demo",
-                    PasswordHash = "",      // blank for now
+                    PasswordHash = "", 
                     PasswordSalt = "",
                     FullName = "Demo User",
                     DriverLicenseNumber = "X1234567",
@@ -114,12 +105,11 @@ namespace LuxuryCarRental.Data
                     }
                 };
                 context.Customers.Add(demoCustomer);
-                context.SaveChanges(); // demoCustomer.Id is now assigned by EF
+                context.SaveChanges(); 
             }
 
-            // ───────────────────────────────────────
-            // 3) Ensure DemoUser has a Basket
-            // ───────────────────────────────────────
+
+            // demo basket
             if (!context.Baskets.Any(b => b.CustomerId == demoCustomer.Id))
             {
                 var basket = new Basket(demoCustomer.Id, demoCustomer);

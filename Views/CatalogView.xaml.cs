@@ -19,19 +19,16 @@ namespace LuxuryCarRental.Views
 {
     public partial class CatalogView : UserControl
     {
-        // 1) Parameterless ctor for XAML instantiation
         public CatalogView()
         {
             InitializeComponent();
 
-            // wire up its VM from the DI container
             if (Application.Current is not App app)
                 return;
 
             DataContext = app.Services.GetRequiredService<CatalogViewModel>();
         }
 
-        // 2) (Optional) an overload if you want to support DI directly
         public CatalogView(CatalogViewModel vm) : this()
         {
             DataContext = vm;
@@ -81,9 +78,6 @@ namespace LuxuryCarRental.Views
                 YachtScrollViewer.HorizontalOffset + 200);
         }
 
-        // ───────── Carousel_PreviewMouseWheel ─────────
-        // Whenever the mouse wheel is used while hovering over a horizontal carousel, 
-        // redirect the delta to the outer (vertical) ScrollViewer.
         private void Carousel_PreviewMouseWheel(object sender, MouseWheelEventArgs e)
         {
             e.Handled = true;
@@ -95,8 +89,6 @@ namespace LuxuryCarRental.Views
         }
 
 
-        // Utility: climb up until we find the outer ScrollViewer
-        // Заменяем ScrollViewer на ScrollViewer?, чтобы явно показать, что может вернуться null.
         private ScrollViewer? FindParentScrollViewer(DependencyObject child)
         {
             DependencyObject current = child;
@@ -104,7 +96,7 @@ namespace LuxuryCarRental.Views
             {
                 if (current is ScrollViewer sv)
                 {
-                    // Возвращаем только тот ScrollViewer, у которого вертикальная прокрутка не отключена:
+                    
                     if (sv.VerticalScrollBarVisibility != ScrollBarVisibility.Disabled)
                         return sv;
                 }

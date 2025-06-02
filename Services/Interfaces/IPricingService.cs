@@ -10,7 +10,7 @@ namespace LuxuryCarRental.Services.Interfaces
 {
     public interface IPricingService
     {
-        /// <summary>Calculate total cost for renting <paramref name="car"/> over <paramref name="period"/>, including any optional features.</summary>
+        // Calculate total cost 
         Money CalculateTotal(Vehicle vehicle, DateRange period, IEnumerable<string> options);
     }
 }

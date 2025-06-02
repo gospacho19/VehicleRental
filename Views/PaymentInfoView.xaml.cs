@@ -10,7 +10,6 @@ namespace LuxuryCarRental.Views
         {
             InitializeComponent();
 
-            // Now that this is a UserControl, DataContext exists:
             if (App.Current is not App app) return;
             DataContext = app.Services.GetRequiredService<PaymentInfoViewModel>();
         }

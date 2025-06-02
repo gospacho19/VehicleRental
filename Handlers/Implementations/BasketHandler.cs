@@ -36,7 +36,7 @@ namespace LuxuryCarRental.Managers.Implementations
                      customerId,
                      item.VehicleId,
                      period,
-                     Array.Empty<string>()   // <— returns an empty IEnumerable<string>
+                     Array.Empty<string>()  
                  )
              );
             }

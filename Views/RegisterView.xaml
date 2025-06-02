@@ -10,7 +10,6 @@
     Background="{StaticResource LightBackgroundBrush}">
 
     <UserControl.Resources>
-        <!-- TextBox styling from shared resources -->
         <Style x:Key="MyTextBoxStyle" TargetType="TextBox">
             <Setter Property="FontSize" Value="14"/>
             <Setter Property="BorderBrush" Value="Gray"/>
@@ -19,7 +18,6 @@
             <Setter Property="Padding" Value="4"/>
         </Style>
 
-        <!-- PasswordBox style (mirrors TextBox padding + border) -->
         <Style x:Key="MyPasswordBoxStyle" TargetType="PasswordBox">
             <Setter Property="FontSize" Value="14"/>
             <Setter Property="BorderBrush" Value="Gray"/>
@@ -29,7 +27,6 @@
         </Style>
     </UserControl.Resources>
 
-    <!-- Center the CardPanel in the available space -->
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*"/>
@@ -41,7 +38,6 @@
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
-        <!-- CardPanel Container -->
         <Border
             Grid.Column="1"
             Style="{StaticResource CardPanel}"
@@ -242,7 +238,6 @@
                         Height="32" />
                 </StackPanel>
 
-                <!-- Filler space in last row if needed -->
             </Grid>
         </Border>
     </Grid>

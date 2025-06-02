@@ -16,9 +16,7 @@ using System.Windows.Shapes;
 
 namespace LuxuryCarRental.Views
 {
-    /// <summary>
-    /// Логика взаимодействия для ConfirmationView.xaml
-    /// </summary>
+
     public partial class ConfirmationView : UserControl
     {
         public ConfirmationView()

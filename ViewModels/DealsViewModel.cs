@@ -25,11 +25,9 @@ namespace LuxuryCarRental.ViewModels
                                                             CanCancelRental);
             RefreshCommand = new RelayCommand(LoadMyDeals);
 
-            // Whenever someone sends GoToDealsMessage, reload
             WeakReferenceMessenger.Default.Register<GoToDealsMessage>(
                 this, (_, _) => LoadMyDeals());
 
-            // Initial load
             LoadMyDeals();
         }
 
@@ -45,8 +43,8 @@ namespace LuxuryCarRental.ViewModels
         {
             if (r == null) return;
 
-            _rentalHandler.CancelRental(r.Id);   // also sets Vehicle.Status = Available
-            LoadMyDeals();                       // refresh list & button states
+            _rentalHandler.CancelRental(r.Id); 
+            LoadMyDeals();                   
         }
 
         private void LoadMyDeals()
@@ -56,7 +54,6 @@ namespace LuxuryCarRental.ViewModels
             var current = _session.CurrentCustomer;
             if (current == null)
             {
-                // Optionally: show a message or do nothing if not logged in
                 return;
             }
             int customerId = current.Id;
@@ -68,7 +65,6 @@ namespace LuxuryCarRental.ViewModels
                 MyDeals.Add(r);
             }
 
-            // Re-evaluate "Cancel" button state
             CancelRentalCommand.NotifyCanExecuteChanged();
         }
     }

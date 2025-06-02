@@ -8,7 +8,6 @@ using CommunityToolkit.Mvvm.Messaging.Messages;
 
 namespace LuxuryCarRental.Messaging
 {
-    /// <summary>
     public class GoToProfileMessage : ValueChangedMessage<bool>
     {
         public GoToProfileMessage() : base(true) { }

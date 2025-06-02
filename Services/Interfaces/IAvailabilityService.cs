@@ -11,10 +11,7 @@ namespace LuxuryCarRental.Services.Interfaces
     {
         bool IsAvailable(int vehicleId, DateRange period, int? ignoreCustomerId = null);
 
-        /// <summary>
-        /// Returns all vehicle IDs that are booked (Status=Booked/Active) or in a cart
-        /// (excluding any cart items for ignoreCustomerId), overlapping the given period.
-        /// </summary>
+        // returns all vehicle IDs that are booked or in a cart
         Task<HashSet<int>> GetBlockedVehicleIdsAsync(DateRange period, int? ignoreCustomerId = null);
     }
 }

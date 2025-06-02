@@ -10,7 +10,6 @@ namespace LuxuryCarRental.Models
     {
         public Yacht() { }
 
-        // Yacht-specific properties
         public required decimal LengthInMeters { get; init; }
         public required int CabinCount { get; init; }
 

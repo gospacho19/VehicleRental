@@ -7,89 +7,103 @@
     xmlns:vm="clr-namespace:LuxuryCarRental.ViewModels"
     xmlns:views="clr-namespace:LuxuryCarRental.Views"
     mc:Ignorable="d"
-    Title="Luxury Car Rental"
-    Height="450"
-    Width="800">
+    Title="Vehicle Rental"
+    Height="600"
+    Width="1000"
+    Background="{StaticResource LightBackgroundBrush}">
 
-    <!-- 1) ViewModel→View DataTemplates -->
+
     <Window.Resources>
-        <!-- Catalog -->
         <DataTemplate DataType="{x:Type vm:CatalogViewModel}">
             <views:CatalogView />
         </DataTemplate>
-
-        <!-- Cart -->
-        <DataTemplate DataType="{x:Type vm:CartViewModel}">
-            <views:CartView />
-        </DataTemplate>
-
-        <!-- Checkout -->
-        <DataTemplate DataType="{x:Type vm:CheckoutViewModel}">
-            <views:CheckoutView />
-        </DataTemplate>
-
-        <!-- Confirmation -->
-        <DataTemplate DataType="{x:Type vm:ConfirmationViewModel}">
-            <views:ConfirmationView />
-        </DataTemplate>
-
-        <!-- Deals -->
-        <DataTemplate DataType="{x:Type vm:DealsViewModel}">
-            <views:DealsView />
-        </DataTemplate>
-
-        <!-- Category -->
         <DataTemplate DataType="{x:Type vm:CategoryViewModel}">
             <views:CategoryView />
         </DataTemplate>
-
-        <!-- Profile -->
+        <DataTemplate DataType="{x:Type vm:CartViewModel}">
+            <views:CartView />
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type vm:DealsViewModel}">
+            <views:DealsView />
+        </DataTemplate>
         <DataTemplate DataType="{x:Type vm:ProfileViewModel}">
             <views:ProfileView />
         </DataTemplate>
-
-        <!-- PaymentInfo -->
-        <DataTemplate DataType="{x:Type vm:PaymentInfoViewModel}">
-            <views:PaymentInfoView />
-        </DataTemplate>
-
-        <!-- Login -->
         <DataTemplate DataType="{x:Type vm:LoginViewModel}">
             <views:LoginView />
         </DataTemplate>
-
-        <!-- Register -->
         <DataTemplate DataType="{x:Type vm:RegisterViewModel}">
             <views:RegisterView />
         </DataTemplate>
-
         <DataTemplate DataType="{x:Type vm:VehicleDetailViewModel}">
             <views:VehicleDetailView />
         </DataTemplate>
-
-
-        <!-- MyDeals (if you have a MyDealsViewModel/MyDealsView) -->
-        <!--
-        <DataTemplate DataType="{x:Type vm:MyDealsViewModel}">
-            <views:MyDealsView />
+        <DataTemplate DataType="{x:Type vm:CheckoutViewModel}">
+            <views:CheckoutView />
         </DataTemplate>
-        -->
+        <DataTemplate DataType="{x:Type vm:PaymentInfoViewModel}">
+            <views:PaymentInfoView />
+        </DataTemplate>
     </Window.Resources>
 
-    <DockPanel>
-        <!-- 2) Navigation bar bound to MainViewModel commands -->
-        <StackPanel Orientation="Horizontal" DockPanel.Dock="Top" Margin="5">
-            <Button Content="Catalog"      Command="{Binding ShowCatalogCmd}"      Margin="2"/>
-            <Button Content="Categories"   Command="{Binding ShowCategoryCmd}"     Margin="2"/>
-            <Button Content="Cart"         Command="{Binding ShowCartCmd}"         Margin="2"/>
-            <Button Content="Checkout"     Command="{Binding ShowCheckoutCmd}"     Margin="2"/>
-            <Button Content="Confirm"      Command="{Binding ShowConfirmationCmd}"  Margin="2"/>
-            <Button Content="Deals"        Command="{Binding ShowDealsCmd}"        Margin="2"/>
-            <Button Content="Payment Info" Command="{Binding ShowPaymentInfoCmd}"  Margin="2"/>
-            <Button Content="Profile"      Command="{Binding ShowProfileCmd}"      Margin="2"/>
-        </StackPanel>
 
-        <!-- 3) Content area: shows whichever VM is CurrentViewModel -->
-        <ContentControl Content="{Binding CurrentViewModel}" />
+
+    <DockPanel>
+        <Border
+    DockPanel.Dock="Top"
+    Style="{StaticResource CardPanel}"
+    Background="{StaticResource CardBackgroundBrush}"
+    CornerRadius="4"
+    Padding="8"
+    Margin="8">
+
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" >
+
+                <!-- Catalog -->
+                <Button
+            Content="Catalog"
+            Command="{Binding ShowCatalogCmd}"
+            Style="{StaticResource NavButton}"
+            MinWidth="100"
+            Margin="0,0,8,0" />
+
+                <!-- Categories -->
+                <Button
+            Content="Categories"
+            Command="{Binding ShowCategoryCmd}"
+            Style="{StaticResource NavButton}"
+            MinWidth="100"
+            Margin="0,0,8,0" />
+
+                <!-- Cart -->
+                <Button
+            Content="Cart"
+            Command="{Binding ShowCartCmd}"
+            Style="{StaticResource NavButton}"
+            MinWidth="100"
+            Margin="0,0,8,0" />
+
+                <!-- Deals -->
+                <Button
+            Content="Deals"
+            Command="{Binding ShowDealsCmd}"
+            Style="{StaticResource NavButton}"
+            MinWidth="100"
+            Margin="0,0,8,0" />
+
+                <!-- Profile -->
+                <Button
+            Content="Profile"
+            Command="{Binding ShowProfileCmd}"
+            Style="{StaticResource NavButton}"
+            MinWidth="100"
+            Margin="0,0,0,0" />
+
+            </StackPanel>
+        </Border>
+
+        <ContentControl
+            Content="{Binding CurrentViewModel}"
+            Margin="8" />
     </DockPanel>
 </Window>

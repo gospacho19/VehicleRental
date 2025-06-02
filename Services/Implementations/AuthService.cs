@@ -1,4 +1,4 @@
-﻿// LuxuryCarRental/Services/Implementations/AuthService.cs
+﻿
 using LuxuryCarRental.Data;
 using LuxuryCarRental.Models;
 using LuxuryCarRental.Services.Interfaces;
@@ -26,11 +26,9 @@ namespace LuxuryCarRental.Services.Implementations
             string driverLicenseNumber,
             ContactInfo contact)
         {
-            // 1) Check if username is already taken
             if (_ctx.Customers.Any(c => c.Username == username))
                 throw new InvalidOperationException("Username already exists");
 
-            // 2) Generate salt + hash
             var salt = GenerateSalt();
             var hash = HashPassword(password, salt);
 
@@ -58,7 +56,6 @@ namespace LuxuryCarRental.Services.Implementations
                                .FirstOrDefault(c => c.Username == username);
             if (customer == null) return null;
 
-            // Recompute hash with stored salt
             var hash = HashPassword(password, customer.PasswordSalt);
             if (hash != customer.PasswordHash)
                 return null;
@@ -68,7 +65,7 @@ namespace LuxuryCarRental.Services.Implementations
 
         public void Logout(Customer customer)
         {
-            // On logout, clear the RememberMe boolean
+            // on logout clear RememberMe 
             customer.RememberMe = false;
             _ctx.SaveChanges();
         }
@@ -81,7 +78,7 @@ namespace LuxuryCarRental.Services.Implementations
 
         public Customer? GetRememberedUser()
         {
-            // Find the single user where RememberMe == true
+            // find the user where RememberMe == true
             return _ctx.Customers
                        .Include(c => c.Cards)
                        .Include(c => c.Rentals)

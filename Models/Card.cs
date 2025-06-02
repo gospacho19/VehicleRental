@@ -13,12 +13,10 @@ namespace LuxuryCarRental.Models
         [Key]
         public int Id { get; set; }
 
-        // Link back to Customer
         [ForeignKey(nameof(Customer))]
         public int CustomerId { get; set; }
         public virtual Customer Customer { get; set; } = default!;
 
-        // You might normally use a token instead of raw numbers
         [Required, MaxLength(16)]
         public string CardNumber { get; set; } = string.Empty;
 
@@ -32,7 +30,7 @@ namespace LuxuryCarRental.Models
         {
             get
             {
-                // e.g. “03/25”
+                // like 03/25
                 return $"{ExpiryMonth:D2}/{ExpiryYear % 100:D2}";
             }
         }
@@ -40,7 +38,7 @@ namespace LuxuryCarRental.Models
         [Required, MaxLength(4)]
         public string Cvv { get; set; } = string.Empty;
 
-        // A friendly description, e.g. “Visa ending 4242”
+        // friendly description
         [MaxLength(50)]
         public string? Nickname { get; set; }
     }

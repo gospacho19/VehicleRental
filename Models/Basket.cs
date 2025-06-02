@@ -4,7 +4,6 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-// Models/Basket.cs
 using System.Diagnostics.CodeAnalysis;
 
 namespace LuxuryCarRental.Models
@@ -19,14 +18,12 @@ namespace LuxuryCarRental.Models
         public required Customer Customer { get; init; }
 
 
-        [SetsRequiredMembers]   // tells the compiler “this ctor fulfills the required props”
+        [SetsRequiredMembers]   
         public Basket(int customerId, Customer customer)
         {
             Customer = customer ?? throw new ArgumentNullException(nameof(customer));
             CustomerId = customerId;
         }
-
-        // for EF tooling
 
         public ICollection<CartItem> Items { get; init; } = new List<CartItem>();
 

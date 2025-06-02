@@ -14,7 +14,6 @@ namespace LuxuryCarRental.Models
         public int Id { get; set; }
         public virtual string Name { get; set; } = "";
         public required Money DailyRate { get; set; }
-        // … any other shared props …
         public VehicleStatus Status { get; set; } = VehicleStatus.Available;
         public VehicleType VehicleType { get; set; }
 
@@ -58,7 +57,7 @@ namespace LuxuryCarRental.Models
                     bmp.UriSource = uri;
                     bmp.CacheOption = BitmapCacheOption.OnLoad;
                     bmp.EndInit();
-                    bmp.Freeze(); // Freeze so it’s thread‐safe
+                    bmp.Freeze();
                     _cachedImage = bmp;
                 }
                 catch
@@ -70,31 +69,22 @@ namespace LuxuryCarRental.Models
             }
         }
 
-        /// <summary>
-        /// Returns a display‐string combining the actual DB Status plus
-        /// the computed flag CurrentlyAvailable.
-        /// </summary>
         public string DisplayStatus
         {
             get
             {
-                // If the car is physically “Rented” in the DB, say “Rented”:
                 if (Status == VehicleStatus.Rented)
                     return "Rented";
 
-                // If it's marked Available in the DB but our
-                // availability check says “not available right now,” say “Unavailable”:
                 if (!CurrentlyAvailable)
                     return "Unavailable";
 
-                // Otherwise, it's truly free:
                 return "Available";
             }
         }
 
 
     }
-    // hi
     public enum VehicleType
     {
         Car,

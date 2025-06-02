@@ -27,9 +27,8 @@ namespace LuxuryCarRental.Handlers.Implementations
             _availability = availability;
         }
 
-        // Handlers/Implementations/RentalHandler.cs
         public Rental BookVehicle(int customerId,
-                                  int vehicleId,                     // ← camelCase
+                                  int vehicleId,               
                                   DateRange period,
                                   IEnumerable<string> options)
         {
@@ -37,14 +36,12 @@ namespace LuxuryCarRental.Handlers.Implementations
             if (!_availability.IsAvailable(vehicleId, period, customerId))
                 throw new InvalidOperationException("Car not available.");
 
-            // load domain objects
             var customer = _ctx.Customers.Find(customerId)
                            ?? throw new InvalidOperationException("Customer not found.");
 
             var vehicle = _ctx.Vehicles.Find(vehicleId)
                            ?? throw new InvalidOperationException("Vehicle not found.");
 
-            // price, create, persist
             var cost = _pricing.CalculateTotal(vehicle, period, options);
             var rental = new Rental(customer, vehicle, period, cost);
 

@@ -1,4 +1,4 @@
-﻿// ViewModels/VehicleDetailViewModel.cs
+﻿
 using System;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -45,21 +45,11 @@ namespace LuxuryCarRental.ViewModels
             _messenger.Register<CartUpdatedMessage>(this);
         }
 
-        /// <summary>
-        /// Public method to “load” (or refresh) this VM with a new VehicleId.
-        /// </summary>
         public void Load(int vehicleId)
         {
-            // Fetch the vehicle from the repository/DB
+            // Fetch the vehicle 
             Vehicle = _uow.Vehicles.GetById(vehicleId);
-            // Optionally, you could also compute an “CurrentlyAvailable” flag here:
-            // var todayRange = new DateRange(DateTime.Today, DateTime.Today.AddDays(1));
-            // if (Vehicle != null)
-            //     Vehicle.CurrentlyAvailable = 
-            //         (Vehicle.Status == VehicleStatus.Available) 
-            //         && _availability.IsAvailable(vehicleId, todayRange, _session.CurrentCustomer?.Id);
 
-            // After loading, requery CanExecute for AddToCart
             AddToCartCommand.NotifyCanExecuteChanged();
         }
 
@@ -68,7 +58,7 @@ namespace LuxuryCarRental.ViewModels
             if (Vehicle == null)
                 return false;
 
-            // Only allow "Add to Cart" if the vehicle is currently Available
+            // Only allow Add to Cart if the vehicle is Available
             return Vehicle.Status == VehicleStatus.Available;
         }
 
@@ -99,7 +89,6 @@ namespace LuxuryCarRental.ViewModels
 
         public void Receive(CartUpdatedMessage message)
         {
-            // Whenever the cart changes, recheck if we can still AddToCart
             AddToCartCommand.NotifyCanExecuteChanged();
         }
 

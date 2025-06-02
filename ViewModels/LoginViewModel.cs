@@ -4,7 +4,7 @@ using CommunityToolkit.Mvvm.Messaging;
 using LuxuryCarRental.Messaging;
 using LuxuryCarRental.Models;
 using LuxuryCarRental.Services.Interfaces;
-using LuxuryCarRental.Services.Implementations; // for UserSessionService
+using LuxuryCarRental.Services.Implementations; 
 
 namespace LuxuryCarRental.ViewModels
 {
@@ -17,7 +17,7 @@ namespace LuxuryCarRental.ViewModels
         public LoginViewModel(
             IAuthService auth,
             IMessenger messenger,
-            UserSessionService session)    // add session here
+            UserSessionService session)   
         {
             _auth = auth;
             _messenger = messenger;
@@ -31,7 +31,6 @@ namespace LuxuryCarRental.ViewModels
         [NotifyCanExecuteChangedFor(nameof(LoginCommand))]
         private string _username = string.Empty;
 
-        // Will be set by code‐behind PasswordBox_PasswordChanged
         [ObservableProperty]
         [NotifyCanExecuteChangedFor(nameof(LoginCommand))]
         private string _password = string.Empty;
@@ -62,16 +61,15 @@ namespace LuxuryCarRental.ViewModels
                 return;
             }
 
-            // 1) Store in session
+            // store in session
             _session.SetCurrentCustomer(customer);
 
-            // 2) “Remember Me” ...
+            // “Remember Me” 
             if (RememberMe)
                 _auth.SetRememberMe(customer, true);
             else
                 _auth.SetRememberMe(customer, false);
 
-            // 3) Notify MainVM
             _messenger.Send(new LoginSuccessfulMessage(customer));
         }
 

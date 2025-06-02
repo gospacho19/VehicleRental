@@ -9,7 +9,6 @@ namespace LuxuryCarRental.Models
 
         public int Id { get; set; }
 
-        // These fields are now required (init‐only), set at registration:
         public required string Username { get; init; }
         public required string PasswordHash { get; set; }
         public required string PasswordSalt { get; set; }
@@ -19,8 +18,7 @@ namespace LuxuryCarRental.Models
         public ContactInfo Contact { get; set; } = new ContactInfo();
         public bool IsBlacklisted { get; set; }
 
-        // wow
-        // Optional “Remember Me” bool
+        // “Remember Me” bool
         public bool RememberMe { get; set; } = false;
 
         // nav

@@ -1,4 +1,4 @@
-﻿<!-- LuxuryCarRental/Views/ConfirmationView.xaml -->
+﻿
 <UserControl
     x:Class="LuxuryCarRental.Views.ConfirmationView"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
@@ -10,20 +10,16 @@
 
     <Grid Margin="16">
         <Grid.RowDefinitions>
-            <!-- 1) Page Title -->
             <RowDefinition Height="Auto"/>
-            <!-- 2) Card Panel -->
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
-        <!-- ─────────── 1) Page Header ─────────── -->
         <TextBlock
             Grid.Row="0"
             Text="Confirm Your Rental"
             Style="{StaticResource HeaderText}"
             Margin="0,0,0,16" />
 
-        <!-- ─────────── 2) White “Card” Container ─────────── -->
         <Border
             Grid.Row="1"
             Style="{StaticResource CardPanel}"
@@ -34,20 +30,13 @@
             <Grid>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>
-                    <!-- A) Vehicle List -->
                     <RowDefinition Height="Auto"/>
-                    <!-- B) Total -->
                     <RowDefinition Height="Auto"/>
-                    <!-- C) “Card:” label -->
                     <RowDefinition Height="Auto"/>
-                    <!-- D) Card details -->
                     <RowDefinition Height="*"   />
-                    <!-- E) Spacer -->
                     <RowDefinition Height="Auto"/>
-                    <!-- F) Button Row -->
                 </Grid.RowDefinitions>
 
-                <!-- ─────────── A) Vehicle List ─────────── -->
                 <ItemsControl
                     Grid.Row="0"
                     ItemsSource="{Binding Items}">
@@ -69,7 +58,6 @@
                     </ItemsControl.ItemTemplate>
                 </ItemsControl>
 
-                <!-- ─────────── B) Total Line ─────────── -->
                 <TextBlock
                     Grid.Row="1"
                     Text="{Binding Total.Amount, StringFormat='Total: {0:C}'}"
@@ -78,7 +66,6 @@
                     Foreground="{StaticResource PrimaryBrush}"
                     Margin="0,8,0,16" />
 
-                <!-- ─────────── C) Payment Header ─────────── -->
                 <TextBlock
                     Grid.Row="2"
                     Text="Card:"
@@ -87,7 +74,6 @@
                     Foreground="{StaticResource PrimaryBrush}"
                     Margin="0,0,0,8" />
 
-                <!-- ─────────── D) Card Details ─────────── -->
                 <StackPanel Grid.Row="3" Orientation="Vertical" Margin="0,0,0,16">
                     <TextBlock
                         Text="{Binding PaymentCard.CardNumber, StringFormat='Number: {0}'}"
@@ -103,16 +89,13 @@
                     </TextBlock>
                 </StackPanel>
 
-                <!-- ─────────── E) Spacer ─────────── -->
                 <Grid Grid.Row="4" />
 
-                <!-- ─────────── F) Button Row ─────────── -->
                 <StackPanel
                     Grid.Row="5"
                     Orientation="Horizontal"
                     HorizontalAlignment="Right"
                     Margin="0,16,0,0">
-                    <!-- Back to Cart -->
                     <Button
                         Content="← Back to Cart"
                         Command="{Binding BackToCartCommand}"
@@ -120,7 +103,6 @@
                         Width="140"
                         Height="36"
                         Margin="0,0,8,0" />
-                    <!-- Confirm -->
                     <Button
                         Content="Confirm"
                         Command="{Binding ConfirmCommand}"

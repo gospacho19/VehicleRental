@@ -4,8 +4,6 @@
     xmlns:model="clr-namespace:LuxuryCarRental.Models"
     xmlns:vm="clr-namespace:LuxuryCarRental.ViewModels">
 
-    <!-- ───── VehicleCard_CatalogTemplate ───── -->
-    <!-- Binds to CatalogViewModel.AddToCartCommand -->
     <DataTemplate x:Key="VehicleCard_CatalogTemplate" DataType="{x:Type model:Vehicle}">
         <Border
         Background="White"
@@ -59,7 +57,6 @@
                    Foreground="{StaticResource SecondaryBrush}"
                    Margin="0,0,0,4"/>
 
-                <!-- “Add to Cart” Button (Catalog) -->
                 <Button Grid.Row="3"
                 Content="Add to Cart"
                 FontSize="12"
@@ -72,9 +69,7 @@
             </Grid>
         </Border>
     </DataTemplate>
-
-    <!-- ───── VehicleCard_CategoryTemplate ───── -->
-    <!-- Binds to CategoryViewModel.RentNowCommand -->
+    
     <DataTemplate x:Key="VehicleCard_CategoryTemplate" DataType="{x:Type model:Vehicle}">
         <Border
         Background="White"
@@ -97,7 +92,6 @@
                     <!-- Button -->
                 </Grid.RowDefinitions>
 
-                <!-- Vehicle Image -->
                 <Border Grid.Row="0"
                 Background="#EEE"
                 CornerRadius="2"
@@ -111,7 +105,6 @@
                  HorizontalAlignment="Center"/>
                 </Border>
 
-                <!-- Vehicle Name -->
                 <TextBlock Grid.Row="1"
                    Text="{Binding Name}"
                    FontWeight="SemiBold"
@@ -121,14 +114,12 @@
                    Foreground="{StaticResource PrimaryBrush}"
                    Margin="0,0,0,2"/>
 
-                <!-- Vehicle Price -->
                 <TextBlock Grid.Row="2"
                    Text="{Binding DailyRate.Amount, StringFormat=C}"
                    FontSize="12"
                    Foreground="{StaticResource SecondaryBrush}"
                    Margin="0,0,0,4"/>
 
-                <!-- “Rent Now” Button (Category) -->
                 <Button Grid.Row="3"
                 Content="Rent Now"
                 FontSize="12"

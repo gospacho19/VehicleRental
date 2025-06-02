@@ -1,4 +1,4 @@
-﻿// Messaging/CheckoutDraft.cs
+﻿
 using LuxuryCarRental.Models;
 using System.Collections.Generic;
 

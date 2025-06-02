@@ -10,7 +10,6 @@
     Background="{StaticResource LightBackgroundBrush}">
 
     <UserControl.Resources>
-        <!-- TextBox styling (same as other forms) -->
         <Style x:Key="MyTextBoxStyle" TargetType="TextBox">
             <Setter Property="FontSize" Value="14"/>
             <Setter Property="BorderBrush" Value="Gray"/>
@@ -19,7 +18,6 @@
             <Setter Property="Padding" Value="4"/>
         </Style>
 
-        <!-- PasswordBox styling (mirror TextBox) -->
         <Style x:Key="MyPasswordBoxStyle" TargetType="PasswordBox">
             <Setter Property="FontSize" Value="14"/>
             <Setter Property="BorderBrush" Value="Gray"/>
@@ -36,7 +34,6 @@
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
 
-        <!-- Centered CardPanel -->
         <Border
             Grid.Column="1"
             Style="{StaticResource CardPanel}"
@@ -66,7 +63,6 @@
                     <!-- 6) Error Message -->
                     <RowDefinition Height="Auto"/>
 
-                    <!-- Filler -->
                     <RowDefinition Height="*"/>
                 </Grid.RowDefinitions>
 
@@ -75,7 +71,6 @@
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
 
-                <!-- 1) Section Title -->
                 <TextBlock
                     Grid.Row="0"
                     Grid.Column="0"
@@ -85,7 +80,6 @@
                     HorizontalAlignment="Center"
                     Margin="0,0,0,16" />
 
-                <!-- 2) Username -->
                 <TextBlock
                     Grid.Row="1"
                     Grid.Column="0"
@@ -100,7 +94,6 @@
                     Text="{Binding Username, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                     Margin="0,0,0,8"/>
 
-                <!-- 3) Password -->
                 <TextBlock
                     Grid.Row="2"
                     Grid.Column="0"
@@ -115,7 +108,6 @@
                     PasswordChanged="PasswordBox_PasswordChanged"
                     Margin="0,0,0,8"/>
 
-                <!-- 4) Remember Me -->
                 <CheckBox
                     Grid.Row="3"
                     Grid.Column="1"
@@ -123,7 +115,6 @@
                     IsChecked="{Binding RememberMe, Mode=TwoWay}"
                     Margin="0,0,0,16"/>
 
-                <!-- 5) Buttons -->
                 <StackPanel
                     Grid.Row="4"
                     Grid.Column="0"
@@ -148,7 +139,6 @@
                         Height="32" />
                 </StackPanel>
 
-                <!-- 6) Error Message -->
                 <TextBlock
                     Grid.Row="5"
                     Grid.Column="0"
@@ -158,7 +148,6 @@
                     FontWeight="SemiBold"
                     Margin="0,0,0,0"/>
 
-                <!-- Filler Row 6 left deliberately blank -->
             </Grid>
         </Border>
     </Grid>

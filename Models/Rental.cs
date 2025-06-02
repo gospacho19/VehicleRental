@@ -22,11 +22,6 @@ namespace LuxuryCarRental.Models
         public required Money TotalCost { get; init; }
         public RentalStatus Status { get; set; } = RentalStatus.Booked;
 
-
-
-        /// <summary>
-        /// Creates a new Rental for the given customer, car, and date range.
-        /// </summary>
         [SetsRequiredMembers]
         public Rental(Customer customer, Vehicle vehicle, DateRange period, Money totalCost)
         {

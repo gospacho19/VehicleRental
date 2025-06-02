@@ -1,4 +1,4 @@
-﻿// LuxuryCarRental/ViewModels/ConfirmationViewModel.cs
+﻿
 using System;
 using System.Linq;
 using System.Collections.Generic;
@@ -8,7 +8,7 @@ using CommunityToolkit.Mvvm.Messaging;
 using LuxuryCarRental.Handlers.Interfaces;
 using LuxuryCarRental.Messaging;
 using LuxuryCarRental.Models;
-using LuxuryCarRental.Services.Implementations; // for UserSessionService
+using LuxuryCarRental.Services.Implementations; 
 using LuxuryCarRental.Services.Interfaces;
 
 namespace LuxuryCarRental.ViewModels
@@ -39,9 +39,7 @@ namespace LuxuryCarRental.ViewModels
             BackToCartCommand = new RelayCommand(OnBackToCart);
         }
 
-        /// <summary>
-        /// Called by MainViewModel immediately after creating or navigating to this VM.
-        /// </summary>
+
         public void Initialize(Money total,
                                IEnumerable<CartItem> items,
                                Card paymentCard)
@@ -60,9 +58,7 @@ namespace LuxuryCarRental.ViewModels
             var current = _session.CurrentCustomer
                          ?? throw new InvalidOperationException("No user is currently logged in.");
 
-            // If the cart contains multiple items with different date ranges,
-            // you might need to pass along a list of rentals. For simplicity,
-            // this example assumes every CartItem has the same Start/End dates.
+
             var firstItem = Items.FirstOrDefault()
                             ?? throw new InvalidOperationException("Cart is empty.");
 
@@ -71,20 +67,18 @@ namespace LuxuryCarRental.ViewModels
                 firstItem.EndDate
             );
 
-            // Persist a “Rental” (deal) for this customer
+            // deal for this customer
             _checkout.Checkout(
                 customerId: current.Id,
                 period: period,
                 paymentToken: "auth:" + PaymentCard.Id
             );
 
-            // Navigate to “My Deals” (or wherever makes sense after checkout)
             _messenger.Send(new GoToDealsMessage());
         }
 
         private void OnBackToCart()
         {
-            // Simply send a message that tells MainViewModel to switch to CartView.
             _messenger.Send(new GoToCartMessage());
         }
     }

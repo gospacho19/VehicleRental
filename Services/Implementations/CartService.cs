@@ -23,32 +23,29 @@ namespace LuxuryCarRental.Services.Implementations
             _pricing = pricing;
         }
 
-        // new – matches ICartService exactly
         public void AddToCart(int customerId, Vehicle vehicle, DateRange period, IEnumerable<string> options)
         {
-            // 1) Find or create the basket
+            // find or create the basket
             var basket = _ctx.Baskets
                 .Include(b => b.Items)
                 .FirstOrDefault(b => b.CustomerId == customerId);
 
             if (basket == null)
             {
-                // Ensure the customer exists
+                // if customer exists
                 var customer = _ctx.Customers.Find(customerId)
                     ?? throw new InvalidOperationException($"Customer {customerId} not found");
 
-                // Use the ctor that fulfills the required nav
                 basket = new Basket(customerId, customer);
                 _ctx.Baskets.Add(basket);
-                _ctx.SaveChanges();  // so basket.Id is set and EF is tracking it
+                _ctx.SaveChanges(); 
             }
 
-            // 2) Load the EF-tracked Vehicle instance by its Id
             var trackedVehicle = _ctx.Vehicles
                 .FirstOrDefault(v => v.Id == vehicle.Id)
                 ?? throw new InvalidOperationException($"Vehicle {vehicle.Id} not found");
 
-            // 3) Create the CartItem with the tracked entities
+            // create the CartItem
             var item = new CartItem(
                 basket: basket,
                 vehicle: trackedVehicle,
@@ -58,7 +55,6 @@ namespace LuxuryCarRental.Services.Implementations
 
             _ctx.CartItems.Add(item);
 
-            // 4) Persist
             _ctx.SaveChanges();
         }
 
@@ -66,34 +62,29 @@ namespace LuxuryCarRental.Services.Implementations
 
         public IEnumerable<CartItem> GetCartItems(int customerId)
             => _ctx.CartItems
-                   .Include(ci => ci.Vehicle)   // ← pull in the Vehicle
+                   .Include(ci => ci.Vehicle)  
                    .Where(ci => ci.Basket.CustomerId == customerId)
                    .ToList();
 
         public Money GetCartTotal(int customerId)
         {
             var totalAmount = GetCartItems(customerId)
-                .Sum(ci => ci.Subtotal.Amount);   // <-- use Subtotal.Amount (decimal)
+                .Sum(ci => ci.Subtotal.Amount);  
 
-            // 2) Wrap it into Money
             return new Money(totalAmount, "USD");
         }
 
         public void RemoveFromCart(int customerId, int cartItemId)
         {
-            // 1) Load the CartItem *and* its Vehicle
             var item = _ctx.CartItems
                            .Include(ci => ci.Vehicle)
                            .FirstOrDefault(ci => ci.Id == cartItemId);
             if (item != null)
             {
-                // 2) Reset that vehicle’s status to Available
                 item.Vehicle.Status = VehicleStatus.Available;
 
-                // 3) Remove the CartItem
                 _ctx.CartItems.Remove(item);
 
-                // 4) Persist both changes
                 _ctx.SaveChanges();
             }
         }
@@ -106,14 +97,12 @@ namespace LuxuryCarRental.Services.Implementations
                             .Where(ci => ci.Basket.CustomerId == customerId)
                             .ToList();
 
-            // 1) Mark each vehicle as Available
+            // mark each vehicle as Available
             foreach (var ci in items)
                 ci.Vehicle.Status = VehicleStatus.Available;
 
-            // 2) Remove all CartItems
             _ctx.CartItems.RemoveRange(items);
 
-            // 3) Persist
             _ctx.SaveChanges();
         }
 

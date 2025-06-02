@@ -1,11 +1,11 @@
-﻿// LuxuryCarRental/ViewModels/RegisterViewModel.cs
+﻿
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
 using LuxuryCarRental.Messaging;
 using LuxuryCarRental.Models;
 using LuxuryCarRental.Services.Interfaces;
-using LuxuryCarRental.Services.Implementations; // for UserSessionService
+using LuxuryCarRental.Services.Implementations; 
 using System;
 using System.Text.RegularExpressions;
 using System.Diagnostics;
@@ -16,16 +16,16 @@ namespace LuxuryCarRental.ViewModels
     {
         private readonly IAuthService _auth;
         private readonly IMessenger _messenger;
-        private readonly UserSessionService _session;   // add UserSessionService
+        private readonly UserSessionService _session;  
 
         public RegisterViewModel(
             IAuthService auth,
             IMessenger messenger,
-            UserSessionService session)       // inject it here
+            UserSessionService session)      
         {
             _auth = auth;
             _messenger = messenger;
-            _session = session;               // assign it
+            _session = session;              
 
             RegisterCommand = new RelayCommand(OnRegister, CanRegister);
             CancelCommand = new RelayCommand(OnCancel);
@@ -35,12 +35,10 @@ namespace LuxuryCarRental.ViewModels
         [NotifyCanExecuteChangedFor(nameof(RegisterCommand))]
         private string _username = string.Empty;
 
-        // Bound by View’s code-behind from PasswordBox
         [ObservableProperty]
         [NotifyCanExecuteChangedFor(nameof(RegisterCommand))]
         private string _password = string.Empty;
 
-        // Bound by View’s code-behind from ConfirmPasswordBox
         [ObservableProperty]
         [NotifyCanExecuteChangedFor(nameof(RegisterCommand))]
         private string _confirmPassword = string.Empty;
@@ -69,7 +67,6 @@ namespace LuxuryCarRental.ViewModels
 
         private bool CanRegister()
         {
-            // All fields must be non‐empty, and Password == ConfirmPassword
             if (string.IsNullOrWhiteSpace(Username))
             {
                 Debug.WriteLine("Username is blank");
@@ -132,8 +129,7 @@ namespace LuxuryCarRental.ViewModels
 
             try
             {
-                // 1) Perform actual registration via the IAuthService
-                //    Assume Register(...) returns a Customer object if successful
+                
                 var newCustomer = _auth.Register(
                     Username.Trim(),
                     Password,
@@ -147,23 +143,19 @@ namespace LuxuryCarRental.ViewModels
                     return;
                 }
 
-                // 2) Immediately set this new customer into session
                 _session.SetCurrentCustomer(newCustomer);
 
-                // 3) Now that “bob” (for example) is in session, navigate directly to Catalog
-                //    so that Catalog/CART/DEALS etc. will all use newCustomer.Id.
                 _messenger.Send(new LoginSuccessfulMessage(newCustomer));
             }
             catch (Exception ex)
             {
-                // If the underlying service throws (e.g. username taken), display that
                 ErrorMessage = ex.Message;
             }
         }
 
         private void OnCancel()
         {
-            // If the user cancels registration, go back to the Login screen
+            // If user cancels registration go back to the Login screen
             _messenger.Send(new GoToLoginMessage());
         }
     }

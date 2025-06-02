@@ -14,22 +14,16 @@
 
     <Grid Margin="16">
         <Grid.RowDefinitions>
-            <!-- 1) Section Title -->
             <RowDefinition Height="Auto"/>
-            <!-- 2) The white card containing DataGrid + footer -->
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
-        <!-- ────────────────────────────────────────────────────────────────── -->
-        <!-- 1) SECTION TITLE (“Your Cart”)                                     -->
         <TextBlock
             Grid.Row="0"
             Text="Your Cart"
             Style="{StaticResource SectionTitleText}"
             Margin="0,0,0,12" />
 
-        <!-- ────────────────────────────────────────────────────────────────── -->
-        <!-- 2) MAIN CARD PANEL (white background, shadow, corner radius)       -->
         <Border
             Grid.Row="1"
             Style="{StaticResource CardPanel}"
@@ -39,13 +33,10 @@
 
             <Grid>
                 <Grid.RowDefinitions>
-                    <!-- 2A) DATA GRID -->
                     <RowDefinition Height="*"/>
-                    <!-- 2B) FOOTER (Total + clear/checkout) -->
                     <RowDefinition Height="Auto"/>
                 </Grid.RowDefinitions>
 
-                <!-- ────────── (2A) CART DataGrid ────────── -->
                 <Border
                     Grid.Row="0"
                     Background="{StaticResource LightBackgroundBrush}"
@@ -70,12 +61,10 @@
                         VirtualizingPanel.VirtualizationMode="Recycling">
 
                         <DataGrid.Resources>
-                            <!-- 1) Cell padding so contents have breathing room -->
                             <Style TargetType="DataGridCell">
                                 <Setter Property="Padding" Value="8,0" />
                                 <Setter Property="BorderThickness" Value="0,0,0,0" />
                             </Style>
-                            <!-- 2) Header padding & left alignment -->
                             <Style TargetType="DataGridColumnHeader">
                                 <Setter Property="Padding" Value="8,0"/>
                                 <Setter Property="HorizontalContentAlignment" Value="Left"/>
@@ -83,7 +72,7 @@
                         </DataGrid.Resources>
 
                         <DataGrid.Columns>
-                            <!-- 2A-1) Vehicle Image Column (100×100) -->
+                            <!-- Vehicle Image Column  -->
                             <DataGridTemplateColumn Header="Image" Width="Auto" MinWidth="120">
                                 <DataGridTemplateColumn.CellTemplate>
                                     <DataTemplate>
@@ -97,28 +86,25 @@
                                 </DataGridTemplateColumn.CellTemplate>
                             </DataGridTemplateColumn>
 
-                            <!-- 2A-2) Vehicle Make -->
                             <DataGridTextColumn
                                 Header="Type"
                                 Binding="{Binding Vehicle.VehicleType}"
                                 Width="2*"
                                 MinWidth="120"/>
 
-                            <!-- 2A-3) Vehicle Model -->
                             <DataGridTextColumn
                                 Header="Name"
                                 Binding="{Binding Vehicle.Name}"
                                 Width="2*"
                                 MinWidth="120"/>
 
-                            <!-- 2A-4) Subtotal -->
+                            <!--  Subtotal -->
                             <DataGridTextColumn
                                 Header="Subtotal"
                                 Binding="{Binding Subtotal, StringFormat=C}"
                                 Width="Auto"
                                 MinWidth="100"/>
 
-                            <!-- 2A-5) Actions (Remove button fills almost entire cell) -->
                             <DataGridTemplateColumn Header="Actions" Width="Auto" MinWidth="140">
                                 <DataGridTemplateColumn.CellTemplate>
                                     <DataTemplate>
@@ -139,13 +125,13 @@
                     </DataGrid>
                 </Border>
 
-                <!-- ────────── (2B) FOOTER: Total Daily Rate + Clear/Proceed Buttons ────────── -->
+                
                 <StackPanel
                     Grid.Row="1"
                     Orientation="Horizontal"
                     HorizontalAlignment="Right"
                     Margin="0,0,0,0">
-                    <!-- Each child (except last) gets right-margin 12 -->
+                    
                     <TextBlock
                         Text="Total Daily Rate:"
                         FontWeight="Bold"

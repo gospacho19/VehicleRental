@@ -23,16 +23,12 @@ namespace LuxuryCarRental.ViewModels
         [NotifyCanExecuteChangedFor(nameof(BeginEditCardCommand))]
         private Card? _selectedCard;
 
-        // ──────────────────────────────────────────────────────────────────────────
-        // “Add/Edit Card” panel state & fields (nickname removed)
-        // ──────────────────────────────────────────────────────────────────────────
+
+        // “Add/Edit Card” panel state & fields 
+
         [ObservableProperty] private bool _isAddingOrEditingCard;
         [ObservableProperty] private bool _isEditingExistingCard;
 
-        // We no longer need NewCardNickname, so it’s gone:
-        // [ObservableProperty]
-        // [NotifyCanExecuteChangedFor(nameof(SaveCardCommand))]
-        // private string _newCardNickname = string.Empty;
 
         [ObservableProperty]
         [NotifyCanExecuteChangedFor(nameof(SaveCardCommand))]
@@ -40,7 +36,7 @@ namespace LuxuryCarRental.ViewModels
 
         [ObservableProperty]
         [NotifyCanExecuteChangedFor(nameof(SaveCardCommand))]
-        private string _newExpiry = string.Empty; // e.g. "01/25"
+        private string _newExpiry = string.Empty; 
 
         [ObservableProperty]
         [NotifyCanExecuteChangedFor(nameof(SaveCardCommand))]
@@ -48,9 +44,7 @@ namespace LuxuryCarRental.ViewModels
 
         [ObservableProperty] private string _errorMessage = string.Empty;
 
-        // ──────────────────────────────────────────────────────────────────────────
         // Commands
-        // ──────────────────────────────────────────────────────────────────────────
         public IRelayCommand RefreshCommand { get; }
         public IRelayCommand BeginAddCardCommand { get; }
         public IRelayCommand BeginEditCardCommand { get; }
@@ -94,7 +88,6 @@ namespace LuxuryCarRental.ViewModels
         private void OnBeginAddCard()
         {
             IsEditingExistingCard = false;
-            // NewCardNickname = string.Empty;   // removed
             NewCardNumber = string.Empty;
             NewExpiry = string.Empty;
             NewCvv = string.Empty;
@@ -109,7 +102,6 @@ namespace LuxuryCarRental.ViewModels
             if (card == null) return;
 
             IsEditingExistingCard = true;
-            // Prefill the number/expiry/CVV; nickname is auto‐generated below on save
             NewCardNumber = card.CardNumber;
             NewExpiry = $"{card.ExpiryMonth:D2}/{card.ExpiryYear % 100:D2}";
             NewCvv = card.Cvv;
@@ -118,7 +110,6 @@ namespace LuxuryCarRental.ViewModels
             IsAddingOrEditingCard = true;
         }
 
-        // Updated CanSaveCard: no longer checks nickname, only number/expiry/CVV
         private bool CanSaveCard()
         {
             return
@@ -137,7 +128,7 @@ namespace LuxuryCarRental.ViewModels
                 return;
             }
 
-            // 1) Validate card number: exactly 16 digits
+            // exactly 16 digits
             var number = NewCardNumber.Trim();
             if (!Regex.IsMatch(number, @"^\d{16}$"))
             {
@@ -145,7 +136,7 @@ namespace LuxuryCarRental.ViewModels
                 return;
             }
 
-            // 2) Validate expiry “MM/YY” or “MM/YYYY”
+            // expiry “MM/YY” 
             var parts = NewExpiry.Trim().Split('/');
             if (parts.Length != 2
                 || !int.TryParse(parts[0], out int m)
@@ -170,21 +161,19 @@ namespace LuxuryCarRental.ViewModels
                 return;
             }
 
-            // 3) Validate CVV: 3 or 4 digits
+            // CVV: 3 or 4 digits
             if (!Regex.IsMatch(NewCvv.Trim(), @"^\d{3,4}$"))
             {
                 ErrorMessage = "CVV must be 3 or 4 digits.";
                 return;
             }
 
-            // 4) Compute the nickname from the last 4 digits:
-            //    e.g. "Card ending 1234"
+            // Compute the nickname from the last 4 digits
             var last4 = number.Substring(number.Length - 4);
             var nickname = "Card ending " + last4;
 
             if (IsEditingExistingCard && SelectedCard != null)
             {
-                // Update existing card
                 SelectedCard.Nickname = nickname;
                 SelectedCard.CardNumber = number;
                 SelectedCard.ExpiryMonth = m;
@@ -196,7 +185,6 @@ namespace LuxuryCarRental.ViewModels
             }
             else
             {
-                // Insert new card with auto‐generated nickname
                 var card = new Card
                 {
                     CustomerId = current.Id,

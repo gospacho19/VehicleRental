@@ -1,4 +1,4 @@
-﻿<!-- LuxuryCarRental/Views/CheckoutView.xaml -->
+﻿
 <UserControl
     x:Class="LuxuryCarRental.Views.CheckoutView"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
@@ -12,9 +12,7 @@
     Background="{StaticResource LightBackgroundBrush}"
     >
 
-    <!-- ────── LOCAL RESOURCES ────── -->
     <UserControl.Resources>
-        <!-- “Use new card” stack only visible when SelectedSavedCard.Id == -1 -->
         <Style x:Key="ShowWhenPlaceholder" TargetType="StackPanel">
             <Setter Property="Visibility" Value="Collapsed"/>
             <Style.Triggers>
@@ -33,16 +31,12 @@
             </Style.Triggers>
         </Style>
     </UserControl.Resources>
-    <!-- ────────────────────────────────────────────────────────────────── -->
 
 
     <Grid Margin="16">
-        <!-- 1) Page Header (“Checkout”) -->
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
-            <!-- Header -->
             <RowDefinition Height="*"/>
-            <!-- CardPanel -->
         </Grid.RowDefinitions>
 
         <TextBlock
@@ -51,7 +45,6 @@
             Style="{StaticResource HeaderText}"
             Margin="0,0,0,16" />
 
-        <!-- 2) CardPanel containing all content -->
         <Border
             Grid.Row="1"
             Style="{StaticResource CardPanel}"
@@ -60,7 +53,6 @@
             Padding="{StaticResource ContentPadding}">
 
             <DockPanel LastChildFill="True">
-                <!-- A) Scrollable form (dates, cart grid, payment) -->
                 <ScrollViewer
                     DockPanel.Dock="Top"
                     VerticalScrollBarVisibility="Auto"
@@ -68,7 +60,6 @@
                     Margin="0,0,0,8">
 
                     <StackPanel>
-                        <!-- ─── 1) Date Pickers ─── -->
                         <StackPanel Orientation="Horizontal" Margin="0,0,0,16">
                             <TextBlock Text="Start Date:" VerticalAlignment="Center" Margin="0,0,8,0"/>
                             <DatePicker
@@ -90,7 +81,6 @@
                                 VerticalAlignment="Center" />
                         </StackPanel>
 
-                        <!-- ─── 2) Cart Items DataGrid ─── -->
                         <DataGrid
                             ItemsSource="{Binding CartItems}"
                             AutoGenerateColumns="False"
@@ -129,15 +119,12 @@
                             </DataGrid.Columns>
                         </DataGrid>
 
-                        <!-- ─── 3) Payment Section Header ─── -->
                         <TextBlock
                             Text="Payment Information"
                             Style="{StaticResource SectionTitleText}"
                             Margin="0,0,0,8" />
 
-                        <!-- ─── 4) Payment Fields ─── -->
                         <StackPanel Orientation="Vertical" Margin="0,0,0,8">
-                            <!-- 4a) Use Saved Card -->
                             <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
                                 <TextBlock Text="Use Saved Card:" VerticalAlignment="Center"/>
                                 <ComboBox
@@ -171,14 +158,12 @@
                                     Margin="8,0,0,0"/>
                             </StackPanel>
 
-                            <!-- 4b) “Remember this card” only when new‐card placeholder -->
                             <CheckBox
                                 Content="Remember this card"
                                 IsChecked="{Binding RememberCard, Mode=TwoWay}"
                                 Style="{StaticResource ShowCheckBoxWhenPlaceholder}"
                                 Margin="0,0,0,8"/>
 
-                            <!-- 4c) Manual entry fields (when new‐card placeholder) -->
                             <StackPanel
                                 Style="{StaticResource ShowWhenPlaceholder}"
                                 Margin="0,0,0,8">
@@ -205,14 +190,12 @@
                     </StackPanel>
                 </ScrollViewer>
 
-                <!-- B) Button Row (always visible, clickable) -->
                 <StackPanel
                     DockPanel.Dock="Bottom"
                     Orientation="Horizontal"
                     HorizontalAlignment="Right"
                     Margin="0,8,0,0">
 
-                    <!-- ← Back to Cart -->
                     <Button
                         Content="← Back to Cart"
                         Command="{Binding BackToCartCommand}"
@@ -221,7 +204,6 @@
                         Height="36"
                         Margin="0,0,8,0"/>
 
-                    <!-- Confirm &amp; Pay -->
                     <Button
                         Content="Confirm &amp; Pay"
                         Command="{Binding PayCommand}"

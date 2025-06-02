@@ -16,9 +16,6 @@ using LuxuryCarRental.ViewModels;
 
 namespace LuxuryCarRental.Views
 {
-    /// <summary>
-    /// Логика взаимодействия для CartView.xaml
-    /// </summary>
     public partial class CartView : UserControl
     {
         public CartView()

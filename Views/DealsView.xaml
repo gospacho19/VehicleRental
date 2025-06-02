@@ -9,15 +9,10 @@
     d:DesignWidth="700"
     Background="{StaticResource LightBackgroundBrush}">
 
-    <!-- ────────────────────── Resources ────────────────────── -->
     <UserControl.Resources>
-        <!--
-          1. Default “CancelButtonStyle” inherits from nothing special,
-             but you could copy your Primary/Secondary button brushes here.
-        2. When Status == “Cancelled”, we override to light gray + disable.
-        -->
+
         <Style x:Key="CancelButtonStyle" TargetType="Button">
-            <!-- Default appearance (enabled) -->
+
             <Setter Property="Background"      Value="{StaticResource SecondaryBrush}" />
             <Setter Property="Foreground"      Value="White"                  />
             <Setter Property="Padding"         Value="4,1"                    />
@@ -29,7 +24,6 @@
             <Setter Property="HorizontalAlignment" Value="Center"              />
             <Setter Property="VerticalAlignment"   Value="Center"              />
             <Setter Property="IsEnabled"       Value="True"                    />
-            <!-- Rounded corners using a simple ControlTemplate: -->
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="Button">
@@ -46,9 +40,7 @@
             </Setter>
 
             <Style.Triggers>
-                <!-- If the underlying “Status” property equals “Cancelled”… -->
                 <DataTrigger Binding="{Binding Status}" Value="Cancelled">
-                    <!-- … change colors to light gray + disable the button -->
                     <Setter Property="Background"    Value="LightGray" />
                     <Setter Property="Foreground"    Value="Gray"      />
                     <Setter Property="IsEnabled"     Value="False"     />
@@ -56,7 +48,6 @@
             </Style.Triggers>
         </Style>
     </UserControl.Resources>
-    <!-- ──────────────────────────────────────────────────────── -->
 
     <Grid Margin="20">
         <Grid.RowDefinitions>
@@ -81,49 +72,42 @@
             VirtualizingPanel.VirtualizationMode="Recycling">
 
             <DataGrid.Columns>
-                <!-- ─────── Type ─────── -->
                 <DataGridTextColumn
                     Header="Type"
                     Binding="{Binding Vehicle.VehicleType}"
                     Width="*"
                     MinWidth="80" />
 
-                <!-- ─────── Name ─────── -->
                 <DataGridTextColumn
                     Header="Name"
                     Binding="{Binding Vehicle.Name}"
                     Width="2*"
                     MinWidth="120" />
 
-                <!-- ─────── Start Date ─────── -->
                 <DataGridTextColumn
                     Header="Start"
                     Binding="{Binding StartDate, StringFormat=d}"
                     Width="Auto"
                     MinWidth="100" />
 
-                <!-- ─────── End Date ─────── -->
                 <DataGridTextColumn
                     Header="End"
                     Binding="{Binding EndDate, StringFormat=d}"
                     Width="Auto"
                     MinWidth="100" />
 
-                <!-- ─────── Total Cost ─────── -->
                 <DataGridTextColumn
                     Header="Total"
                     Binding="{Binding TotalCost, StringFormat=C}"
                     Width="Auto"
                     MinWidth="100" />
 
-                <!-- ─────── Status ─────── -->
                 <DataGridTextColumn
                     Header="Status"
                     Binding="{Binding Status}"
                     Width="Auto"
                     MinWidth="80" />
 
-                <!-- ─────── Cancel Button ─────── -->
                 <DataGridTemplateColumn Header="" MinWidth="100" Width="Auto">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
