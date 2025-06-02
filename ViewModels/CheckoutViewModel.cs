@@ -50,6 +50,9 @@ namespace LuxuryCarRental.ViewModels
             PayCommand = new RelayCommand(OnPay, CanPay);
             NavigateToPaymentInfoCommand = new RelayCommand(() =>
                 _messenger.Send(new GoToPaymentInfoMessage()));
+            BackToCartCommand = new RelayCommand(() =>
+            _messenger.Send(new GoToCartMessage())
+            );
 
             // Any time StartDate/EndDate changes, update the cart item date ranges:
             PropertyChanged += (_, e) =>
@@ -147,6 +150,7 @@ namespace LuxuryCarRental.ViewModels
         public IRelayCommand PayCommand { get; }
         public IRelayCommand RefreshCommand { get; }
         public IRelayCommand NavigateToPaymentInfoCommand { get; }
+        public IRelayCommand BackToCartCommand { get; }
 
 
         // ────────── Public Methods ──────────
@@ -366,6 +370,8 @@ namespace LuxuryCarRental.ViewModels
                 totalMoney,
                 CartItems.ToList(),
                 cardToCharge));
+
+
 
             // 5) Clear the form for next time:
             CardNumber = string.Empty;

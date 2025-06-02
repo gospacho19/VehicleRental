@@ -5,6 +5,17 @@
     xmlns:converters="clr-namespace:LuxuryCarRental.Converters">
 
     <Application.Resources>
-        <converters:NullToBoolConverter x:Key="NullToBoolConverter" />
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <!-- 1) Styles must come first (so brushes, thickness, button‐styles exist) -->
+                <ResourceDictionary Source="Styles.xaml" />
+
+                <!-- 2) Templates must come after Styles (because VehicleCardTemplate uses BorderBrushColor, etc.) -->
+                <ResourceDictionary Source="Templates.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+
+            <!-- Any other app‐wide resources, e.g. converters: -->
+            <converters:NullToBoolConverter x:Key="NullToBoolConverter" />
+        </ResourceDictionary>
     </Application.Resources>
 </Application>

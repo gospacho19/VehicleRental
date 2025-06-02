@@ -155,6 +155,14 @@ namespace LuxuryCarRental.ViewModels
                 }
             });
 
+            messenger.Register<GoToCartMessage>(this, (r, msg) => {
+                // Refresh the CartViewModel if needed:
+                CartVM.RefreshCommand.Execute(null);
+                // Switch the content
+                CurrentViewModel = CartVM;
+            });
+
+
             // 7) Now register for “GoToVehicleDetail” and “GoToCategoryView”
             messenger.Register<GoToVehicleDetailMessage>(this);
             messenger.Register<GoToCategoryViewMessage>(this);

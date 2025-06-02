@@ -1,105 +1,177 @@
-﻿<!-- CartView.xaml -->
-<UserControl
+﻿<UserControl
     x:Class="LuxuryCarRental.Views.CartView"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-    mc:Ignorable="d"
     xmlns:vm="clr-namespace:LuxuryCarRental.ViewModels"
+    mc:Ignorable="d"
     d:DesignHeight="450"
-    d:DesignWidth="800">
+    d:DesignWidth="800"
+    Background="{StaticResource LightBackgroundBrush}">
 
-    <!-- DataContext will be set in code-behind via DI -->
-    <Grid Margin="10">
+
+
+    <Grid Margin="16">
         <Grid.RowDefinitions>
-            <RowDefinition Height="*" />
-            <RowDefinition Height="Auto" />
+            <!-- 1) Section Title -->
+            <RowDefinition Height="Auto"/>
+            <!-- 2) The white card containing DataGrid + footer -->
+            <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
-        <!-- DataGrid showing CartItems -->
-        <DataGrid
+        <!-- ────────────────────────────────────────────────────────────────── -->
+        <!-- 1) SECTION TITLE (“Your Cart”)                                     -->
+        <TextBlock
             Grid.Row="0"
-            ItemsSource="{Binding Items}"
-            AutoGenerateColumns="False"
-            CanUserAddRows="False"
-            IsReadOnly="True"
-            RowHeight="100"
-            HeadersVisibility="Column">
-            <DataGrid.Columns>
-                <!-- 1) Vehicle Image Column -->
-                <DataGridTemplateColumn Header="Image" Width="Auto">
-                    <DataGridTemplateColumn.CellTemplate>
-                        <DataTemplate>
-                            <Image
-                                Source="{Binding Vehicle.ImageSource}"
-                                Width="80"
-                                Height="80"
-                                Stretch="UniformToFill"
-                                Margin="4"/>
-                        </DataTemplate>
-                    </DataGridTemplateColumn.CellTemplate>
-                </DataGridTemplateColumn>
+            Text="Your Cart"
+            Style="{StaticResource SectionTitleText}"
+            Margin="0,0,0,12" />
 
-                <!-- 2) Vehicle Make -->
-                <DataGridTextColumn
-                    Header="Make"
-                    Binding="{Binding Vehicle.Make}"
-                    Width="*"/>
-
-                <!-- 3) Vehicle Model -->
-                <DataGridTextColumn
-                    Header="Model"
-                    Binding="{Binding Vehicle.Model}"
-                    Width="*"/>
-
-                <!-- 4) Subtotal -->
-                <DataGridTextColumn
-                    Header="Subtotal"
-                    Binding="{Binding Subtotal, StringFormat=C}"
-                    Width="Auto"/>
-
-                <!-- 5) Actions (Remove button) -->
-                <DataGridTemplateColumn Header="Actions" Width="Auto">
-                    <DataGridTemplateColumn.CellTemplate>
-                        <DataTemplate>
-                            <Button
-                                Content="Remove"
-                                Command="{Binding DataContext.RemoveCommand,
-                                                  RelativeSource={RelativeSource AncestorType=UserControl}}"
-                                CommandParameter="{Binding}"
-                                Padding="4,2"
-                                Margin="4"/>
-                        </DataTemplate>
-                    </DataGridTemplateColumn.CellTemplate>
-                </DataGridTemplateColumn>
-            </DataGrid.Columns>
-        </DataGrid>
-
-        <!-- Bottom bar: Total, Clear, and Proceed to Checkout -->
-        <StackPanel
+        <!-- ────────────────────────────────────────────────────────────────── -->
+        <!-- 2) MAIN CARD PANEL (white background, shadow, corner radius)       -->
+        <Border
             Grid.Row="1"
-            Orientation="Horizontal"
-            HorizontalAlignment="Right"
-            Margin="0,10,0,0">
-            <TextBlock
-                Text="Total: "
-                FontWeight="Bold"
-                VerticalAlignment="Center"/>
-            <TextBlock
-                Text="{Binding Total, StringFormat=C}"
-                FontWeight="Bold"
-                Margin="0,0,20,0"
-                VerticalAlignment="Center"/>
+            Style="{StaticResource CardPanel}"
+            Background="{StaticResource CardBackgroundBrush}"
+            CornerRadius="8"
+            Padding="16">
 
-            <Button
-                Content="Clear Cart"
-                Command="{Binding ClearCommand}"
-                Margin="0,0,10,0"/>
+            <Grid>
+                <Grid.RowDefinitions>
+                    <!-- 2A) DATA GRID -->
+                    <RowDefinition Height="*"/>
+                    <!-- 2B) FOOTER (Total + clear/checkout) -->
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
 
-            <Button Content="Proceed to Checkout"
-                    Command="{Binding ProceedToCheckoutCommand}"/>
+                <!-- ────────── (2A) CART DataGrid ────────── -->
+                <Border
+                    Grid.Row="0"
+                    Background="{StaticResource LightBackgroundBrush}"
+                    CornerRadius="4"
+                    Padding="8"
+                    Margin="0,0,0,12">
+                    <DataGrid
+                        ItemsSource="{Binding Items}"
+                        AutoGenerateColumns="False"
+                        CanUserAddRows="False"
+                        IsReadOnly="True"
+                        RowHeight="100"
+                        HeadersVisibility="Column"
+                        GridLinesVisibility="All"
+                        HorizontalGridLinesBrush="#E0E0E0"
+                        VerticalGridLinesBrush="#E0E0E0"
+                        AlternatingRowBackground="{StaticResource VeryLightGrayBrush}"
+                        RowBackground="White"
+                        ColumnHeaderHeight="32"
+                        ColumnHeaderStyle="{StaticResource CartDataGridHeaderStyle}"
+                        VirtualizingPanel.IsVirtualizing="True"
+                        VirtualizingPanel.VirtualizationMode="Recycling">
 
-        </StackPanel>
+                        <DataGrid.Resources>
+                            <!-- 1) Cell padding so contents have breathing room -->
+                            <Style TargetType="DataGridCell">
+                                <Setter Property="Padding" Value="8,0" />
+                                <Setter Property="BorderThickness" Value="0,0,0,0" />
+                            </Style>
+                            <!-- 2) Header padding & left alignment -->
+                            <Style TargetType="DataGridColumnHeader">
+                                <Setter Property="Padding" Value="8,0"/>
+                                <Setter Property="HorizontalContentAlignment" Value="Left"/>
+                            </Style>
+                        </DataGrid.Resources>
+
+                        <DataGrid.Columns>
+                            <!-- 2A-1) Vehicle Image Column (100×100) -->
+                            <DataGridTemplateColumn Header="Image" Width="Auto" MinWidth="120">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <Image
+                                            Source="{Binding Vehicle.ImageSource}"
+                                            Width="100"
+                                            Height="100"
+                                            Stretch="UniformToFill"
+                                            Margin="4"/>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+
+                            <!-- 2A-2) Vehicle Make -->
+                            <DataGridTextColumn
+                                Header="Type"
+                                Binding="{Binding Vehicle.VehicleType}"
+                                Width="2*"
+                                MinWidth="120"/>
+
+                            <!-- 2A-3) Vehicle Model -->
+                            <DataGridTextColumn
+                                Header="Name"
+                                Binding="{Binding Vehicle.Name}"
+                                Width="2*"
+                                MinWidth="120"/>
+
+                            <!-- 2A-4) Subtotal -->
+                            <DataGridTextColumn
+                                Header="Subtotal"
+                                Binding="{Binding Subtotal, StringFormat=C}"
+                                Width="Auto"
+                                MinWidth="100"/>
+
+                            <!-- 2A-5) Actions (Remove button fills almost entire cell) -->
+                            <DataGridTemplateColumn Header="Actions" Width="Auto" MinWidth="140">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <Button
+                                            Content="Remove"
+                                            Command="{Binding DataContext.RemoveCommand, 
+                                                              RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                            CommandParameter="{Binding}"
+                                            Style="{StaticResource SecondaryButton}"
+                                            HorizontalAlignment="Stretch"
+                                            VerticalAlignment="Center"
+                                            Padding="8,4"
+                                            Margin="4,0"/>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </Border>
+
+                <!-- ────────── (2B) FOOTER: Total Daily Rate + Clear/Proceed Buttons ────────── -->
+                <StackPanel
+                    Grid.Row="1"
+                    Orientation="Horizontal"
+                    HorizontalAlignment="Right"
+                    Margin="0,0,0,0">
+                    <!-- Each child (except last) gets right-margin 12 -->
+                    <TextBlock
+                        Text="Total Daily Rate:"
+                        FontWeight="Bold"
+                        VerticalAlignment="Center"
+                        Margin="0,0,12,0"/>
+
+                    <TextBlock
+                        Text="{Binding Total, StringFormat=C}"
+                        FontWeight="Bold"
+                        VerticalAlignment="Center"
+                        Margin="0,0,12,0"/>
+
+                    <Button
+                        Content="Clear Cart"
+                        Command="{Binding ClearCommand}"
+                        Style="{StaticResource SecondaryButton}"
+                        Padding="8,4"
+                        Margin="0,0,12,0"/>
+
+                    <Button
+                        Content="Proceed to Checkout"
+                        Command="{Binding ProceedToCheckoutCommand}"
+                        Style="{StaticResource PrimaryButton}"
+                        Padding="8,4"/>
+                </StackPanel>
+            </Grid>
+        </Border>
     </Grid>
 </UserControl>

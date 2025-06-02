@@ -6,50 +6,66 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d"
     d:DesignHeight="500"
-    d:DesignWidth="700">
+    d:DesignWidth="700"
+    Background="{StaticResource LightBackgroundBrush}">
 
     <UserControl.Resources>
-        <!-- BooleanToVisibility converter (already in place) -->
-        <BooleanToVisibilityConverter x:Key="BoolToVis" />
+        <!-- 1) If you actually need BoolToVis, define it here: -->
+        <BooleanToVisibilityConverter x:Key="BoolToVis"/>
 
-        <!-- A simple style that disables any Button when its SelectedCard is null.
-             We will use this to gray out the Delete button if nothing is selected. -->
+        <!-- 2) A style that targets StackPanel only -->
+        <Style x:Key="ShowWhenEditing" TargetType="StackPanel">
+            <Setter Property="Visibility" Value="Collapsed"/>
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding IsAddingOrEditingCard}" Value="True">
+                    <Setter Property="Visibility" Value="Visible"/>
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+
+        <!-- 3) A style that targets CheckBox only -->
         <Style x:Key="DisableWhenNoSelection" TargetType="Button">
             <Setter Property="IsEnabled" Value="True"/>
             <Style.Triggers>
-                <!-- If SelectedCard is null, IsEnabled → False -->
                 <DataTrigger Binding="{Binding SelectedCard}" Value="{x:Null}">
                     <Setter Property="IsEnabled" Value="False"/>
                 </DataTrigger>
             </Style.Triggers>
+        </Style>
+
+        <!-- 4) A style that targets TextBox only (no mismatches) -->
+        <Style x:Key="MyTextBoxStyle" TargetType="TextBox">
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="BorderBrush" Value="Gray"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Background" Value="White"/>
+            <Setter Property="Padding" Value="4"/>
         </Style>
     </UserControl.Resources>
 
     <Grid Margin="20">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
-            <!-- Debug status -->
+            <!-- Debug/info text -->
             <RowDefinition Height="Auto"/>
-            <!-- SavedCards list -->
+            <!-- SavedCards ListBox -->
             <RowDefinition Height="Auto"/>
-            <!-- [Add] [Delete] buttons -->
+            <!-- Add/Delete buttons -->
             <RowDefinition Height="Auto"/>
-            <!-- Spacer -->
+            <!-- Separator -->
             <RowDefinition Height="Auto"/>
             <!-- Add/Edit panel -->
-            <RowDefinition Height="Auto"/>
-            <!-- Error message -->
-            <RowDefinition Height="*"   />
-            <!-- filler -->
+            <RowDefinition Height="*"/>
+            <!-- Error message / filler -->
         </Grid.RowDefinitions>
 
-        <!-- 1) Debug TextBlock (optional) -->
+        <!-- 1) Debug TextBlock (no mismatches: this style is for TextBlock) -->
         <TextBlock
             Grid.Row="0"
-            Margin="0,0,0,12"
-            Foreground="DarkBlue"
             FontStyle="Italic"
-            Text="PanelOpen: {Binding IsAddingOrEditingCard}" />
+            Foreground="DarkBlue"
+            Text="PanelOpen: {Binding IsAddingOrEditingCard}"
+            Margin="0,0,0,12" />
 
         <!-- 2) Saved Cards ListBox -->
         <ListBox
@@ -60,32 +76,30 @@
             Height="100"
             Margin="0,0,0,12" />
 
-        <!-- 3) Add / Delete Card Buttons -->
-        <StackPanel
-            Grid.Row="2"
-            Orientation="Horizontal"
-            HorizontalAlignment="Right"
-            Margin="0,0,0,12">
-
-            <!-- Add Card -->
+        <!-- 3) Add / Delete Buttons -->
+        <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,0,0,12">
+            <!-- Add Card (SecondaryButton style assumed already defined elsewhere) -->
             <Button
                 Content="Add Card"
                 Command="{Binding BeginAddCardCommand}"
+                Style="{StaticResource SecondaryButton}"
                 Width="80"
                 Margin="0,0,12,0" />
 
-            <!-- Delete Card: disabled if no card is selected -->
+            <!-- Delete Card: uses DisableWhenNoSelection (only 1 style!) -->
             <Button
                 Content="Delete Card"
                 Command="{Binding DeleteCardCommand}"
-                Width="80"
-                Style="{StaticResource DisableWhenNoSelection}" />
+                Style="{StaticResource DisableWhenNoSelection}"
+                Width="80" />
         </StackPanel>
 
-        <!-- 4) Spacer -->
+        <!-- 4) Horizontal separator -->
         <Separator Grid.Row="3" Margin="0,0,0,12" />
 
-        <!-- 5) Add/Edit Card Panel (same as before) -->
+        <!-- 5) Add/Edit Card Panel: 
+               - This is a StackPanel, so we use ShowWhenEditing (TargetType=StackPanel).
+               - We bind to a bool → but convert it to Visibility via BoolToVis (which is now declared). -->
         <Border
             Grid.Row="4"
             Padding="12"
@@ -93,6 +107,7 @@
             BorderThickness="1"
             Background="#FFF9F9F9"
             Visibility="{Binding IsAddingOrEditingCard, Converter={StaticResource BoolToVis}}">
+
             <Grid>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>
@@ -102,77 +117,62 @@
                     <RowDefinition Height="Auto"/>
                     <!-- CVV -->
                     <RowDefinition Height="Auto"/>
-                    <!-- Save / Cancel Buttons -->
+                    <!-- Save / Cancel buttons -->
                 </Grid.RowDefinitions>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto"/>
-                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
 
                 <!-- Card Number -->
-                <TextBlock
-                    Text="Card Number:"
-                    Grid.Row="0"
-                    Grid.Column="0"
-                    VerticalAlignment="Center"
-                    Margin="0,0,8,8" />
+                <TextBlock Text="Card Number:" Grid.Row="0" Grid.Column="0" VerticalAlignment="Center" Margin="0,0,8,8" />
                 <TextBox
-                    Text="{Binding NewCardNumber, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                     Grid.Row="0"
                     Grid.Column="1"
+                    Style="{StaticResource MyTextBoxStyle}"
+                    Text="{Binding NewCardNumber, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                     Margin="0,0,0,8" />
 
                 <!-- Expiry -->
-                <TextBlock
-                    Text="Expiry (MM/YY):"
-                    Grid.Row="1"
-                    Grid.Column="0"
-                    VerticalAlignment="Center"
-                    Margin="0,0,8,8" />
+                <TextBlock Text="Expiry (MM/YY):" Grid.Row="1" Grid.Column="0" VerticalAlignment="Center" Margin="0,0,8,8" />
                 <TextBox
-                    Text="{Binding NewExpiry, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                     Grid.Row="1"
                     Grid.Column="1"
+                    Style="{StaticResource MyTextBoxStyle}"
+                    Text="{Binding NewExpiry, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                     Margin="0,0,0,8" />
 
                 <!-- CVV -->
-                <TextBlock
-                    Text="CVV:"
-                    Grid.Row="2"
-                    Grid.Column="0"
-                    VerticalAlignment="Center"
-                    Margin="0,0,8,8" />
+                <TextBlock Text="CVV:" Grid.Row="2" Grid.Column="0" VerticalAlignment="Center" Margin="0,0,8,8" />
                 <TextBox
-                    Text="{Binding NewCvv, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                     Grid.Row="2"
                     Grid.Column="1"
+                    Style="{StaticResource MyTextBoxStyle}"
+                    Text="{Binding NewCvv, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                     Margin="0,0,0,8" />
 
                 <!-- Save / Cancel Buttons -->
-                <StackPanel
-                    Grid.Row="3"
-                    Grid.Column="1"
-                    Orientation="Horizontal"
-                    HorizontalAlignment="Right"
-                    Margin="0,8,0,0">
-                    <Button
-                        Content="Save"
-                        Command="{Binding SaveCardCommand}"
-                        Width="80"
+                <StackPanel Grid.Row="3" Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,8,0,0">
+                    <Button 
+                        Content="Save" 
+                        Command="{Binding SaveCardCommand}" 
+                        Style="{StaticResource SecondaryButton}" 
+                        Width="80" 
                         Margin="0,0,8,0" />
-                    <Button
-                        Content="Cancel"
-                        Command="{Binding CancelCardCommand}"
+                    <Button 
+                        Content="Cancel" 
+                        Command="{Binding CancelCardCommand}" 
+                        Style="{StaticResource SecondaryButton}" 
                         Width="80" />
                 </StackPanel>
             </Grid>
         </Border>
 
-        <!-- 6) Error Message -->
-        <TextBlock
+        <!-- 6) Error Message (just a normal TextBlock, no converter needed) -->
+        <TextBlock 
             Grid.Row="5"
             Text="{Binding ErrorMessage}"
             Foreground="Red"
-            Margin="0,8,0,0" />
+            Margin="0,8,0,0"/>
     </Grid>
 </UserControl>

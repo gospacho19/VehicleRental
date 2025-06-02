@@ -7,25 +7,23 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:sys="clr-namespace:System;assembly=mscorlib"
     mc:Ignorable="d"
-    d:DesignHeight="450"
-    d:DesignWidth="800">
+    d:DesignHeight="600"
+    d:DesignWidth="900"
+    Background="{StaticResource LightBackgroundBrush}"
+    >
 
+    <!-- ────── LOCAL RESOURCES ────── -->
     <UserControl.Resources>
-        <!-- BooleanToVisibilityConverter (unchanged) -->
-        <BooleanToVisibilityConverter x:Key="BoolToVis" />
-
-        <!-- Style for StackPanel: Visible only when SelectedSavedCard.Id == -1 -->
+        <!-- “Use new card” stack only visible when SelectedSavedCard.Id == -1 -->
         <Style x:Key="ShowWhenPlaceholder" TargetType="StackPanel">
             <Setter Property="Visibility" Value="Collapsed"/>
             <Style.Triggers>
-                <!-- If SelectedSavedCard.Id == -1, show panel -->
                 <DataTrigger Binding="{Binding SelectedSavedCard.Id}" Value="-1">
                     <Setter Property="Visibility" Value="Visible"/>
                 </DataTrigger>
             </Style.Triggers>
         </Style>
 
-        <!-- Style for CheckBox: Visible only when SelectedSavedCard.Id == -1 -->
         <Style x:Key="ShowCheckBoxWhenPlaceholder" TargetType="CheckBox">
             <Setter Property="Visibility" Value="Collapsed"/>
             <Style.Triggers>
@@ -35,192 +33,203 @@
             </Style.Triggers>
         </Style>
     </UserControl.Resources>
+    <!-- ────────────────────────────────────────────────────────────────── -->
 
 
     <Grid Margin="16">
+        <!-- 1) Page Header (“Checkout”) -->
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
-            <!-- Date pickers -->
-            <RowDefinition Height="Auto"/>
-            <!-- Cart items -->
-            <RowDefinition Height="Auto"/>
-            <!-- Payment section header -->
+            <!-- Header -->
             <RowDefinition Height="*"/>
-            <!-- Payment area: dropdown + fields -->
-            <RowDefinition Height="Auto"/>
-            <!-- Spacer -->
-            <RowDefinition Height="Auto"/>
-            <!-- Error message + Pay button -->
+            <!-- CardPanel -->
         </Grid.RowDefinitions>
 
-        <!-- ─────────── 1) Date pickers ─────────── -->
-        <StackPanel Orientation="Horizontal" Grid.Row="0" Margin="0,0,0,16">
-            <TextBlock Text="Start Date:" VerticalAlignment="Center" Margin="0,0,8,0"/>
-            <DatePicker
-                SelectedDate="{Binding StartDate, Mode=TwoWay}"
-                DisplayDateStart="{x:Static sys:DateTime.Today}"
-                Width="120"
-                Margin="0,0,16,0"/>
-            <TextBlock Text="End Date:" VerticalAlignment="Center" Margin="0,0,8,0"/>
-            <DatePicker
-                SelectedDate="{Binding EndDate, Mode=TwoWay}"
-                DisplayDateStart="{Binding StartDate}"
-                Width="120"
-                Margin="0,0,16,0"/>
-            <TextBlock Text="Duration:" VerticalAlignment="Center" Margin="0,0,8,0"/>
-            <TextBlock
-                Text="{Binding DurationDays, StringFormat='{}{0} days'}"
-                VerticalAlignment="Center"
-                Margin="0,0,4,0"/>
-        </StackPanel>
-
-        <!-- ─────────── 2) Cart items DataGrid ─────────── -->
-        <DataGrid
-            Grid.Row="1"
-            ItemsSource="{Binding CartItems}"
-            AutoGenerateColumns="False"
-            CanUserAddRows="False"
-            IsReadOnly="True"
-            Margin="0,0,0,16"
-            RowHeight="30">
-            <DataGrid.Columns>
-                <DataGridTextColumn
-                    Header="Vehicle"
-                    Binding="{Binding Vehicle.Make}"
-                    Width="*" />
-                <DataGridTextColumn
-                    Header="Model"
-                    Binding="{Binding Vehicle.Model}"
-                    Width="*" />
-                <DataGridTextColumn
-                    Header="Start"
-                    Binding="{Binding StartDate, StringFormat=d}"
-                    Width="Auto" />
-                <DataGridTextColumn
-                    Header="End"
-                    Binding="{Binding EndDate, StringFormat=d}"
-                    Width="Auto" />
-                <DataGridTextColumn
-                    Header="Subtotal"
-                    Binding="{Binding Subtotal.Amount, StringFormat=C}"
-                    Width="Auto" />
-            </DataGrid.Columns>
-        </DataGrid>
-
-        <!-- ─────────── 3) PAYMENT SECTION HEADER ─────────── -->
         <TextBlock
-            Text="Payment Information"
-            FontSize="16"
-            FontWeight="Bold"
-            Grid.Row="2"
-            Margin="0,0,0,8" />
+            Grid.Row="0"
+            Text="Checkout"
+            Style="{StaticResource HeaderText}"
+            Margin="0,0,0,16" />
 
-        <!-- ─────────── 4) PAYMENT AREA ─────────── -->
-        <StackPanel Grid.Row="3" Orientation="Vertical" Margin="0,0,0,16">
+        <!-- 2) CardPanel containing all content -->
+        <Border
+            Grid.Row="1"
+            Style="{StaticResource CardPanel}"
+            Background="{StaticResource CardBackgroundBrush}"
+            CornerRadius="8"
+            Padding="{StaticResource ContentPadding}">
 
-            <!-- 4a) Use Saved Card Dropdown -->
-            <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
-                <TextBlock Text="Use Saved Card:" VerticalAlignment="Center"/>
-                <ComboBox
-                    ItemsSource="{Binding SavedCards}"
-                    SelectedItem="{Binding SelectedSavedCard, Mode=TwoWay}"
-                    IsSynchronizedWithCurrentItem="False"
-                    Width="220"
-                    Margin="8,0,0,0">
-                    <ComboBox.ItemTemplate>
-                        <DataTemplate>
-                            <TextBlock>
-                                <TextBlock.Style>
-                                    <Style TargetType="TextBlock">
-                                        <!-- Default: show the real card’s Nickname -->
-                                        <Setter Property="Text" Value="{Binding Nickname}" />
-                                        <Style.Triggers>
-                                            <!-- If this item’s Id == -1, show “(Use a new card)” -->
-                                            <DataTrigger Binding="{Binding Id}" Value="-1">
-                                                <Setter Property="Text" Value="(Use a new card)" />
-                                            </DataTrigger>
-                                        </Style.Triggers>
-                                    </Style>
-                                </TextBlock.Style>
-                            </TextBlock>
-                        </DataTemplate>
-                    </ComboBox.ItemTemplate>
-                </ComboBox>
-                <TextBlock
-                    Text="(optional)"
-                    VerticalAlignment="Center"
-                    FontStyle="Italic"
-                    Foreground="Gray"
-                    Margin="8,0,0,0"/>
-            </StackPanel>
+            <DockPanel LastChildFill="True">
+                <!-- A) Scrollable form (dates, cart grid, payment) -->
+                <ScrollViewer
+                    DockPanel.Dock="Top"
+                    VerticalScrollBarVisibility="Auto"
+                    HorizontalScrollBarVisibility="Disabled"
+                    Margin="0,0,0,8">
 
-            <!-- 4b) “Remember this card” checkbox (visible only when placeholder is selected) -->
-            <CheckBox
-                Content="Remember this card"
-                IsChecked="{Binding RememberCard, Mode=TwoWay}"
-                Style="{StaticResource ShowCheckBoxWhenPlaceholder}"
-                Margin="0,0,0,8" />
+                    <StackPanel>
+                        <!-- ─── 1) Date Pickers ─── -->
+                        <StackPanel Orientation="Horizontal" Margin="0,0,0,16">
+                            <TextBlock Text="Start Date:" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                            <DatePicker
+                                SelectedDate="{Binding StartDate, Mode=TwoWay}"
+                                DisplayDateStart="{x:Static sys:DateTime.Today}"
+                                Width="120"
+                                Margin="0,0,16,0"/>
 
-            <!-- 4c) Manual‐entry fields (visible only when placeholder is selected) -->
-            <StackPanel
-                Style="{StaticResource ShowWhenPlaceholder}"
-                Margin="0,0,0,8">
+                            <TextBlock Text="End Date:" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                            <DatePicker
+                                SelectedDate="{Binding EndDate, Mode=TwoWay}"
+                                DisplayDateStart="{Binding StartDate}"
+                                Width="120"
+                                Margin="0,0,16,0"/>
 
-                <StackPanel Orientation="Horizontal" Margin="0,0,0,4">
-                    <TextBlock
-                        Text="Card #:" VerticalAlignment="Center" Width="80"/>
-                    <TextBox
+                            <TextBlock Text="Duration:" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                            <TextBlock
+                                Text="{Binding DurationDays, StringFormat='{}{0} days'}"
+                                VerticalAlignment="Center" />
+                        </StackPanel>
+
+                        <!-- ─── 2) Cart Items DataGrid ─── -->
+                        <DataGrid
+                            ItemsSource="{Binding CartItems}"
+                            AutoGenerateColumns="False"
+                            CanUserAddRows="False"
+                            IsReadOnly="True"
+                            RowHeight="30"
+                            HeadersVisibility="Column"
+                            ColumnHeaderStyle="{StaticResource CartDataGridHeaderStyle}"
+                            Margin="0,0,0,16">
+
+                            <DataGrid.Columns>
+                                <DataGridTextColumn
+                                    Header="Vehicle"
+                                    Binding="{Binding Vehicle.VehicleType}"
+                                    Width="*" />
+
+                                <DataGridTextColumn
+                                    Header="Model"
+                                    Binding="{Binding Vehicle.Name}"
+                                    Width="*" />
+
+                                <DataGridTextColumn
+                                    Header="Start"
+                                    Binding="{Binding StartDate, StringFormat=d}"
+                                    Width="Auto" />
+
+                                <DataGridTextColumn
+                                    Header="End"
+                                    Binding="{Binding EndDate, StringFormat=d}"
+                                    Width="Auto" />
+
+                                <DataGridTextColumn
+                                    Header="Subtotal"
+                                    Binding="{Binding Subtotal.Amount, StringFormat=C}"
+                                    Width="Auto" />
+                            </DataGrid.Columns>
+                        </DataGrid>
+
+                        <!-- ─── 3) Payment Section Header ─── -->
+                        <TextBlock
+                            Text="Payment Information"
+                            Style="{StaticResource SectionTitleText}"
+                            Margin="0,0,0,8" />
+
+                        <!-- ─── 4) Payment Fields ─── -->
+                        <StackPanel Orientation="Vertical" Margin="0,0,0,8">
+                            <!-- 4a) Use Saved Card -->
+                            <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
+                                <TextBlock Text="Use Saved Card:" VerticalAlignment="Center"/>
+                                <ComboBox
+                                    ItemsSource="{Binding SavedCards}"
+                                    SelectedItem="{Binding SelectedSavedCard, Mode=TwoWay}"
+                                    IsSynchronizedWithCurrentItem="False"
+                                    Width="220"
+                                    Margin="8,0,0,0">
+                                    <ComboBox.ItemTemplate>
+                                        <DataTemplate>
+                                            <TextBlock>
+                                                <TextBlock.Style>
+                                                    <Style TargetType="TextBlock">
+                                                        <Setter Property="Text" Value="{Binding Nickname}"/>
+                                                        <Style.Triggers>
+                                                            <DataTrigger Binding="{Binding Id}" Value="-1">
+                                                                <Setter Property="Text" Value="(Use a new card)"/>
+                                                            </DataTrigger>
+                                                        </Style.Triggers>
+                                                    </Style>
+                                                </TextBlock.Style>
+                                            </TextBlock>
+                                        </DataTemplate>
+                                    </ComboBox.ItemTemplate>
+                                </ComboBox>
+                                <TextBlock
+                                    Text="(optional)"
+                                    VerticalAlignment="Center"
+                                    FontStyle="Italic"
+                                    Foreground="Gray"
+                                    Margin="8,0,0,0"/>
+                            </StackPanel>
+
+                            <!-- 4b) “Remember this card” only when new‐card placeholder -->
+                            <CheckBox
+                                Content="Remember this card"
+                                IsChecked="{Binding RememberCard, Mode=TwoWay}"
+                                Style="{StaticResource ShowCheckBoxWhenPlaceholder}"
+                                Margin="0,0,0,8"/>
+
+                            <!-- 4c) Manual entry fields (when new‐card placeholder) -->
+                            <StackPanel
+                                Style="{StaticResource ShowWhenPlaceholder}"
+                                Margin="0,0,0,8">
+                                <StackPanel Orientation="Horizontal" Margin="0,0,0,4">
+                                    <TextBlock Text="Card #:" VerticalAlignment="Center" Width="80"/>
+                                    <TextBox
+                                        Width="180"
+                                        Text="{Binding CardNumber, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                                </StackPanel>
+                                <StackPanel Orientation="Horizontal" Margin="0,0,0,4">
+                                    <TextBlock Text="Expiry (MM/YY):" VerticalAlignment="Center" Width="80"/>
+                                    <TextBox
+                                        Width="80"
+                                        Text="{Binding Expiry, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                                </StackPanel>
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Text="CVV:" VerticalAlignment="Center" Width="80"/>
+                                    <TextBox
+                                        Width="60"
+                                        Text="{Binding Cvv, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                                </StackPanel>
+                            </StackPanel>
+                        </StackPanel>
+                    </StackPanel>
+                </ScrollViewer>
+
+                <!-- B) Button Row (always visible, clickable) -->
+                <StackPanel
+                    DockPanel.Dock="Bottom"
+                    Orientation="Horizontal"
+                    HorizontalAlignment="Right"
+                    Margin="0,8,0,0">
+
+                    <!-- ← Back to Cart -->
+                    <Button
+                        Content="← Back to Cart"
+                        Command="{Binding BackToCartCommand}"
+                        Style="{StaticResource SecondaryButton}"
                         Width="140"
-                        Text="{Binding CardNumber, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                        Height="36"
+                        Margin="0,0,8,0"/>
+
+                    <!-- Confirm &amp; Pay -->
+                    <Button
+                        Content="Confirm &amp; Pay"
+                        Command="{Binding PayCommand}"
+                        Style="{StaticResource PrimaryButton}"
+                        Width="140"
+                        Height="36"/>
                 </StackPanel>
-
-                <StackPanel Orientation="Horizontal" Margin="0,0,0,4">
-                    <TextBlock
-                        Text="Expiry (MM/YY):" VerticalAlignment="Center" Width="80"/>
-                    <TextBox
-                        Width="80"
-                        Text="{Binding Expiry, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
-                </StackPanel>
-
-                <StackPanel Orientation="Horizontal">
-                    <TextBlock
-                        Text="CVV:" VerticalAlignment="Center" Width="80"/>
-                    <TextBox
-                        Width="60"
-                        Text="{Binding Cvv, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
-                </StackPanel>
-            </StackPanel>
-        </StackPanel>
-
-        <!-- ─────────── 5) Spacer ─────────── -->
-        <Grid Grid.Row="4" />
-
-        <!-- ─────────── 6) Error message + Confirm & Pay button ─────────── -->
-        <StackPanel Grid.Row="5" Orientation="Vertical" Margin="0,12,0,0">
-            <TextBlock
-                Text="{Binding ErrorMessage}"
-                Foreground="Red"
-                Margin="0,0,0,8">
-                <TextBlock.Style>
-                    <Style TargetType="TextBlock">
-                        <Setter Property="Visibility" Value="Visible"/>
-                        <Style.Triggers>
-                            <DataTrigger Binding="{Binding ErrorMessage}" Value="">
-                                <Setter Property="Visibility" Value="Collapsed"/>
-                            </DataTrigger>
-                            <DataTrigger Binding="{Binding ErrorMessage}" Value="{x:Null}">
-                                <Setter Property="Visibility" Value="Collapsed"/>
-                            </DataTrigger>
-                        </Style.Triggers>
-                    </Style>
-                </TextBlock.Style>
-            </TextBlock>
-
-            <Button
-                Content="Confirm &amp; Pay"
-                Command="{Binding PayCommand}"
-                HorizontalAlignment="Right"
-                Padding="8,4" />
-        </StackPanel>
+            </DockPanel>
+        </Border>
     </Grid>
 </UserControl>

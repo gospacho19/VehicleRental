@@ -1,4 +1,7 @@
-﻿using System.Linq;
+﻿// LuxuryCarRental/ViewModels/ConfirmationViewModel.cs
+using System;
+using System.Linq;
+using System.Collections.Generic;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
@@ -14,37 +17,38 @@ namespace LuxuryCarRental.ViewModels
     {
         private readonly ICheckoutHandler _checkout;
         private readonly IMessenger _messenger;
-        private readonly UserSessionService _session;   // ← We now need this
+        private readonly UserSessionService _session;
 
         public Money Total { get; private set; } = default!;
-        public IEnumerable<CartItem> Items { get; private set; } = default!;
+        public IEnumerable<CartItem> Items { get; private set; } = Enumerable.Empty<CartItem>();
         public Card PaymentCard { get; private set; } = default!;
 
         public IRelayCommand ConfirmCommand { get; }
-        public IRelayCommand CancelCommand { get; }
+        public IRelayCommand BackToCartCommand { get; }
 
         public ConfirmationViewModel(
             ICheckoutHandler checkout,
             IMessenger messenger,
-            UserSessionService session)        // ← Added session
+            UserSessionService session)
         {
-            _checkout = checkout;
-            _messenger = messenger;
-            _session = session;
+            _checkout = checkout ?? throw new ArgumentNullException(nameof(checkout));
+            _messenger = messenger ?? throw new ArgumentNullException(nameof(messenger));
+            _session = session ?? throw new ArgumentNullException(nameof(session));
 
             ConfirmCommand = new RelayCommand(OnConfirm);
-            CancelCommand = new RelayCommand(() =>
-                               _messenger.Send(new GoToCatalogMessage()));
+            BackToCartCommand = new RelayCommand(OnBackToCart);
         }
 
-        /// <summary>Called by MainViewModel right after creating this VM:</summary>
+        /// <summary>
+        /// Called by MainViewModel immediately after creating or navigating to this VM.
+        /// </summary>
         public void Initialize(Money total,
                                IEnumerable<CartItem> items,
                                Card paymentCard)
         {
             Total = total;
-            Items = items;
-            PaymentCard = paymentCard;
+            Items = items ?? Enumerable.Empty<CartItem>();
+            PaymentCard = paymentCard ?? throw new ArgumentNullException(nameof(paymentCard));
 
             OnPropertyChanged(nameof(Total));
             OnPropertyChanged(nameof(Items));
@@ -54,22 +58,34 @@ namespace LuxuryCarRental.ViewModels
         private void OnConfirm()
         {
             var current = _session.CurrentCustomer
-                         ?? throw new InvalidOperationException("No user logged in");
+                         ?? throw new InvalidOperationException("No user is currently logged in.");
+
+            // If the cart contains multiple items with different date ranges,
+            // you might need to pass along a list of rentals. For simplicity,
+            // this example assumes every CartItem has the same Start/End dates.
+            var firstItem = Items.FirstOrDefault()
+                            ?? throw new InvalidOperationException("Cart is empty.");
 
             var period = new DateRange(
-                Items.First().StartDate,
-                Items.First().EndDate
+                firstItem.StartDate,
+                firstItem.EndDate
             );
 
-            // Persist a “Rental” (deal) for this exact customer
+            // Persist a “Rental” (deal) for this customer
             _checkout.Checkout(
                 customerId: current.Id,
                 period: period,
                 paymentToken: "auth:" + PaymentCard.Id
             );
 
-            // Tell the app to navigate to Deals
+            // Navigate to “My Deals” (or wherever makes sense after checkout)
             _messenger.Send(new GoToDealsMessage());
+        }
+
+        private void OnBackToCart()
+        {
+            // Simply send a message that tells MainViewModel to switch to CartView.
+            _messenger.Send(new GoToCartMessage());
         }
     }
 }
