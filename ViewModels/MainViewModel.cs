@@ -1,17 +1,19 @@
-﻿// LuxuryCarRental/ViewModels/MainViewModel.cs
-using System;
+﻿// ViewModels/MainViewModel.cs
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
 using LuxuryCarRental.Messaging;
-using LuxuryCarRental.Services.Implementations; // for UserSessionService
 using LuxuryCarRental.Services.Interfaces;
+using LuxuryCarRental.Repositories.Interfaces;
+using LuxuryCarRental.Services.Implementations;
 
 namespace LuxuryCarRental.ViewModels
 {
-    public class MainViewModel : ObservableObject
+    public class MainViewModel : ObservableObject,
+                                 IRecipient<GoToVehicleDetailMessage>,
+                                 IRecipient<GoToCategoryViewMessage>
     {
-        // 1) Screen VMs
+        // 1) Screen VMs (injected via DI)
         public CatalogViewModel CatalogVM { get; }
         public CategoryViewModel CategoryVM { get; }
         public CartViewModel CartVM { get; }
@@ -23,7 +25,10 @@ namespace LuxuryCarRental.ViewModels
         public LoginViewModel LoginVM { get; }
         public RegisterViewModel RegisterVM { get; }
 
-        // 2) “Current” VM shown in the ContentControl:
+        // *** 2) A single instance of VehicleDetailViewModel, also injected ***
+        public VehicleDetailViewModel VehicleVM { get; }
+
+        // 3) The “Current” VM shown in the content area:
         private object _currentViewModel = null!;
         public object CurrentViewModel
         {
@@ -31,7 +36,7 @@ namespace LuxuryCarRental.ViewModels
             set => SetProperty(ref _currentViewModel, value);
         }
 
-        // 3) Navigation commands (all must be initialized in ctor)
+        // 4) Navigation commands (bound to your top‐bar buttons)
         public IRelayCommand ShowCatalogCmd { get; }
         public IRelayCommand ShowCategoryCmd { get; }
         public IRelayCommand ShowCartCmd { get; }
@@ -41,6 +46,10 @@ namespace LuxuryCarRental.ViewModels
         public IRelayCommand ShowProfileCmd { get; }
         public IRelayCommand ShowPaymentInfoCmd { get; }
 
+        // 5) Store shared services so we can pass them into VehicleVM if needed
+        private readonly IUnitOfWork _uow;
+        private readonly ICartService _cartService;
+        private readonly IMessenger _messenger;
         private readonly UserSessionService _session;
 
         public MainViewModel(
@@ -54,11 +63,13 @@ namespace LuxuryCarRental.ViewModels
             PaymentInfoViewModel paymentInfoVm,
             LoginViewModel loginVm,
             RegisterViewModel registerVm,
+            VehicleDetailViewModel vehicleVm,  // <-- inject the single instance here
             IMessenger messenger,
             IAuthService auth,
-            UserSessionService session)   // ← inject session here
+            IUnitOfWork uow,
+            ICartService cartService,
+            UserSessionService session)
         {
-            // 4) Assign injected VMs:
             CatalogVM = catalog;
             CategoryVM = category;
             CartVM = cart;
@@ -69,89 +80,73 @@ namespace LuxuryCarRental.ViewModels
             PaymentInfoVM = paymentInfoVm;
             LoginVM = loginVm;
             RegisterVM = registerVm;
-            _session = session;  // ← store session
 
-            // 5) Subscribe to messages for navigation:
+            VehicleVM = vehicleVm;   // <-- store the injected VehicleDetailViewModel
 
-            // When login succeeds, show the Catalog (and refresh Cart & Checkout Views):
+            _uow = uow;
+            _cartService = cartService;
+            _messenger = messenger;
+            _session = session;
+
+            // 6) Subscribe to the usual navigation messages
             messenger.Register<LoginSuccessfulMessage>(this, (r, msg) =>
             {
-                // A) Refresh cart (so CartVM uses the new CurrentCustomer.Id)
                 CartVM.RefreshCommand.Execute(null);
-
-                // B) Refresh checkout (load saved cards + cart items)
                 CheckoutVM.RefreshCommand.Execute(null);
-
-                // C) Refresh catalog (mark rented vehicles appropriately)
                 CatalogVM.RefreshCommand.Execute(null);
-
-                // D) Show the Catalog screen
                 CurrentViewModel = CatalogVM;
             });
 
-            // From LoginView: “Register” button → go to RegisterView
             messenger.Register<GoToRegisterMessage>(this, (r, msg) =>
             {
                 CurrentViewModel = RegisterVM;
             });
 
-            // After a successful registration, return to LoginView (prefill username):
             messenger.Register<RegistrationSuccessfulMessage>(this, (r, msg) =>
             {
                 LoginVM.Username = msg.Value;
                 CurrentViewModel = LoginVM;
             });
 
-            // From RegisterView: “Cancel” → go back to LoginView
             messenger.Register<GoToLoginMessage>(this, (_, __) =>
             {
                 CurrentViewModel = LoginVM;
             });
 
-            // From anywhere: navigate to CheckoutView
             messenger.Register<GoToCheckoutMessage>(this, (_, __) =>
             {
                 if (_session.CurrentCustomer != null)
                 {
-                    // First, tell the Checkout VM to reload its cart items (and saved cards)
                     CheckoutVM.RefreshCommand.Execute(null);
-                    // Now show the Checkout screen
                     CurrentViewModel = CheckoutVM;
                 }
                 else
                 {
-                    // If no one is logged in, send them to login first
                     CurrentViewModel = LoginVM;
                 }
             });
 
-            // From CheckoutViewModel when payment is done → go to ConfirmationView
             messenger.Register<GoToConfirmationMessage>(this, (r, msg) =>
             {
                 ConfirmVM.Initialize(msg.Total, msg.Items, msg.PaymentCard);
                 CurrentViewModel = ConfirmVM;
             });
 
-            // From anywhere: navigate to ProfileView
             messenger.Register<GoToProfileMessage>(this, (_, __) =>
             {
                 CurrentViewModel = ProfileVM;
             });
 
-            // From anywhere: navigate to PaymentInfoView
             messenger.Register<GoToPaymentInfoMessage>(this, (_, __) =>
             {
                 CurrentViewModel = PaymentInfoVM;
             });
 
-          
-
-            // When someone says “GoToDeals”, we show the DealsVM
             messenger.Register<GoToDealsMessage>(this, (r, msg) =>
             {
                 if (_session.CurrentCustomer != null)
                 {
-                    DealsVM.RefreshCommand.Execute(null);  // ← refresh here
+                    DealsVM.RefreshCommand.Execute(null);
                     CurrentViewModel = DealsVM;
                 }
                 else
@@ -160,7 +155,11 @@ namespace LuxuryCarRental.ViewModels
                 }
             });
 
-            // 6) Build the navigation commands – all must be non-nullable:
+            // 7) Now register for “GoToVehicleDetail” and “GoToCategoryView”
+            messenger.Register<GoToVehicleDetailMessage>(this);
+            messenger.Register<GoToCategoryViewMessage>(this);
+
+            // 8) Build the navigation commands (for your button row)
             ShowCatalogCmd = new RelayCommand(() =>
             {
                 CatalogVM.RefreshCommand.Execute(null);
@@ -169,10 +168,7 @@ namespace LuxuryCarRental.ViewModels
 
             ShowCategoryCmd = new RelayCommand(() =>
             {
-                // 1) Tell CategoryVM to re‐fetch/filter/sort its list
                 CategoryVM.RefreshCommand.Execute(null);
-
-                // 2) Then actually show the Category screen
                 CurrentViewModel = CategoryVM;
             });
 
@@ -188,6 +184,7 @@ namespace LuxuryCarRental.ViewModels
                     CurrentViewModel = LoginVM;
                 }
             });
+
             ShowCheckoutCmd = new RelayCommand(() =>
             {
                 if (_session.CurrentCustomer != null)
@@ -200,11 +197,11 @@ namespace LuxuryCarRental.ViewModels
                     CurrentViewModel = LoginVM;
                 }
             });
+
             ShowDealsCmd = new RelayCommand(() =>
             {
                 if (_session.CurrentCustomer != null)
                 {
-                    // Optionally: DealsVM.RefreshCommand.Execute(null);
                     DealsVM.RefreshCommand.Execute(null);
                     CurrentViewModel = DealsVM;
                 }
@@ -213,39 +210,55 @@ namespace LuxuryCarRental.ViewModels
                     CurrentViewModel = LoginVM;
                 }
             });
+
             ShowConfirmationCmd = new RelayCommand(() =>
             {
                 CurrentViewModel = ConfirmVM;
             });
+
             ShowProfileCmd = new RelayCommand(() =>
             {
                 CurrentViewModel = ProfileVM;
             });
+
             ShowPaymentInfoCmd = new RelayCommand(() =>
             {
                 CurrentViewModel = PaymentInfoVM;
             });
 
-            // 7) Finally, show the Login screen at startup:
+            // Show either Catalog (if “remember me”) or Login at startup
             var rememberedCustomer = auth.GetRememberedUser();
             if (rememberedCustomer != null)
             {
-                // A) Store in session
                 session.SetCurrentCustomer(rememberedCustomer);
 
-                // B) Refresh dependent VMs
                 CartVM.RefreshCommand.Execute(null);
                 CheckoutVM.RefreshCommand.Execute(null);
                 CatalogVM.RefreshCommand.Execute(null);
 
-                // C) Show Catalog immediately
                 CurrentViewModel = CatalogVM;
             }
             else
             {
-                // If no one was remembered, show Login
                 CurrentViewModel = LoginVM;
             }
+        }
+
+        // 9) When someone sends GoToVehicleDetailMessage, reuse the injected VehicleVM
+        public void Receive(GoToVehicleDetailMessage message)
+        {
+            // Tell VehicleVM to load the requested vehicle ID
+            VehicleVM.Load(message.VehicleId);
+
+            // Then show that VM
+            CurrentViewModel = VehicleVM;
+        }
+
+        // 10) When someone sends GoToCategoryViewMessage, switch back to CategoryVM
+        public void Receive(GoToCategoryViewMessage message)
+        {
+            CategoryVM.RefreshCommand.Execute(null);
+            CurrentViewModel = CategoryVM;
         }
     }
 }

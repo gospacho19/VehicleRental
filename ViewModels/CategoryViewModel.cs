@@ -1,4 +1,6 @@
-﻿using System;
+﻿// LuxuryCarRental/ViewModels/CategoryViewModel.cs
+
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
@@ -39,9 +41,9 @@ namespace LuxuryCarRental.ViewModels
 
             _messenger.Register<CartUpdatedMessage>(this);
 
-            // Populate filter dropdowns
+            // Populate filter dropdowns …
             Categories.Add("All");
-            foreach (var vt in Enum.GetValues<VehicleType>().Cast<VehicleType>())
+            foreach (var vt in Enum.GetValues(typeof(VehicleType)).Cast<VehicleType>())
                 Categories.Add(vt.ToString());
             SelectedCategory = "All";
 
@@ -61,13 +63,15 @@ namespace LuxuryCarRental.ViewModels
             RefreshCommand = new AsyncRelayCommand(RefreshAsync);
             RentNowCommand = new RelayCommand<Vehicle?>(OnRentNow, CanRentNow);
 
+            // *** Change here: LearnMoreCommand must be RelayCommand<Vehicle?>, not RelayCommand<Vehicle> ***
+            LearnMoreCommand = new RelayCommand<Vehicle?>(OnLearnMore);
+
             // Initial load
             RefreshCommand.Execute(null);
         }
 
         // ────────── PUBLIC COLLECTIONS & PROPERTIES ──────────
 
-        // (A) Vehicle Type dropdown:
         public ObservableCollection<string> Categories { get; } = new();
         private string _selectedCategory = string.Empty;
         public string SelectedCategory
@@ -80,7 +84,6 @@ namespace LuxuryCarRental.ViewModels
             }
         }
 
-        // (B) Availability filter dropdown:
         public ObservableCollection<string> AvailabilityOptions { get; } = new();
         private string _selectedAvailability = string.Empty;
         public string SelectedAvailability
@@ -93,7 +96,6 @@ namespace LuxuryCarRental.ViewModels
             }
         }
 
-        // (C) Sort order dropdown:
         public ObservableCollection<string> SortOptions { get; } = new();
         private string _selectedSortOption = string.Empty;
         public string SelectedSortOption
@@ -106,50 +108,48 @@ namespace LuxuryCarRental.ViewModels
             }
         }
 
-        // (D) The filtered + sorted list of vehicles shown in the DataGrid:
         public ObservableCollection<Vehicle> Vehicles { get; } = new();
 
-        // (E) “Refresh” button:
         public IAsyncRelayCommand RefreshCommand { get; }
-
-        // (F) “Rent Now” button (one per row) takes a Vehicle as parameter:
         public IRelayCommand<Vehicle?> RentNowCommand { get; }
 
+        // *** Change here: use Vehicle? in the type argument ***
+        public IRelayCommand<Vehicle?> LearnMoreCommand { get; }
+
         // ────────── PRIVATE BACKING LIST ──────────
-        // We always fetch all vehicles into this list, then filter/sort it for `Vehicles`.
         private List<Vehicle> _allVehicles = new();
 
-        // ────────── REFRESH LOGIC ──────────
         private async Task RefreshAsync()
         {
+            Vehicles.Clear();
+
             // 1) Fetch all vehicles from the database
             _allVehicles = _uow.Vehicles.GetAll().ToList();
 
-            // 2) Determine “todayRange” once
+            // 2) Determine “todayRange”
             var todayRange = new DateRange(DateTime.Today, DateTime.Today.AddDays(1));
-
-            // 3) Batch‐fetch blocked IDs (overlapping rentals or other users’ carts)
             int? ignoreId = _session.CurrentCustomer?.Id;
+
+            // 3) Batch‐fetch blocked IDs
             var blockedIds = await _availability.GetBlockedVehicleIdsAsync(todayRange, ignoreId);
 
-            // 4) In‐memory filter + sort
+            // 4) Filter by Category + Availability + Sort
             IEnumerable<Vehicle> temp = _allVehicles;
 
-            // Filter by VehicleType
-            if (!string.Equals(SelectedCategory, "All", StringComparison.OrdinalIgnoreCase))
+            if (!string.Equals(SelectedCategory, "All", StringComparison.OrdinalIgnoreCase) &&
+                Enum.TryParse<VehicleType>(SelectedCategory, out var vt))
             {
-                if (Enum.TryParse<VehicleType>(SelectedCategory, out var vt))
-                    temp = temp.Where(v => v.VehicleType == vt);
+                temp = temp.Where(v => v.VehicleType == vt);
             }
 
-            // Compute CurrentlyAvailable for each vehicle
+            // Compute CurrentlyAvailable
             foreach (var v in temp)
             {
                 bool freeNow = (v.Status == VehicleStatus.Available) && !blockedIds.Contains(v.Id);
                 v.CurrentlyAvailable = freeNow;
             }
 
-            // Filter by Availability
+            // Filter by Availability selection
             if (string.Equals(SelectedAvailability, "Available", StringComparison.OrdinalIgnoreCase))
             {
                 temp = temp.Where(v => v.CurrentlyAvailable);
@@ -158,7 +158,6 @@ namespace LuxuryCarRental.ViewModels
             {
                 temp = temp.Where(v => !v.CurrentlyAvailable);
             }
-            // else “All” → no additional filter
 
             // Sort
             temp = SelectedSortOption switch
@@ -170,12 +169,11 @@ namespace LuxuryCarRental.ViewModels
                 _ => temp
             };
 
-            // 5) Push into ObservableCollection
+            // 5) Push results into the ObservableCollection
             Vehicles.Clear();
             foreach (var v in temp)
                 Vehicles.Add(v);
 
-            // Force DataGrid to rebind
             OnPropertyChanged(nameof(Vehicles));
         }
 
@@ -205,7 +203,14 @@ namespace LuxuryCarRental.ViewModels
             _ = RefreshAsync();
         }
 
-        // IMessageHandler for CartUpdatedMessage
+        // *** Change here: Accept Vehicle? instead of Vehicle ***
+        private void OnLearnMore(Vehicle? vehicle)
+        {
+            if (vehicle == null) return;
+
+            _messenger.Send(new GoToVehicleDetailMessage(vehicle.Id));
+        }
+
         public void Receive(CartUpdatedMessage message)
         {
             var current = _session.CurrentCustomer;
