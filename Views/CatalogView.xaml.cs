@@ -86,32 +86,25 @@ namespace LuxuryCarRental.Views
         // redirect the delta to the outer (vertical) ScrollViewer.
         private void Carousel_PreviewMouseWheel(object sender, MouseWheelEventArgs e)
         {
-            // 1) Mark this event as handled by the inner ScrollViewer:
             e.Handled = true;
-
-            // 2) Find the parent that is the outer vertical ScrollViewer:
-            //    We know that the CatalogView has one top‐level ScrollViewer, so we climb
-            //    the visual/logical tree until we find a ScrollViewer that can scroll vertically.
-            var parent = FindParentScrollViewer((DependencyObject)sender);
-
+            ScrollViewer? parent = FindParentScrollViewer((DependencyObject)sender);
             if (parent != null)
             {
-                // 3) Scroll the parent up or down by the wheel delta.
-                //    Mouse wheel delta is positive when scrolling up; negative when scrolling down.
                 parent.ScrollToVerticalOffset(parent.VerticalOffset - e.Delta);
             }
         }
 
+
         // Utility: climb up until we find the outer ScrollViewer
-        private ScrollViewer FindParentScrollViewer(DependencyObject child)
+        // Заменяем ScrollViewer на ScrollViewer?, чтобы явно показать, что может вернуться null.
+        private ScrollViewer? FindParentScrollViewer(DependencyObject child)
         {
             DependencyObject current = child;
             while (current != null)
             {
                 if (current is ScrollViewer sv)
                 {
-                    // Ensure we are not returning the inner (horizontal) scrollviewer:
-                    // the inner ones have VerticalScrollBarVisibility="Disabled".
+                    // Возвращаем только тот ScrollViewer, у которого вертикальная прокрутка не отключена:
                     if (sv.VerticalScrollBarVisibility != ScrollBarVisibility.Disabled)
                         return sv;
                 }
@@ -119,5 +112,6 @@ namespace LuxuryCarRental.Views
             }
             return null;
         }
+
     }
 }

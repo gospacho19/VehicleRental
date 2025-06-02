@@ -6,22 +6,160 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d"
     d:DesignHeight="300"
-    d:DesignWidth="400">
+    d:DesignWidth="400"
+    Background="{StaticResource LightBackgroundBrush}">
 
-    <Grid Margin="16">
-        <StackPanel Orientation="Vertical" Width="300">
-            <TextBlock Text="Username:"/>
-            <TextBox Text="{Binding Username, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+    <UserControl.Resources>
+        <!-- TextBox styling (same as other forms) -->
+        <Style x:Key="MyTextBoxStyle" TargetType="TextBox">
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="BorderBrush" Value="Gray"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Background" Value="White"/>
+            <Setter Property="Padding" Value="4"/>
+        </Style>
 
-            <TextBlock Text="Password:" Margin="0,12,0,0"/>
-            <PasswordBox PasswordChanged="PasswordBox_PasswordChanged" />
+        <!-- PasswordBox styling (mirror TextBox) -->
+        <Style x:Key="MyPasswordBoxStyle" TargetType="PasswordBox">
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="BorderBrush" Value="Gray"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Background" Value="White"/>
+            <Setter Property="Padding" Value="4"/>
+        </Style>
+    </UserControl.Resources>
 
-            <CheckBox Content="Remember Me"
-                      IsChecked="{Binding RememberMe, Mode=TwoWay}" Margin="0,12,0,0"/>
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
 
-            <Button Content="Log In" Command="{Binding LoginCommand}" Margin="0,20,0,0"/>
-            <Button Content="Register" Command="{Binding NavigateToRegisterCommand}" Margin="0,8,0,0"/>
-            <TextBlock Text="{Binding ErrorMessage}" Foreground="Red" Margin="0,12,0,0"/>
-        </StackPanel>
+        <!-- Centered CardPanel -->
+        <Border
+            Grid.Column="1"
+            Style="{StaticResource CardPanel}"
+            Background="{StaticResource CardBackgroundBrush}"
+            CornerRadius="8"
+            Padding="16"
+            Margin="0,40,0,40"
+            Width="350">
+
+            <Grid>
+                <Grid.RowDefinitions>
+                    <!-- 1) Section Title -->
+                    <RowDefinition Height="Auto"/>
+
+                    <!-- 2) Username -->
+                    <RowDefinition Height="Auto"/>
+
+                    <!-- 3) Password -->
+                    <RowDefinition Height="Auto"/>
+
+                    <!-- 4) Remember Me -->
+                    <RowDefinition Height="Auto"/>
+
+                    <!-- 5) Buttons -->
+                    <RowDefinition Height="Auto"/>
+
+                    <!-- 6) Error Message -->
+                    <RowDefinition Height="Auto"/>
+
+                    <!-- Filler -->
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+
+                <!-- 1) Section Title -->
+                <TextBlock
+                    Grid.Row="0"
+                    Grid.Column="0"
+                    Grid.ColumnSpan="2"
+                    Text="Log In"
+                    Style="{StaticResource SectionTitleText}"
+                    HorizontalAlignment="Center"
+                    Margin="0,0,0,16" />
+
+                <!-- 2) Username -->
+                <TextBlock
+                    Grid.Row="1"
+                    Grid.Column="0"
+                    Text="Username:"
+                    Style="{StaticResource LabelText}"
+                    VerticalAlignment="Center"
+                    Margin="0,0,12,8" />
+                <TextBox
+                    Grid.Row="1"
+                    Grid.Column="1"
+                    Style="{StaticResource MyTextBoxStyle}"
+                    Text="{Binding Username, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                    Margin="0,0,0,8"/>
+
+                <!-- 3) Password -->
+                <TextBlock
+                    Grid.Row="2"
+                    Grid.Column="0"
+                    Text="Password:"
+                    Style="{StaticResource LabelText}"
+                    VerticalAlignment="Center"
+                    Margin="0,0,12,8" />
+                <PasswordBox
+                    Grid.Row="2"
+                    Grid.Column="1"
+                    Style="{StaticResource MyPasswordBoxStyle}"
+                    PasswordChanged="PasswordBox_PasswordChanged"
+                    Margin="0,0,0,8"/>
+
+                <!-- 4) Remember Me -->
+                <CheckBox
+                    Grid.Row="3"
+                    Grid.Column="1"
+                    Content="Remember Me"
+                    IsChecked="{Binding RememberMe, Mode=TwoWay}"
+                    Margin="0,0,0,16"/>
+
+                <!-- 5) Buttons -->
+                <StackPanel
+                    Grid.Row="4"
+                    Grid.Column="0"
+                    Grid.ColumnSpan="2"
+                    Orientation="Horizontal"
+                    HorizontalAlignment="Right"
+                    Margin="0,0,0,8">
+
+                    <Button
+                        Content="Log In"
+                        Command="{Binding LoginCommand}"
+                        Style="{StaticResource PrimaryButton}"
+                        Width="100"
+                        Height="32"
+                        Margin="0,0,12,0" />
+
+                    <Button
+                        Content="Register"
+                        Command="{Binding NavigateToRegisterCommand}"
+                        Style="{StaticResource SecondaryButton}"
+                        Width="100"
+                        Height="32" />
+                </StackPanel>
+
+                <!-- 6) Error Message -->
+                <TextBlock
+                    Grid.Row="5"
+                    Grid.Column="0"
+                    Grid.ColumnSpan="2"
+                    Text="{Binding ErrorMessage}"
+                    Foreground="Red"
+                    FontWeight="SemiBold"
+                    Margin="0,0,0,0"/>
+
+                <!-- Filler Row 6 left deliberately blank -->
+            </Grid>
+        </Border>
     </Grid>
 </UserControl>

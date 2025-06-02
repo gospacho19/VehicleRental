@@ -1,5 +1,4 @@
-﻿<!-- LuxuryCarRental/Views/ProfileView.xaml -->
-<UserControl
+﻿<UserControl
     x:Class="LuxuryCarRental.Views.ProfileView"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
@@ -8,102 +7,165 @@
     xmlns:vm="clr-namespace:LuxuryCarRental.ViewModels"
     mc:Ignorable="d"
     d:DesignHeight="500"
-    d:DesignWidth="600">
+    d:DesignWidth="600"
+    Background="{StaticResource LightBackgroundBrush}">
 
-    <!-- NOTE: We removed the <UserControl.DataContext> block entirely.
-         The DataContext will be set by MainViewModel (e.g. via a ContentControl binding). -->
+    <UserControl.Resources>
+        <!-- TextBox styling (same as in PaymentInfoView) -->
+        <Style x:Key="MyTextBoxStyle" TargetType="TextBox">
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="BorderBrush" Value="Gray"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Background" Value="White"/>
+            <Setter Property="Padding" Value="4"/>
+        </Style>
+    </UserControl.Resources>
 
-    <Grid Margin="20">
+    <Grid Margin="{StaticResource ContentPadding}">
         <Grid.RowDefinitions>
-            <!-- Personal Info rows -->
+            <!-- 1) Section Title -->
             <RowDefinition Height="Auto"/>
-            <!-- Full Name -->
-            <RowDefinition Height="Auto"/>
-            <!-- Driver's License -->
-            <RowDefinition Height="Auto"/>
-            <!-- Email -->
-            <RowDefinition Height="Auto"/>
-            <!-- Phone -->
-            <RowDefinition Height="Auto"/>
-            <!-- Save Profile Button -->
-            <RowDefinition Height="Auto"/>
-            <!-- Spacer (separator) -->
-            <RowDefinition Height="Auto"/>
-            <!-- Add Card + Logout Buttons -->
-            <RowDefinition Height="*"   />
-            <!-- Filler -->
+
+            <!-- 2) CardPanel containing form + buttons -->
+            <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="Auto"/>
-            <ColumnDefinition Width="*" />
-        </Grid.ColumnDefinitions>
+        <!-- 1) Section Title -->
+        <TextBlock
+            Grid.Row="0"
+            Text="Profile"
+            Style="{StaticResource SectionTitleText}"
+            Margin="0,0,0,12" />
 
-        <!-- ───── Full Name ───── -->
-        <TextBlock Text="Full Name:" 
-                   Grid.Row="0" Grid.Column="0"
-                   VerticalAlignment="Center"/>
-        <TextBox Grid.Row="0" Grid.Column="1"
-                 Text="{Binding FullName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                 Margin="4"/>
+        <!-- 2) CardPanel -->
+        <Border
+            Grid.Row="1"
+            Style="{StaticResource CardPanel}"
+            Background="{StaticResource CardBackgroundBrush}"
+            CornerRadius="8"
+            Padding="16">
 
-        <!-- ───── Driver's License ───── -->
-        <TextBlock Text="Driver's License:" 
-                   Grid.Row="1" Grid.Column="0"
-                   VerticalAlignment="Center"/>
-        <TextBox Grid.Row="1" Grid.Column="1"
-                 Text="{Binding DriverLicenseNumber, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                 Margin="4"/>
+            <Grid>
+                <Grid.RowDefinitions>
+                    <!-- Full Name -->
+                    <RowDefinition Height="Auto"/>
+                    <!-- Driver's License -->
+                    <RowDefinition Height="Auto"/>
+                    <!-- Email -->
+                    <RowDefinition Height="Auto"/>
+                    <!-- Phone -->
+                    <RowDefinition Height="Auto"/>
+                    <!-- Save Profile Button -->
+                    <RowDefinition Height="Auto"/>
+                    <!-- Separator -->
+                    <RowDefinition Height="Auto"/>
+                    <!-- Add Card + Logout Buttons -->
+                    <RowDefinition Height="Auto"/>
+                    <!-- Filler -->
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
 
-        <!-- ───── Email ───── -->
-        <TextBlock Text="Email:" 
-                   Grid.Row="2" Grid.Column="0"
-                   VerticalAlignment="Center"/>
-        <TextBox Grid.Row="2" Grid.Column="1"
-                 Text="{Binding Email, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                 Margin="4"/>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
 
-        <!-- ───── Phone ───── -->
-        <TextBlock Text="Phone:" 
-                   Grid.Row="3" Grid.Column="0"
-                   VerticalAlignment="Center"/>
-        <TextBox Grid.Row="3" Grid.Column="1"
-                 Text="{Binding Phone, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                 Margin="4"/>
+                <!-- Full Name -->
+                <TextBlock
+                    Grid.Row="0" Grid.Column="0"
+                    Text="Full Name:"
+                    Style="{StaticResource LabelText}"
+                    VerticalAlignment="Center"
+                    Margin="0,0,12,8" />
+                <TextBox
+                    Grid.Row="0" Grid.Column="1"
+                    Style="{StaticResource MyTextBoxStyle}"
+                    Text="{Binding FullName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                    Margin="0,0,0,8"/>
 
-        <!-- ───── Save Profile Button ───── -->
-        <Button Grid.Row="4"
-                Grid.Column="1"
-                Content="Save Profile"
-                Command="{Binding SaveProfileCommand}"
-                HorizontalAlignment="Right"
-                Padding="8,4"
-                Margin="0,8,0,8" />
+                <!-- Driver's License -->
+                <TextBlock
+                    Grid.Row="1" Grid.Column="0"
+                    Text="Driver’s License:"
+                    Style="{StaticResource LabelText}"
+                    VerticalAlignment="Center"
+                    Margin="0,0,12,8" />
+                <TextBox
+                    Grid.Row="1" Grid.Column="1"
+                    Style="{StaticResource MyTextBoxStyle}"
+                    Text="{Binding DriverLicenseNumber, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                    Margin="0,0,0,8"/>
 
-        <!-- ───── Spacer (separator) ───── -->
-        <Separator Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="2" Margin="0,8"/>
+                <!-- Email -->
+                <TextBlock
+                    Grid.Row="2" Grid.Column="0"
+                    Text="Email:"
+                    Style="{StaticResource LabelText}"
+                    VerticalAlignment="Center"
+                    Margin="0,0,12,8" />
+                <TextBox
+                    Grid.Row="2" Grid.Column="1"
+                    Style="{StaticResource MyTextBoxStyle}"
+                    Text="{Binding Email, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                    Margin="0,0,0,8"/>
 
-        <!-- ───── Add Card & Log Out Buttons ───── -->
-        <StackPanel Grid.Row="6" Grid.Column="0" Grid.ColumnSpan="2"
+                <!-- Phone -->
+                <TextBlock
+                    Grid.Row="3" Grid.Column="0"
+                    Text="Phone:"
+                    Style="{StaticResource LabelText}"
+                    VerticalAlignment="Center"
+                    Margin="0,0,12,8" />
+                <TextBox
+                    Grid.Row="3" Grid.Column="1"
+                    Style="{StaticResource MyTextBoxStyle}"
+                    Text="{Binding Phone, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                    Margin="0,0,0,8"/>
+
+                <!-- Save Profile Button -->
+                <Button
+                    Grid.Row="4" Grid.Column="1"
+                    Content="Save Profile"
+                    Command="{Binding SaveProfileCommand}"
+                    Style="{StaticResource PrimaryButton}"
+                    HorizontalAlignment="Right"
+                    Padding="8,4"
+                    Margin="0,8,0,8" />
+
+                <!-- Separator -->
+                <Separator
+                    Grid.Row="5"
+                    Grid.Column="0" Grid.ColumnSpan="2"
+                    Margin="0,8,0,8"/>
+
+                <!-- Add Card & Log Out Buttons -->
+                <StackPanel
+                    Grid.Row="6"
+                    Grid.Column="0" Grid.ColumnSpan="2"
                     Orientation="Horizontal"
                     HorizontalAlignment="Center"
                     Margin="0,10,0,0">
-            <!-- Add Card -->
-            <Button Content="Add Card"
-                    Command="{Binding AddCardCommand}"
-                    Width="100"
-                    Height="30"
-                    Margin="0,0,20,0" 
-                    />
 
-            <!-- Log Out -->
-            <Button Content="Log Out"
-                    Command="{Binding LogoutCommand}"
-                    Width="100"
-                    Height="30"/>
-        </StackPanel>
+                    <!-- Add Card -->
+                    <Button
+                        Content="Add Card"
+                        Command="{Binding AddCardCommand}"
+                        Style="{StaticResource SecondaryButton}"
+                        Width="100"
+                        Height="32"
+                        Margin="0,0,20,0" />
 
-        <!-- ───── Filler Row ───── -->
-        <!-- Nothing needed in Grid.Row="7" -->
+                    <!-- Log Out -->
+                    <Button
+                        Content="Log Out"
+                        Command="{Binding LogoutCommand}"
+                        Style="{StaticResource SecondaryButton}"
+                        Width="100"
+                        Height="32" />
+                </StackPanel>
+
+                <!-- Filler (no controls needed) -->
+            </Grid>
+        </Border>
     </Grid>
 </UserControl>
