@@ -96,7 +96,7 @@
                 <!-- (E) Status Column -->
                 <DataGridTextColumn
                     Header="Status"
-                    Binding="{Binding Status}"
+                    Binding="{Binding DisplayStatus}"
                     Width="Auto"/>
 
                 <!-- (F) Rent Now Button Column -->

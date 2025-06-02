@@ -1,31 +1,262 @@
 [
   {
     "Type": "Car",
-    "Key": "2022 Toyota Camry",
-    "Make": "Toyota",
-    "Model": "Camry",
-    "Year": 2022,
-    "DailyRate": 49.99,
-    "ImageUri": "pack://application:,,,/LuxuryCarRental;component/Images/Vehicles/car1.jpg"
+    "Key": "2016 Honda CR-V",
+    "Make": "Honda",
+    "Model": "CR-V",
+    "Year": 2016,
+    "DailyRate": 54.99,
+    "ImageUri": "pack://application:,,,/LuxuryCarRental;component/Images/Vehicles/honda_crv.jpg"
   },
   {
     "Type": "Motorcycle",
-    "Key": "Motorcycle 700cc",
-    "EngineCapacityCc": 700,
+    "Key": "2019 KTM 790 Duke",
+    "EngineCapacityCc": 799,
     "HasSidecar": false,
-    "DailyRate": 29.99,
-    "ImageUri": "pack://application:,,,/LuxuryCarRental;component/Images/Vehicles/motorcycle1.jpg"
+    "DailyRate": 44.99,
+    "ImageUri": "pack://application:,,,/LuxuryCarRental;component/Images/Vehicles/ktm_790_duke.jpg"
   },
   {
     "Type": "LuxuryCar",
-    "Key": "2023 Mercedes-Benz S-Class",
-    "Make": "Mercedes-Benz",
-    "Model": "S-Class",
-    "Year": 2023,
-    "DailyRate": 199.99,
-    "SecurityDeposit": 500.0,
+    "Key": "2021 Lamborghini Huracán Evo Spyder",
+    "Make": "Lamborghini",
+    "Model": "Huracán Evo Spyder",
+    "Year": 2021,
+    "DailyRate": 319.99,
+    "SecurityDeposit": 1500.0,
     "IncludesChauffeur": false,
-    "OptionalFeatures": "Leather seats",
-    "ImageUri": "pack://application:,,,/LuxuryCarRental;component/Images/Vehicles/luxurycar1.jpg"
+    "OptionalFeatures": "Convertible top, advanced aerodynamics package",
+    "ImageUri": "pack://application:,,,/LuxuryCarRental;component/Images/Vehicles/lamborghini_huracan_evo_spyder.jpg"
+  },
+  {
+    "Type": "Car",
+    "Key": "2017 BMW 3 Series",
+    "Make": "BMW",
+    "Model": "3 Series",
+    "Year": 2017,
+    "DailyRate": 59.99,
+    "ImageUri": "pack://application:,,,/LuxuryCarRental;component/Images/Vehicles/bmw3series.jpg"
+  },
+  {
+    "Type": "Car",
+    "Key": "2016 Range Rover Evoque",
+    "Make": "Range Rover",
+    "Model": "Evoque",
+    "Year": 2016,
+    "DailyRate": 79.99,
+    "ImageUri": "pack://application:,,,/LuxuryCarRental;component/Images/Vehicles/range_rover_evoque.jpg"
+  },
+  {
+    "Type": "LuxuryCar",
+    "Key": "2017 Audi RS7",
+    "Make": "Audi",
+    "Model": "RS7",
+    "Year": 2017,
+    "DailyRate": 229.99,
+    "SecurityDeposit": 1000.0,
+    "IncludesChauffeur": false,
+    "OptionalFeatures": "Performance brakes, sport suspension",
+    "ImageUri": "pack://application:,,,/LuxuryCarRental;component/Images/Vehicles/audi_rs7.jpg"
+  },
+  {
+    "Type": "Car",
+    "Key": "1960 MG MGA",
+    "Make": "MG",
+    "Model": "MGA",
+    "Year": 1960,
+    "DailyRate": 149.99,
+    "ImageUri": "pack://application:,,,/LuxuryCarRental;component/Images/Vehicles/mg_mga.jpg"
+  },
+  {
+    "Type": "Car",
+    "Key": "2016 Mercedes-Benz A-Class",
+    "Make": "Mercedes-Benz",
+    "Model": "A-Class",
+    "Year": 2016,
+    "DailyRate": 69.99,
+    "ImageUri": "pack://application:,,,/LuxuryCarRental;component/Images/Vehicles/mercedes_a_class.jpg"
+  },
+  {
+    "Type": "Car",
+    "Key": "2019 Jeep Grand Cherokee",
+    "Make": "Jeep",
+    "Model": "Grand Cherokee",
+    "Year": 2019,
+    "DailyRate": 89.99,
+    "ImageUri": "pack://application:,,,/LuxuryCarRental;component/Images/Vehicles/jeep_grand_cherokee.jpg"
+  },
+  {
+    "Type": "LuxuryCar",
+    "Key": "2019 Lamborghini Huracán",
+    "Make": "Lamborghini",
+    "Model": "Huracán",
+    "Year": 2019,
+    "DailyRate": 299.99,
+    "SecurityDeposit": 1500.0,
+    "IncludesChauffeur": false,
+    "OptionalFeatures": "Carbon fiber trim, performance package",
+    "ImageUri": "pack://application:,,,/LuxuryCarRental;component/Images/Vehicles/lamborghini_huracan.jpg"
+  },
+  {
+    "Type": "LuxuryCar",
+    "Key": "2014 Mercedes-Benz SLK55 AMG",
+    "Make": "Mercedes-Benz",
+    "Model": "SLK55 AMG",
+    "Year": 2014,
+    "DailyRate": 189.99,
+    "SecurityDeposit": 800.0,
+    "IncludesChauffeur": false,
+    "OptionalFeatures": "Premium sound system, sport seats",
+    "ImageUri": "pack://application:,,,/LuxuryCarRental;component/Images/Vehicles/mercedes_slk55_amg.jpg"
+  },
+  {
+    "Type": "Car",
+    "Key": "2018 Jeep Wrangler Rubicon",
+    "Make": "Jeep",
+    "Model": "Wrangler Rubicon",
+    "Year": 2018,
+    "DailyRate": 99.99,
+    "ImageUri": "pack://application:,,,/LuxuryCarRental;component/Images/Vehicles/jeep_wrangler_rubicon.jpg"
+  },
+  {
+    "Type": "Car",
+    "Key": "2018 Ford Focus",
+    "Make": "Ford",
+    "Model": "Focus",
+    "Year": 2018,
+    "DailyRate": 44.99,
+    "ImageUri": "pack://application:,,,/LuxuryCarRental;component/Images/Vehicles/ford_focus.jpg"
+  },
+  {
+    "Type": "Motorcycle",
+    "Key": "2019 BMW K100 Cafe Racer",
+    "EngineCapacityCc": 1000,
+    "HasSidecar": false,
+    "DailyRate": 39.99,
+    "ImageUri": "pack://application:,,,/LuxuryCarRental;component/Images/Vehicles/bmw_k100_cafe.jpg"
+  },
+  {
+    "Type": "Car",
+    "Key": "1957 Chevrolet Bel Air",
+    "Make": "Chevrolet",
+    "Model": "Bel Air",
+    "Year": 1957,
+    "DailyRate": 129.99,
+    "ImageUri": "pack://application:,,,/LuxuryCarRental;component/Images/Vehicles/chevrolet_bel_air.jpg"
+  },
+  {
+    "Type": "Car",
+    "Key": "2018 BMW 4 Series",
+    "Make": "BMW",
+    "Model": "4 Series",
+    "Year": 2018,
+    "DailyRate": 64.99,
+    "ImageUri": "pack://application:,,,/LuxuryCarRental;component/Images/Vehicles/bmw_4series.jpg"
+  },
+  {
+    "Type": "Car",
+    "Key": "2020 Ford Mustang Shelby GT500",
+    "Make": "Ford",
+    "Model": "Mustang Shelby GT500",
+    "Year": 2020,
+    "DailyRate": 249.99,
+    "ImageUri": "pack://application:,,,/LuxuryCarRental;component/Images/Vehicles/ford_shelby_gt500.jpg"
+  },
+  {
+    "Type": "Car",
+    "Key": "2002 Porsche 911 Carrera Cabriolet",
+    "Make": "Porsche",
+    "Model": "911 Carrera Cabriolet",
+    "Year": 2002,
+    "DailyRate": 179.99,
+    "ImageUri": "pack://application:,,,/LuxuryCarRental;component/Images/Vehicles/porsche_911_cabriolet.jpg"
+  },
+  {
+    "Type": "Motorcycle",
+    "Key": "1975 BMW R90 Cafe Racer",
+    "EngineCapacityCc": 900,
+    "HasSidecar": false,
+    "DailyRate": 34.99,
+    "ImageUri": "pack://application:,,,/LuxuryCarRental;component/Images/Vehicles/bmw_r90_cafe.jpg"
+  },
+  {
+    "Type": "Motorcycle",
+    "Key": "2018 Triumph Thruxton 900",
+    "EngineCapacityCc": 900,
+    "HasSidecar": false,
+    "DailyRate": 37.99,
+    "ImageUri": "pack://application:,,,/LuxuryCarRental;component/Images/Vehicles/triumph_thruxton_900.jpg"
+  },
+  {
+    "Type": "Motorcycle",
+    "Key": "1978 Honda CB750 Cafe Racer",
+    "EngineCapacityCc": 750,
+    "HasSidecar": false,
+    "DailyRate": 32.99,
+    "ImageUri": "pack://application:,,,/LuxuryCarRental;component/Images/Vehicles/honda_cb750_cafe.jpg"
+  },
+  {
+    "Type": "Motorcycle",
+    "Key": "2021 KTM Duke 125",
+    "EngineCapacityCc": 125,
+    "HasSidecar": false,
+    "DailyRate": 34.99,
+    "ImageUri": "pack://application:,,,/LuxuryCarRental;component/Images/Vehicles/ktm_duke_125.jpg"
+  },
+  {
+    "Type": "Motorcycle",
+    "Key": "2015 Harley-Davidson Street Glide",
+    "EngineCapacityCc": 1746,
+    "HasSidecar": false,
+    "DailyRate": 59.99,
+    "ImageUri": "pack://application:,,,/LuxuryCarRental;component/Images/Vehicles/harley_street_glide.jpg"
+  },
+  {
+    "Type": "Motorcycle",
+    "Key": "2020 Harley-Davidson Forty-Eight",
+    "EngineCapacityCc": 1200,
+    "HasSidecar": false,
+    "DailyRate": 49.99,
+    "ImageUri": "pack://application:,,,/LuxuryCarRental;component/Images/Vehicles/harley_forty_eight.jpg"
+  },
+  {
+    "Type": "Motorcycle",
+    "Key": "2022 Generic 150cc Street Bike",
+    "EngineCapacityCc": 150,
+    "HasSidecar": false,
+    "DailyRate": 29.99,
+    "ImageUri": "pack://application:,,,/LuxuryCarRental;component/Images/Vehicles/generic_150cc_street_bike.jpg"
+  },
+  {
+    "Type": "Yacht",
+    "Key": "28m Motor Yacht",
+    "LengthInMeters": 28,
+    "CabinCount": 4,
+    "DailyRate": 499.99,
+    "ImageUri": "pack://application:,,,/LuxuryCarRental;component/Images/Vehicles/28m_motor_yacht.jpg"
+  },
+  {
+    "Type": "Yacht",
+    "Key": "2019 Motor Yacht 12m",
+    "LengthInMeters": 12,
+    "CabinCount": 2,
+    "DailyRate": 299.99,
+    "ImageUri": "pack://application:,,,/LuxuryCarRental;component/Images/Vehicles/motor_yacht_12m.jpg"
+  },
+  {
+    "Type": "Yacht",
+    "Key": "2020 Motor Yacht 30m",
+    "LengthInMeters": 30,
+    "CabinCount": 5,
+    "DailyRate": 799.99,
+    "ImageUri": "pack://application:,,,/LuxuryCarRental;component/Images/Vehicles/motor_yacht_30m.jpg"
+  },
+  {
+    "Type": "Yacht",
+    "Key": "1960 Riva Aquarama",
+    "LengthInMeters": 8,
+    "CabinCount": 0,
+    "DailyRate": 349.99,
+    "ImageUri": "pack://application:,,,/LuxuryCarRental;component/Images/Vehicles/riva_aquarama.jpg"
   }
 ]

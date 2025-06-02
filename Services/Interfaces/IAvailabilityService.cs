@@ -9,13 +9,12 @@ namespace LuxuryCarRental.Services.Interfaces
 {
     public interface IAvailabilityService
     {
+        bool IsAvailable(int vehicleId, DateRange period, int? ignoreCustomerId = null);
+
         /// <summary>
-        /// Returns true when <paramref name="vehicleId"/> is free.
-        /// When <paramref name="ignoreCustomerId"/> is supplied, any
-        /// CartItems that belong to that customer are ignored.
+        /// Returns all vehicle IDs that are booked (Status=Booked/Active) or in a cart
+        /// (excluding any cart items for ignoreCustomerId), overlapping the given period.
         /// </summary>
-        bool IsAvailable(int vehicleId,
-                         DateRange period,
-                         int? ignoreCustomerId = null);
+        Task<HashSet<int>> GetBlockedVehicleIdsAsync(DateRange period, int? ignoreCustomerId = null);
     }
 }

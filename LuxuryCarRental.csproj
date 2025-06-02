@@ -29,25 +29,140 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <Content Remove="Images\Vehicles\28m_motor_yacht.jpg" />
+	  <Content Remove="Images\Vehicles\audi_rs7.jpg" />
+	  <Content Remove="Images\Vehicles\bmw3series.jpg" />
+	  <Content Remove="Images\Vehicles\bmw_4series.jpg" />
+	  <Content Remove="Images\Vehicles\bmw_k100_cafe.jpg" />
+	  <Content Remove="Images\Vehicles\bmw_r90_cafe.jpg" />
 	  <Content Remove="Images\Vehicles\car1.jpg" />
+	  <Content Remove="Images\Vehicles\chevrolet_bel_air.jpg" />
+	  <Content Remove="Images\Vehicles\ford_focus.jpg" />
+	  <Content Remove="Images\Vehicles\ford_shelby_gt500.jpg" />
+	  <Content Remove="Images\Vehicles\generic_150cc_street_bike.jpg" />
+	  <Content Remove="Images\Vehicles\harley_forty_eight.jpg" />
+	  <Content Remove="Images\Vehicles\harley_street_glide.jpg" />
+	  <Content Remove="Images\Vehicles\honda_cb750_cafe.jpg" />
+	  <Content Remove="Images\Vehicles\honda_crv.jpg" />
+	  <Content Remove="Images\Vehicles\jeep_grand_cherokee.jpg" />
+	  <Content Remove="Images\Vehicles\jeep_wrangler_rubicon.jpg" />
+	  <Content Remove="Images\Vehicles\ktm_790_duke.jpg" />
+	  <Content Remove="Images\Vehicles\ktm_duke_125.jpg" />
+	  <Content Remove="Images\Vehicles\lamborghini_huracan.jpg" />
+	  <Content Remove="Images\Vehicles\lamborghini_huracan_evo_spyder.jpg" />
 	  <Content Remove="Images\Vehicles\luxurycar1.jpg" />
+	  <Content Remove="Images\Vehicles\maserati_granturismo_convertible.jpg" />
+	  <Content Remove="Images\Vehicles\mercedes_a_class.jpg" />
+	  <Content Remove="Images\Vehicles\mercedes_slk55_amg.jpg" />
+	  <Content Remove="Images\Vehicles\mg_mga.jpg" />
 	  <Content Remove="Images\Vehicles\motorcycle1.jpg" />
-	  <Content Remove="Images\Vehicles\yacht1.jpg" />
+	  <Content Remove="Images\Vehicles\motor_yacht_12m.jpg" />
+	  <Content Remove="Images\Vehicles\motor_yacht_30m.jpg" />
+	  <Content Remove="Images\Vehicles\porsche_911_cabriolet.jpg" />
+	  <Content Remove="Images\Vehicles\range_rover_evoque.jpg" />
+	  <Content Remove="Images\Vehicles\riva_aquarama.jpg" />
+	  <Content Remove="Images\Vehicles\triumph_thruxton_900.jpg" />
 	</ItemGroup>
 
 	<ItemGroup>
-	  <Resource Include="Images\Vehicles\car1.jpg" />
-	  <Resource Include="Images\Vehicles\luxurycar1.jpg">
+	  <Resource Include="Images\Vehicles\28m_motor_yacht.jpg">
 	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
 	  </Resource>
-	  <Resource Include="Images\Vehicles\motorcycle1.jpg" />
-	  <Resource Include="Images\Vehicles\yacht1.jpg" />
+	  <Resource Include="Images\Vehicles\audi_rs7.jpg">
+	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+	  </Resource>
+	  <Resource Include="Images\Vehicles\bmw3series.jpg">
+	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+	  </Resource>
+	  <Resource Include="Images\Vehicles\bmw_4series.jpg">
+	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+	  </Resource>
+	  <Resource Include="Images\Vehicles\bmw_k100_cafe.jpg">
+	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+	  </Resource>
+	  <Resource Include="Images\Vehicles\bmw_r90_cafe.jpg">
+	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+	  </Resource>
+	  <Resource Include="Images\Vehicles\chevrolet_bel_air.jpg">
+	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+	  </Resource>
+	  <Resource Include="Images\Vehicles\ford_focus.jpg">
+	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+	  </Resource>
+	  <Resource Include="Images\Vehicles\ford_shelby_gt500.jpg">
+	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+	  </Resource>
+	  <Resource Include="Images\Vehicles\generic_150cc_street_bike.jpg">
+	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+	  </Resource>
+	  <Resource Include="Images\Vehicles\harley_forty_eight.jpg">
+	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+	  </Resource>
+	  <Resource Include="Images\Vehicles\harley_street_glide.jpg">
+	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+	  </Resource>
+	  <Resource Include="Images\Vehicles\honda_cb750_cafe.jpg">
+	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+	  </Resource>
+	  <Resource Include="Images\Vehicles\honda_crv.jpg" />
+	  <Resource Include="Images\Vehicles\jeep_grand_cherokee.jpg">
+	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+	  </Resource>
+	  <Resource Include="Images\Vehicles\jeep_wrangler_rubicon.jpg">
+	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+	  </Resource>
+	  <Resource Include="Images\Vehicles\ktm_790_duke.jpg" />
+	  <Resource Include="Images\Vehicles\ktm_duke_125.jpg">
+	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+	  </Resource>
+	  <Resource Include="Images\Vehicles\lamborghini_huracan.jpg">
+	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+	  </Resource>
+	  <Resource Include="Images\Vehicles\lamborghini_huracan_evo_spyder.jpg">
+	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+	  </Resource>
+	  <Resource Include="Images\Vehicles\maserati_granturismo_convertible.jpg">
+	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+	  </Resource>
+	  <Resource Include="Images\Vehicles\mercedes_a_class.jpg">
+	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+	  </Resource>
+	  <Resource Include="Images\Vehicles\mercedes_slk55_amg.jpg">
+	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+	  </Resource>
+	  <Resource Include="Images\Vehicles\mg_mga.jpg">
+	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+	  </Resource>
+	  <Resource Include="Images\Vehicles\motor_yacht_12m.jpg">
+	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+	  </Resource>
+	  <Resource Include="Images\Vehicles\motor_yacht_30m.jpg">
+	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+	  </Resource>
+	  <Resource Include="Images\Vehicles\porsche_911_cabriolet.jpg">
+	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+	  </Resource>
+	  <Resource Include="Images\Vehicles\range_rover_evoque.jpg">
+	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+	  </Resource>
+	  <Resource Include="Images\Vehicles\riva_aquarama.jpg">
+	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+	  </Resource>
+	  <Resource Include="Images\Vehicles\triumph_thruxton_900.jpg">
+	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+	  </Resource>
 	</ItemGroup>
 
 	<ItemGroup>
-		<None Include="Data\vehicles.json">
+		<Content Include="Data\vehicles.json">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-		</None>
+		</Content>
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Compile Update="Data\SeedData.cs">
+	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+	  </Compile>
 	</ItemGroup>
 
 

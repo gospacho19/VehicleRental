@@ -23,35 +23,72 @@ namespace LuxuryCarRental.Models
         public bool CurrentlyAvailable { get; set; } = false;
 
 
+        private ImageSource? _cachedImage;
+
         public ImageSource? ImageSource
         {
             get
             {
+                if (_cachedImage != null)
+                    return _cachedImage;
+
                 if (string.IsNullOrWhiteSpace(ImagePath))
                     return null;
 
-                // If ImagePath is a pack URI, just load it directly:
-                if (ImagePath.StartsWith("pack://", StringComparison.OrdinalIgnoreCase))
+                try
                 {
-                    try
+                    Uri uri;
+                    if (ImagePath.StartsWith("pack://", StringComparison.OrdinalIgnoreCase))
                     {
-                        return new BitmapImage(new Uri(ImagePath, UriKind.Absolute));
+                        uri = new Uri(ImagePath, UriKind.Absolute);
                     }
-                    catch
+                    else
                     {
-                        return null;
+                        var fullPath = Path.Combine(
+                            AppDomain.CurrentDomain.BaseDirectory,
+                            ImagePath.Replace('/', Path.DirectorySeparatorChar));
+                        if (!File.Exists(fullPath))
+                            return null;
+
+                        uri = new Uri(fullPath, UriKind.Absolute);
                     }
+
+                    var bmp = new BitmapImage();
+                    bmp.BeginInit();
+                    bmp.UriSource = uri;
+                    bmp.CacheOption = BitmapCacheOption.OnLoad;
+                    bmp.EndInit();
+                    bmp.Freeze(); // Freeze so it’s thread‐safe
+                    _cachedImage = bmp;
+                }
+                catch
+                {
+                    _cachedImage = null;
                 }
 
-                // Otherwise, assume it's a relative file on disk
-                var fullPath = Path.Combine(
-                    AppDomain.CurrentDomain.BaseDirectory,
-                    ImagePath.Replace('/', Path.DirectorySeparatorChar)
-                );
-                if (!File.Exists(fullPath))
-                    return null;
+                return _cachedImage;
+            }
+        }
 
-                return new BitmapImage(new Uri(fullPath, UriKind.Absolute));
+        /// <summary>
+        /// Returns a display‐string combining the actual DB Status plus
+        /// the computed flag CurrentlyAvailable.
+        /// </summary>
+        public string DisplayStatus
+        {
+            get
+            {
+                // If the car is physically “Rented” in the DB, say “Rented”:
+                if (Status == VehicleStatus.Rented)
+                    return "Rented";
+
+                // If it's marked Available in the DB but our
+                // availability check says “not available right now,” say “Unavailable”:
+                if (!CurrentlyAvailable)
+                    return "Unavailable";
+
+                // Otherwise, it's truly free:
+                return "Available";
             }
         }
 

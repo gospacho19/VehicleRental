@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
@@ -13,7 +14,7 @@ using LuxuryCarRental.Services.Interfaces;
 
 namespace LuxuryCarRental.ViewModels
 {
-    public partial class CategoryViewModel : ObservableObject
+    public class CategoryViewModel : ObservableObject, IRecipient<CartUpdatedMessage>, IDisposable
     {
         // ────────── Dependencies ──────────
         private readonly IUnitOfWork _uow;
@@ -36,17 +37,18 @@ namespace LuxuryCarRental.ViewModels
             _messenger = messenger;
             _session = session;
 
-            _messenger.Register<CartUpdatedMessage>(this, (_, __) => Refresh());
+            _messenger.Register<CartUpdatedMessage>(this);
 
+            // Populate filter dropdowns
             Categories.Add("All");
-            foreach (var vt in Enum.GetValues(typeof(VehicleType)).Cast<VehicleType>())
+            foreach (var vt in Enum.GetValues<VehicleType>().Cast<VehicleType>())
                 Categories.Add(vt.ToString());
             SelectedCategory = "All";
 
             AvailabilityOptions.Add("All");
             AvailabilityOptions.Add("Available");
             AvailabilityOptions.Add("Not Available");
-            SelectedAvailability = "Available"; // default
+            SelectedAvailability = "Available";
 
             SortOptions.Add("None");
             SortOptions.Add("Name (A → Z)");
@@ -55,12 +57,13 @@ namespace LuxuryCarRental.ViewModels
             SortOptions.Add("Price (High → Low)");
             SelectedSortOption = "None";
 
-            RefreshCommand = new RelayCommand(Refresh);
+            // Commands
+            RefreshCommand = new AsyncRelayCommand(RefreshAsync);
             RentNowCommand = new RelayCommand<Vehicle?>(OnRentNow, CanRentNow);
 
-            Refresh();
+            // Initial load
+            RefreshCommand.Execute(null);
         }
-        
 
         // ────────── PUBLIC COLLECTIONS & PROPERTIES ──────────
 
@@ -73,7 +76,7 @@ namespace LuxuryCarRental.ViewModels
             set
             {
                 if (SetProperty(ref _selectedCategory, value))
-                    ApplyFilterSortAndRefresh();
+                    _ = RefreshAsync();
             }
         }
 
@@ -86,7 +89,7 @@ namespace LuxuryCarRental.ViewModels
             set
             {
                 if (SetProperty(ref _selectedAvailability, value))
-                    ApplyFilterSortAndRefresh();
+                    _ = RefreshAsync();
             }
         }
 
@@ -99,7 +102,7 @@ namespace LuxuryCarRental.ViewModels
             set
             {
                 if (SetProperty(ref _selectedSortOption, value))
-                    ApplyFilterSortAndRefresh();
+                    _ = RefreshAsync();
             }
         }
 
@@ -107,74 +110,57 @@ namespace LuxuryCarRental.ViewModels
         public ObservableCollection<Vehicle> Vehicles { get; } = new();
 
         // (E) “Refresh” button:
-        public IRelayCommand RefreshCommand { get; }
+        public IAsyncRelayCommand RefreshCommand { get; }
 
         // (F) “Rent Now” button (one per row) takes a Vehicle as parameter:
         public IRelayCommand<Vehicle?> RentNowCommand { get; }
-
 
         // ────────── PRIVATE BACKING LIST ──────────
         // We always fetch all vehicles into this list, then filter/sort it for `Vehicles`.
         private List<Vehicle> _allVehicles = new();
 
-
         // ────────── REFRESH LOGIC ──────────
-        private void Refresh()
+        private async Task RefreshAsync()
         {
-            // 1) Fetch all vehicles from the database (including their Status, ImagePath, etc.)
+            // 1) Fetch all vehicles from the database
             _allVehicles = _uow.Vehicles.GetAll().ToList();
 
-            // 2) Apply the current Category + Availability + Sort filters
-            ApplyFilterSortAndRefresh();
-        }
+            // 2) Determine “todayRange” once
+            var todayRange = new DateRange(DateTime.Today, DateTime.Today.AddDays(1));
 
-        private void ApplyFilterSortAndRefresh()
-        {
+            // 3) Batch‐fetch blocked IDs (overlapping rentals or other users’ carts)
+            int? ignoreId = _session.CurrentCustomer?.Id;
+            var blockedIds = await _availability.GetBlockedVehicleIdsAsync(todayRange, ignoreId);
+
+            // 4) In‐memory filter + sort
             IEnumerable<Vehicle> temp = _allVehicles;
 
-            // 1) Filter by VehicleType
+            // Filter by VehicleType
             if (!string.Equals(SelectedCategory, "All", StringComparison.OrdinalIgnoreCase))
             {
                 if (Enum.TryParse<VehicleType>(SelectedCategory, out var vt))
                     temp = temp.Where(v => v.VehicleType == vt);
             }
 
-            // 2) Determine “todayRange” once
-            var todayRange = new DateRange(DateTime.Today, DateTime.Today.AddDays(1));
+            // Compute CurrentlyAvailable for each vehicle
+            foreach (var v in temp)
+            {
+                bool freeNow = (v.Status == VehicleStatus.Available) && !blockedIds.Contains(v.Id);
+                v.CurrentlyAvailable = freeNow;
+            }
 
-            // 3) Filter by Availability (using status AND IAvailabilityService)
+            // Filter by Availability
             if (string.Equals(SelectedAvailability, "Available", StringComparison.OrdinalIgnoreCase))
             {
-                temp = temp.Where(v =>
-                {
-                    bool freeNow = (v.Status == VehicleStatus.Available)
-                                   && _availability.IsAvailable(v.Id, todayRange);
-                    v.CurrentlyAvailable = freeNow;
-                    return freeNow;
-                });
+                temp = temp.Where(v => v.CurrentlyAvailable);
             }
             else if (string.Equals(SelectedAvailability, "Not Available", StringComparison.OrdinalIgnoreCase))
             {
-                temp = temp.Where(v =>
-                {
-                    bool freeNow = (v.Status == VehicleStatus.Available)
-                                   && _availability.IsAvailable(v.Id, todayRange);
-                    v.CurrentlyAvailable = freeNow;
-                    return !freeNow;
-                });
+                temp = temp.Where(v => !v.CurrentlyAvailable);
             }
-            else
-            {
-                // “All” → include everything, but still set CurrentlyAvailable flag
-                temp = temp.Select(v =>
-                {
-                    v.CurrentlyAvailable = (v.Status == VehicleStatus.Available)
-                                            && _availability.IsAvailable(v.Id, todayRange);
-                    return v;
-                });
-            }
+            // else “All” → no additional filter
 
-            // 4) Sort
+            // Sort
             temp = SelectedSortOption switch
             {
                 "Name (A → Z)" => temp.OrderBy(v => v.Name),
@@ -188,6 +174,9 @@ namespace LuxuryCarRental.ViewModels
             Vehicles.Clear();
             foreach (var v in temp)
                 Vehicles.Add(v);
+
+            // Force DataGrid to rebind
+            OnPropertyChanged(nameof(Vehicles));
         }
 
         private bool CanRentNow(Vehicle? vehicle)
@@ -213,8 +202,22 @@ namespace LuxuryCarRental.ViewModels
             _uow.Commit();
 
             _messenger.Send(new CartUpdatedMessage(current.Id));
-            Refresh();
+            _ = RefreshAsync();
         }
 
+        // IMessageHandler for CartUpdatedMessage
+        public void Receive(CartUpdatedMessage message)
+        {
+            var current = _session.CurrentCustomer;
+            if (current is not null && message.CustomerId == current.Id)
+            {
+                _ = RefreshAsync();
+            }
+        }
+
+        public void Dispose()
+        {
+            _messenger.UnregisterAll(this);
+        }
     }
 }

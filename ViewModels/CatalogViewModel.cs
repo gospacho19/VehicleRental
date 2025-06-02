@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
@@ -12,7 +14,7 @@ using LuxuryCarRental.Services.Interfaces;
 
 namespace LuxuryCarRental.ViewModels
 {
-    public class CatalogViewModel : ObservableObject
+    public class CatalogViewModel : ObservableObject, IRecipient<CartUpdatedMessage>, IDisposable
     {
         // 1) Backing collection of vehicles
         public ObservableCollection<Vehicle> Vehicles { get; } = new();
@@ -24,15 +26,15 @@ namespace LuxuryCarRental.ViewModels
         public IEnumerable<Vehicle> Yachts => Vehicles.Where(v => v.VehicleType == VehicleType.Yacht);
 
         // 3) Dependencies
-        private readonly IUnitOfWork _uow;           // for raw fetch and commit
-        private readonly IAvailabilityService _availability;  // check overlaps
-        private readonly IPricingService _pricing;       // if you need price logic
-        private readonly ICartService _cart;          // to add to cart
-        private readonly IMessenger _messenger;     // for CartUpdatedMessage, navigation
-        private readonly UserSessionService _session;       // to get CurrentCustomer
+        private readonly IUnitOfWork _uow;              // for raw fetch and commit
+        private readonly IAvailabilityService _availability; // check overlaps
+        private readonly IPricingService _pricing;      // if you need price logic
+        private readonly ICartService _cart;            // to add to cart
+        private readonly IMessenger _messenger;         // for CartUpdatedMessage, navigation
+        private readonly UserSessionService _session;   // to get CurrentCustomer
 
         // 4) Commands
-        public IRelayCommand RefreshCommand { get; }
+        public IAsyncRelayCommand RefreshCommand { get; }
         public IRelayCommand<Vehicle?> AddToCartCommand { get; }
 
         public CatalogViewModel(
@@ -50,48 +52,47 @@ namespace LuxuryCarRental.ViewModels
             _messenger = messenger;
             _session = session;
 
-            RefreshCommand = new RelayCommand(Refresh);
+            // Use an AsyncRelayCommand so UI stays responsive
+            RefreshCommand = new AsyncRelayCommand(RefreshAsync);
             AddToCartCommand = new RelayCommand<Vehicle?>(OnAddToCart);
 
             // Whenever the cart changes for this user, re‐refresh the catalog
-            _messenger.Register<CartUpdatedMessage>(this, (r, msg) =>
-            {
-                // Only refresh if the message matches the current user
-                var current = _session.CurrentCustomer;
-                if (current is not null && msg.CustomerId == current.Id)
-                {
-                    Refresh();
-                }
-            });
+            _messenger.Register<CartUpdatedMessage>(this);
 
             // Initial load
-            Refresh();
+            RefreshCommand.Execute(null);
         }
 
-        /// <summary>
-        /// Re‐loads the list of available vehicles (only those with Status=Available and no overlapping rentals).
-        /// </summary>
-        private void Refresh()
+        private async Task RefreshAsync()
         {
             Vehicles.Clear();
 
+            // 1) Build today’s date range
             var day = new DateRange(DateTime.Today, DateTime.Today.AddDays(1));
 
-            // 1) Fetch all vehicles that are “Available” in the DB
-            var available = _uow.Vehicles
-                                .GetAll()
-                                .Where(v => v.Status == VehicleStatus.Available);
+            // 2) Fetch all vehicles that are “Available” in the DB
+            //    (synchronously retrieving here; if you prefer async: await _uow.Vehicles.GetAll().ToListAsync())
+            var allAvailable = _uow.Vehicles
+                                   .GetAll()
+                                   .Where(v => v.Status == VehicleStatus.Available)
+                                   .ToList();
 
-            // 2) Only add to the UI if they truly have no overlapping active rentals
-            foreach (var v in available)
+            // 3) Batch‐fetch all “blocked” IDs (overlapping rentals or other users’ carts)
+            var ignoreId = _session.CurrentCustomer?.Id;
+            var blockedIds = await _availability.GetBlockedVehicleIdsAsync(day, ignoreId);
+
+            // 4) Add only those vehicles whose ID is not in blockedIds
+            foreach (var v in allAvailable)
             {
-                if (_availability.IsAvailable(v.Id, day))
+                bool isFreeNow = !blockedIds.Contains(v.Id);
+                v.CurrentlyAvailable = isFreeNow;
+                if (isFreeNow)
                 {
                     Vehicles.Add(v);
                 }
             }
 
-            // 3) Notify the UI that the filtered collections changed
+            // 5) Notify the UI that the filtered collections changed
             OnPropertyChanged(nameof(Cars));
             OnPropertyChanged(nameof(LuxuryCars));
             OnPropertyChanged(nameof(Motorcycles));
@@ -135,5 +136,20 @@ namespace LuxuryCarRental.ViewModels
             _messenger.Send(new CartUpdatedMessage(current.Id));
         }
 
+        // IMessageHandler for CartUpdatedMessage
+        public void Receive(CartUpdatedMessage message)
+        {
+            var current = _session.CurrentCustomer;
+            if (current is not null && message.CustomerId == current.Id)
+            {
+                // Fire the async refresh again
+                _ = RefreshAsync();
+            }
+        }
+
+        public void Dispose()
+        {
+            _messenger.UnregisterAll(this);
+        }
     }
 }
