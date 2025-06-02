@@ -113,7 +113,7 @@
                                     Width="Auto" />
 
                                 <DataGridTextColumn
-                                    Header="Subtotal"
+                                    Header="Daily Rate"
                                     Binding="{Binding Subtotal.Amount, StringFormat=C}"
                                     Width="Auto" />
                             </DataGrid.Columns>

@@ -131,7 +131,14 @@ namespace LuxuryCarRental.ViewModels
 
             messenger.Register<GoToProfileMessage>(this, (_, __) =>
             {
-                CurrentViewModel = ProfileVM;
+                if (_session.CurrentCustomer != null)
+                {
+                    CurrentViewModel = ProfileVM;
+                }
+                else
+                {
+                    CurrentViewModel = LoginVM;
+                }
             });
 
             messenger.Register<GoToPaymentInfoMessage>(this, (_, __) =>
@@ -220,7 +227,14 @@ namespace LuxuryCarRental.ViewModels
 
             ShowProfileCmd = new RelayCommand(() =>
             {
-                CurrentViewModel = ProfileVM;
+                if (_session.CurrentCustomer != null)
+                {
+                    CurrentViewModel = ProfileVM;
+                }
+                else
+                {
+                    CurrentViewModel = LoginVM;
+                }
             });
 
             ShowPaymentInfoCmd = new RelayCommand(() =>

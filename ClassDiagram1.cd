@@ -1,0 +1,425 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="LuxuryCarRental.Models.Vehicle">
+    <Position X="12.25" Y="1.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAACAAAEAAAAAAAAAAEAAIQAIAAAAAAgAAAAAIACABA=</HashCode>
+      <FileName>Models\Vehicle.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Field Name="_cachedImage" />
+    </ShowAsAssociation>
+  </Class>
+  <Class Name="LuxuryCarRental.Models.Car">
+    <Position X="10.25" Y="5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAABAAAAAAAAAAAAAQAAAAAAAAAAAgAAAIAAAA=</HashCode>
+      <FileName>Models\Car.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="LuxuryCarRental.Models.Yacht">
+    <Position X="12.5" Y="5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAQAAAAAAACAAAAAAACAAAA=</HashCode>
+      <FileName>Models\Yacht.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="LuxuryCarRental.Models.Motorcycle">
+    <Position X="14.75" Y="5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAQAAAAAAAQAAAAAAAAAAIAAAAAAAAA=</HashCode>
+      <FileName>Models\Motorcycle.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="LuxuryCarRental.Models.LuxuryCar">
+    <Position X="10.25" Y="8.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>QAAAAAAAAAAAAEAAAAAACAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Models\LuxuryCar.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="LuxuryCarRental.Managers.Implementations.BasketHandler">
+    <Position X="0.5" Y="6" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAEAABAAAAAAAAAAAAACAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Handlers\Implementations\BasketHandler.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="LuxuryCarRental.Handlers.Implementations.CheckoutHandler">
+    <Position X="2.5" Y="6" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAFAABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Handlers\Implementations\CheckoutHandler.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="LuxuryCarRental.Handlers.Implementations.RentalHandler">
+    <Position X="4.5" Y="6" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAEAAAAAAAQCAgAAAAAAAAAAEBAAgAAAAAAAAACAA=</HashCode>
+      <FileName>Handlers\Implementations\RentalHandler.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="LuxuryCarRental.Models.Basket">
+    <Position X="13.5" Y="9.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAECAAAAAAAACAAAAAAAAAAAAAAAABAAAAAAAAAAAAA=</HashCode>
+      <FileName>Models\Basket.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Property Name="Customer" />
+    </ShowAsAssociation>
+  </Class>
+  <Class Name="LuxuryCarRental.Models.Card">
+    <Position X="15.5" Y="9.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>IAEDAAAAQAAAAAAAAAAAAAAAAAEAABAAAAAACAAAEAA=</HashCode>
+      <FileName>Models\Card.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Property Name="Customer" />
+    </ShowAsAssociation>
+  </Class>
+  <Class Name="LuxuryCarRental.Models.CartItem">
+    <Position X="20" Y="9.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>BAACAAAAAAAEoAIAAAAAAAAgBAAAgAAAAAAAAEAAAAA=</HashCode>
+      <FileName>Models\CartItem.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Property Name="Basket" />
+      <Property Name="Vehicle" />
+    </ShowAsAssociation>
+  </Class>
+  <Class Name="LuxuryCarRental.Models.ContactInfo">
+    <Position X="17.75" Y="13.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAACAAAAAAAAAAAAAAAAAAAAAAAAAAIAAAAAA=</HashCode>
+      <FileName>Models\ContactInfo.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="LuxuryCarRental.Models.Customer">
+    <Position X="17.75" Y="9.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>EAiCAAIAAAAAAIAACQAAAAAIAACAAAAAAAAAAAAgAAA=</HashCode>
+      <FileName>Models\Customer.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Property Name="Contact" />
+    </ShowAsAssociation>
+  </Class>
+  <Class Name="LuxuryCarRental.Models.Rental">
+    <Position X="22.25" Y="9.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAECAAAEAAAAAAABAAAAAAAgBAAAgBAAAAAAAEAAAAA=</HashCode>
+      <FileName>Models\Rental.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Property Name="Customer" />
+      <Property Name="Vehicle" />
+    </ShowAsAssociation>
+  </Class>
+  <Class Name="LuxuryCarRental.Services.Implementations.AuthService">
+    <Position X="6" Y="12.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAEAAAAAAAAQgIAAAABAAAAAAAQIAAAAAA=</HashCode>
+      <FileName>Services\Implementations\AuthService.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="LuxuryCarRental.Data.AppDbContext">
+    <Position X="6.75" Y="6" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>EAkAAAACgQAAgAAAAAAAAAAIEBgAAAAAAAAAAAgAAAA=</HashCode>
+      <FileName>Data\AppDbContext.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="System.Windows.Media.ImageSource" Collapsed="true">
+    <Position X="15.75" Y="2" Width="1.5" />
+    <TypeIdentifier />
+  </Class>
+  <Class Name="LuxuryCarRental.Data.DTO">
+    <Position X="8.5" Y="7.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>QAAAAAAABAAAAEQAAAAACAAAAAAAAAiAAYgAAIKAAAA=</HashCode>
+      <FileName>Data\DTO.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="LuxuryCarRental.Data.SeedData">
+    <Position X="6.75" Y="10.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Data\SeedData.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="LuxuryCarRental.Services.Implementations.AvailabilityService">
+    <Position X="7.75" Y="12.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAQAABAAAAAAAAAIAAAAA=</HashCode>
+      <FileName>Services\Implementations\AvailabilityService.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="LuxuryCarRental.Services.Implementations.CartService">
+    <Position X="9.5" Y="12.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>IAAAAAAAAAAAQAAAAAAAAAEAAAABAIAAAAAIAAAAACA=</HashCode>
+      <FileName>Services\Implementations\CartService.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="LuxuryCarRental.Services.Implementations.PaymentService">
+    <Position X="13" Y="12.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Services\Implementations\PaymentService.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="LuxuryCarRental.Services.Implementations.PricingService">
+    <Position X="11.25" Y="12.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAACAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Services\Implementations\PricingService.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="LuxuryCarRental.Services.Implementations.UserSessionService">
+    <Position X="14.75" Y="12.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAgAAAAAAAAAAAAAAAAAAAAAEAAAAAgAAAAAA=</HashCode>
+      <FileName>Services\Implementations\UserSessionService.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="LuxuryCarRental.ViewModels.CartViewModel">
+    <Position X="15.25" Y="16.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAQAAAAGBADAQAgAAAhAAAAAAIQAAwAgAAAABAAAA=</HashCode>
+      <FileName>ViewModels\CartViewModel.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Field Name="_session" />
+    </ShowAsAssociation>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="LuxuryCarRental.ViewModels.CatalogViewModel">
+    <Position X="17.25" Y="16.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>EAAAAAACAGAAwAAAgAAAgAAAAAgIAAAwAAAAAAgIKAQ=</HashCode>
+      <FileName>ViewModels\CatalogViewModel.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Field Name="_session" />
+    </ShowAsAssociation>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="LuxuryCarRental.ViewModels.CategoryViewModel">
+    <Position X="19.25" Y="16.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>CAAAAAAAACAQiAAAhIAIgAApACAIEAAwAABIAQAAKAQ=</HashCode>
+      <FileName>ViewModels\CategoryViewModel.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Field Name="_session" />
+    </ShowAsAssociation>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="LuxuryCarRental.ViewModels.CheckoutViewModel">
+    <Position X="21.25" Y="16.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAQAAggUAAIAIJgQKIgACEygABAAAgIAAAQAIAAIU=</HashCode>
+      <FileName>ViewModels\CheckoutViewModel.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Field Name="_cart" />
+      <Field Name="_session" />
+    </ShowAsAssociation>
+  </Class>
+  <Class Name="LuxuryCarRental.ViewModels.ConfirmationViewModel">
+    <Position X="31.25" Y="16.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AQAAgAAAAAgACQAAAAAAkAAAAAAAQAAgAAAAAIIAAAA=</HashCode>
+      <FileName>ViewModels\ConfirmationViewModel.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Field Name="_checkout" />
+    </ShowAsAssociation>
+  </Class>
+  <Class Name="LuxuryCarRental.ViewModels.DealsViewModel">
+    <Position X="25.25" Y="16.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAEAABACAAAAgBAAAAAAAgAAAAAgAAAAAEAAAAA=</HashCode>
+      <FileName>ViewModels\DealsViewModel.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Field Name="_session" />
+      <Property Name="MyDeals" />
+    </ShowAsAssociation>
+  </Class>
+  <Class Name="LuxuryCarRental.ViewModels.LoginViewModel">
+    <Position X="29.25" Y="16.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAQAAAAAAAAAAEQAAAAEggAEABAAAAAgAAIAAACACAA=</HashCode>
+      <FileName>ViewModels\LoginViewModel.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Field Name="_session" />
+    </ShowAsAssociation>
+  </Class>
+  <Class Name="LuxuryCarRental.ViewModels.MainViewModel">
+    <Position X="30" Y="8.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAQCQAAAAAAEABACJGjAgkEgAKAAAwAAAAgAAQIAA=</HashCode>
+      <FileName>ViewModels\MainViewModel.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Field Name="_currentViewModel" />
+      <Property Name="CatalogVM" />
+      <Property Name="CategoryVM" />
+      <Property Name="CartVM" />
+      <Property Name="CheckoutVM" />
+      <Property Name="ConfirmVM" />
+      <Property Name="DealsVM" />
+      <Property Name="ProfileVM" />
+      <Property Name="PaymentInfoVM" />
+      <Property Name="LoginVM" />
+      <Property Name="RegisterVM" />
+      <Property Name="VehicleVM" />
+    </ShowAsAssociation>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="LuxuryCarRental.ViewModels.PaymentInfoViewModel">
+    <Position X="35.25" Y="16.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAQQAgQACAgFAggIAAAAhEAAABEAAoIAAAAAAQggE=</HashCode>
+      <FileName>ViewModels\PaymentInfoViewModel.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Field Name="_session" />
+      <Field Name="_selectedCard" />
+    </ShowAsAssociation>
+  </Class>
+  <Class Name="LuxuryCarRental.ViewModels.ProfileViewModel">
+    <Position X="33.25" Y="16.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAARBAAAAAEAAAAAAgAIAAAABACAgAAAAAAEEAJE=</HashCode>
+      <FileName>ViewModels\ProfileViewModel.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Field Name="_session" />
+    </ShowAsAssociation>
+  </Class>
+  <Class Name="LuxuryCarRental.ViewModels.RegisterViewModel">
+    <Position X="27.25" Y="16.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>QAQAACAAAAAAAEAAAACAgAIEAAAAACCkAAIAAQAAABE=</HashCode>
+      <FileName>ViewModels\RegisterViewModel.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Field Name="_session" />
+    </ShowAsAssociation>
+  </Class>
+  <Class Name="LuxuryCarRental.ViewModels.VehicleDetailViewModel">
+    <Position X="23.25" Y="16.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAgAAAECAAAAAAAAAAgAAgBAIIAAEwAAAAAAAIIAA=</HashCode>
+      <FileName>ViewModels\VehicleDetailViewModel.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Field Name="_session" />
+    </ShowAsAssociation>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="System.Object">
+    <Position X="24" Y="5.5" Width="1.5" />
+    <TypeIdentifier />
+  </Class>
+  <Class Name="System.Collections.ObjectModel.ObservableCollection&lt;T&gt;" Collapsed="true">
+    <Position X="25.25" Y="21.5" Width="1.5" />
+    <TypeIdentifier />
+    <Lollipop Position="0.2" />
+  </Class>
+  <Interface Name="LuxuryCarRental.Handlers.Interfaces.IBasketHandler">
+    <Position X="0.5" Y="9.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Handlers\Interfaces\IBasketHandler.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="LuxuryCarRental.Handlers.Interfaces.ICheckoutHandler">
+    <Position X="2.5" Y="9.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Handlers\Interfaces\ICheckoutHandler.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="LuxuryCarRental.Handlers.Interfaces.IRentalHandler">
+    <Position X="4.5" Y="9.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAEAAAAAAAACAgAAAAAAAAAAEAAAgAAAAAAAAAAAA=</HashCode>
+      <FileName>Handlers\Interfaces\IRentalHandler.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="LuxuryCarRental.Repositories.Interfaces.IRepository&lt;T&gt;">
+    <Position X="0.5" Y="11.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAYAAAAAAAAAAAAAAAAABAAAAAAAAAAAAgAAAAAAAIA=</HashCode>
+      <FileName>Repositories\Interfaces\IRepository.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="LuxuryCarRental.Repositories.Interfaces.IUnitOfWork">
+    <Position X="3.25" Y="11.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAkAAEACgAAAgAAAAAAAAAAAABgAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Repositories\Interfaces\IUnitOfWork.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Property Name="Vehicles" />
+    </ShowAsAssociation>
+  </Interface>
+  <Interface Name="LuxuryCarRental.Services.Interfaces.IPricingService">
+    <Position X="11.25" Y="16.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAACAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Services\Interfaces\IPricingService.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="LuxuryCarRental.Services.Interfaces.IAvailabilityService">
+    <Position X="7.75" Y="16.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAIAAAAA=</HashCode>
+      <FileName>Services\Interfaces\IAvailabilityService.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="LuxuryCarRental.Services.Interfaces.ICartService">
+    <Position X="9.5" Y="16.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>IAAAAAAAAAAAAAAAAAAAAAEAAAAAAIAAAAAIAAAAACA=</HashCode>
+      <FileName>Services\Interfaces\ICartService.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="LuxuryCarRental.Services.Interfaces.IAuthService">
+    <Position X="6" Y="16.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAQAIAAAABAAAAAAAQIAAAAAA=</HashCode>
+      <FileName>Services\Interfaces\IAuthService.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="LuxuryCarRental.Services.Interfaces.IPaymentService">
+    <Position X="13" Y="16.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Services\Interfaces\IPaymentService.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Enum Name="LuxuryCarRental.Models.VehicleStatus">
+    <Position X="10" Y="2" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAABAAAAAAAAQAAASAAAAAAA=</HashCode>
+      <FileName>Models\Enums.cs</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>
